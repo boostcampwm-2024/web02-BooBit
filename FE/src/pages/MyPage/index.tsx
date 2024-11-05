@@ -1,12 +1,13 @@
 import Header from '../../widgets/Header';
+import Layout from '../../widgets/Layout';
 
-const MyPage = () => {
+const Home = () => {
   return (
     <div>
       <Header />
-      마이페이지
+      <Layout paddingX="px-[16rem]">마이페이지</Layout>
     </div>
   );
 };
 
-export default MyPage;
+export default Home;
