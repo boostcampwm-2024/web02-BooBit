@@ -1,5 +1,7 @@
+import AuthLayout from '../../widgets/AuthLayout';
+
 const SignUp = () => {
-  return <div>회원가입</div>;
+  return <AuthLayout>회원가입</AuthLayout>;
 };
 
 export default SignUp;
