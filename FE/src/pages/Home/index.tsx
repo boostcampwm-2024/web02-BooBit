@@ -1,5 +1,11 @@
+import Header from '../../widgets/header';
+
 const Home = () => {
-  return <div>홈</div>;
+  return (
+    <div>
+      <Header />홈
+    </div>
+  );
 };
 
 export default Home;
