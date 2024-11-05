@@ -1,10 +1,16 @@
 import { Routes, Route } from 'react-router-dom';
+import Home from '../pages/Home';
+import MyPage from '../pages/MyPage';
+import SignIn from '../pages/SignIn';
+import SignUp from '../pages/SignUp';
 
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<h1>홈</h1>} />
-      <Route path="/about" element={<h1>소개</h1>} />
+      <Route path="/" element={<Home />} />
+      <Route path="/mypage" element={<MyPage />} />
+      <Route path="/signin" element={<SignIn />} />
+      <Route path="/signup" element={<SignUp />} />
     </Routes>
   );
 };
