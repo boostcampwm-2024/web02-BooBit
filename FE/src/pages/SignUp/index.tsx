@@ -3,6 +3,7 @@ import AuthLayout from '../../widgets/AuthLayout';
 import logo from '../../shared/images/BuBuWithLogo.png';
 import { useState, ChangeEvent } from 'react';
 import LabeledInput from './UI/LabeledInput';
+import Guideline from './UI/Guideline';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -29,7 +30,7 @@ const SignUp = () => {
 
   return (
     <AuthLayout>
-      <img src={logo} alt="logo" className="w-[11rem] mb-[2rem]" />
+      <img src={logo} alt="logo" className="w-[10rem] mb-[2rem]" />
       <LabeledInput
         label="이메일"
         type="text"
@@ -54,6 +55,10 @@ const SignUp = () => {
         value={formData.password}
         onChange={handleChange}
       />
+      <div className="w-[100%] mb-[1rem]">
+        <Guideline content="영문/숫자/특수문자 중, 2가지 이상 포함" />
+        <Guideline content="8자 이상 32자 이하 입력 (공백 제외)" />
+      </div>
       <LabeledInput
         label="비밀번호 확인"
         type="password"
