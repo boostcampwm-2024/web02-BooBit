@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Currency {
+  currency_code String @id @db.VarChar(20)
+  name String @db.VarChar(50)
+  assets Asset[]
+  transactions DepositWithdrawal[]
+}
+
+model Asset {
+  asset_id BigInt @id @default(autoincrement())
+  user_id BigInt 
+  currency Currency @relation(fields: [currency_code], references: [currency_code]) 
+  currency_code String @db.VarChar(20)
+  available_balance Decimal @db.Decimal(24, 8) 
+  locked_balance Decimal @db.Decimal(24, 8)
+  updated_at DateTime @db.Timestamp(3) @updatedAt 
+  
+  @@unique([user_id, currency_code])
+}
+
+model DepositWithdrawal {
+  tx_id BigInt @id @default(autoincrement())
+  user_id BigInt
+  currency Currency @relation(fields: [currency_code], references: [currency_code]) 
+  currency_code String @db.VarChar(20)
+  tx_type String @db.VarChar(20) 
+  amount Decimal @db.Decimal(24, 8) 
+  created_at DateTime @db.Timestamp(3) @default(now()) 
+}
