@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Asset {
-  asset_id         Int   @id @default(autoincrement())
-  user_id          Int
+  asset_id         String   @id @default(uuid())
+  user_id          String
   currency_code    String   
   available_balance Decimal  
   locked_balance    Decimal  
@@ -19,8 +19,8 @@ model Asset {
 }
 
 model DepositWithdrawal {
-  tx_id         Int   @id @default(autoincrement())
-  user_id       Int
+  tx_id         String   @id @default(uuid())
+  user_id       String
   currency_code String   
   tx_type       String   
   amount        Decimal  
