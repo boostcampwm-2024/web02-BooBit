@@ -1,0 +1,42 @@
+// .gitattributes
+# 모든 텍스트 파일에 대해 LF 사용
+* text=auto eol=lf
+
+# 소스 코드
+*.ts text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.less text eol=lf
+
+# 설정 파일
+.env* text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.eslintrc text eol=lf
+.prettierrc text eol=lf
+*.config.js text eol=lf
+*.config.ts text eol=lf
+
+# 스크립트
+*.sh text eol=lf
+*.bash text eol=lf
+
+# 바이너리 파일 (변환하지 않음)
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.pdf binary
