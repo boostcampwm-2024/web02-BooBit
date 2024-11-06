@@ -6,6 +6,7 @@ import { ClsModule } from 'nestjs-cls';
 import { PrismaService } from './databases/prisma/prisma.service';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { ClsPluginTransactional } from '@nestjs-cls/transactional';
+import { BalanceRepository } from './balance.repository';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { ClsPluginTransactional } from '@nestjs-cls/transactional';
     }),
   ],
   controllers: [BalanceController],
-  providers: [BalanceService],
+  providers: [BalanceService, BalanceRepository],
 })
 export class BalanceModule {}
