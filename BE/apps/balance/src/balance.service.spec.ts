@@ -39,7 +39,7 @@ describe('BalanceService', () => {
   });
 
   describe('deposit', () => {
-    const userId = BigInt(1);
+    const userId = "testuuid";
     const depositDto = {
       currency_code: CurrencyCode.KRW,
       amount: new Decimal(10000),
@@ -61,7 +61,7 @@ describe('BalanceService', () => {
       };
 
       const mockTransaction = {
-        tx_id: BigInt(1),
+        tx_id: "testuuid",
         user_id: userId,
         currency_code: CurrencyCode.KRW,
         tx_type: TransactionType.DEPOSIT,
@@ -101,7 +101,7 @@ describe('BalanceService', () => {
   });
 
   describe('withdraw', () => {
-    const userId = BigInt(1);
+    const userId = "testuuid";
     const withdrawDto = {
       currency_code: CurrencyCode.KRW,
       amount: new Decimal(5000),
@@ -138,7 +138,7 @@ describe('BalanceService', () => {
       };
 
       const mockTransaction = {
-        tx_id: BigInt(1),
+        tx_id: "testuuid",
         user_id: userId,
         currency_code: CurrencyCode.KRW,
         tx_type: TransactionType.WITHDRAWAL,
