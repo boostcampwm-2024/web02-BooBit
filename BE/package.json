@@ -18,7 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e:balance": "jest --config ./apps/balance/test/jest-e2e.json",
-    "prisma:generate:balance": "npx prisma generate --schema ./apps/balance/prisma/schema.prisma"
+    "prisma:generate:balance": "npx prisma generate --schema ./apps/balance/prisma/schema.sqlite.prisma"
   },
   "lint-staged": {
     "*.ts": [
