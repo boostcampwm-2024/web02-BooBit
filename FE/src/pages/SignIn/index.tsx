@@ -6,19 +6,22 @@ import { useState, ChangeEvent } from 'react';
 import InputField from '../../shared/UI/InputFeild';
 
 const SignIn = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
   const navigate = useNavigate();
 
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSumbit = () => {
-    alert('이메일: ' + email + '\n비밀번호: ' + password);
+    alert(JSON.stringify(formData));
   };
 
   const moveToSignup = () => {
@@ -28,12 +31,19 @@ const SignIn = () => {
   return (
     <AuthLayout>
       <img src={logo} alt="logo" className="w-[11rem] mb-[2rem]" />
-      <InputField type="text" placeholder="이메일" value={email} onChange={handleEmailChange} />
+      <InputField
+        type="text"
+        placeholder="이메일"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+      />
       <InputField
         type="password"
         placeholder="비밀번호"
-        value={password}
-        onChange={handlePasswordChange}
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
       />
       <SubmitButton content="로그인" onClick={handleSumbit} />
       <button
