@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Asset {
+  asset_id         Int   @id @default(autoincrement())
+  user_id          Int
+  currency_code    String   
+  available_balance Decimal  
+  locked_balance    Decimal  
+  updated_at       DateTime @updatedAt
+
+  @@unique([user_id, currency_code])
+}
+
+model DepositWithdrawal {
+  tx_id         Int   @id @default(autoincrement())
+  user_id       Int
+  currency_code String   
+  tx_type       String   
+  amount        Decimal  
+  created_at    DateTime @default(now())
+
+  @@index([user_id])
+}

@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/be/test/jest-e2e.json"
+    "test:e2e:balance": "jest --config ./apps/balance/test/jest-e2e.json",
+    "prisma:generate:balance": "npx prisma generate --schema ./apps/balance/prisma/schema.prisma"
   },
   "lint-staged": {
     "*.ts": [
@@ -26,8 +27,10 @@
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@prisma/client": "^5.22.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
   },
@@ -48,6 +51,7 @@
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "source-map-support": "^0.5.21",
+    "sqlite": "^5.1.1",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
@@ -76,7 +80,8 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1"
     }
   }
 }
