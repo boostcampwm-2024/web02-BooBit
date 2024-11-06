@@ -47,7 +47,7 @@ const SignIn = () => {
       />
       <SubmitButton content="로그인" onClick={handleSumbit} />
       <button
-        className="ml-[52%] mb-[5rem] text-available-medium-16 text-text-dark"
+        className="ml-[52%] mb-[5rem] text-available-medium-16 text-text-dark hover:underline"
         onClick={moveToSignup}
       >
         아직 계정이 없다면? 회원가입하기
