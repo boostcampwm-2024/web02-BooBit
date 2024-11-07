@@ -2,25 +2,17 @@ import AuthLayout from '../../widgets/AuthLayout';
 import logo from '../../shared/images/BuBuWithLogo.png';
 import SubmitButton from '../../shared/UI/SubmitButton';
 import { useNavigate } from 'react-router-dom';
-import { useState, ChangeEvent } from 'react';
 import InputField from '../../shared/UI/InputFeild';
+import useSigninForm from './model/useSigninForm';
 
 const SignIn = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const { formData, error, handleChange, validateForm, resetError } = useSigninForm();
   const navigate = useNavigate();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
   const handleSumbit = () => {
+    if (!validateForm()) return;
+
+    resetError();
     alert(JSON.stringify(formData));
   };
 
@@ -37,6 +29,8 @@ const SignIn = () => {
         name="email"
         value={formData.email}
         onChange={handleChange}
+        isError={error.isError}
+        errorMessage={error.errorMessage}
       />
       <InputField
         type="password"
@@ -44,6 +38,8 @@ const SignIn = () => {
         name="password"
         value={formData.password}
         onChange={handleChange}
+        isError={error.isError}
+        errorMessage={error.errorMessage}
       />
       <SubmitButton content="로그인" onClick={handleSumbit} />
       <button
