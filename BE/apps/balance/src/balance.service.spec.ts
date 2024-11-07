@@ -2,13 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { BalanceService, TransactionType } from './balance.service';
 import { PrismaService } from '@app/prisma';
-import { Prisma } from '@prisma/client';
 import { CurrencyCode } from '@app/common';
 import { Decimal } from '@prisma/client/runtime/library';
 
 describe('BalanceService', () => {
   let service: BalanceService;
-  let prismaService: PrismaService;
 
   const mockPrismaService = {
     $transaction: jest.fn((callback) => callback(mockPrismaService)),
@@ -34,12 +32,11 @@ describe('BalanceService', () => {
     }).compile();
 
     service = module.get<BalanceService>(BalanceService);
-    prismaService = module.get<PrismaService>(PrismaService);
     jest.clearAllMocks();
   });
 
   describe('deposit', () => {
-    const userId = "testuuid";
+    const userId = 'testuuid';
     const depositDto = {
       currency_code: CurrencyCode.KRW,
       amount: new Decimal(10000),
@@ -47,9 +44,7 @@ describe('BalanceService', () => {
 
     it('입금 금액이 0보다 작거나 같으면 에러를 반환해야 한다', async () => {
       const invalidDepositDto = { ...depositDto, amount: new Decimal(0) };
-      await expect(service.deposit(userId, invalidDepositDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.deposit(userId, invalidDepositDto)).rejects.toThrow(BadRequestException);
     });
 
     it('새로운 자산을 생성하고 입금이 성공적으로 처리되어야 한다', async () => {
@@ -61,7 +56,7 @@ describe('BalanceService', () => {
       };
 
       const mockTransaction = {
-        tx_id: "testuuid",
+        tx_id: 'testuuid',
         user_id: userId,
         currency_code: CurrencyCode.KRW,
         tx_type: TransactionType.DEPOSIT,
@@ -101,7 +96,7 @@ describe('BalanceService', () => {
   });
 
   describe('withdraw', () => {
-    const userId = "testuuid";
+    const userId = 'testuuid';
     const withdrawDto = {
       currency_code: CurrencyCode.KRW,
       amount: new Decimal(5000),
@@ -119,9 +114,7 @@ describe('BalanceService', () => {
         available_balance: new Decimal(1000),
       });
 
-      await expect(service.withdraw(userId, withdrawDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.withdraw(userId, withdrawDto)).rejects.toThrow(BadRequestException);
     });
 
     it('출금이 성공적으로 처리되어야 한다', async () => {
@@ -138,7 +131,7 @@ describe('BalanceService', () => {
       };
 
       const mockTransaction = {
-        tx_id: "testuuid",
+        tx_id: 'testuuid',
         user_id: userId,
         currency_code: CurrencyCode.KRW,
         tx_type: TransactionType.WITHDRAWAL,

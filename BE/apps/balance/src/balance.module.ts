@@ -4,7 +4,7 @@ import { BalanceService } from './balance.service';
 import { PrismaModule } from '@app/prisma';
 
 @Module({
-  imports: [PrismaModule], 
+  imports: [PrismaModule],
   controllers: [BalanceController],
   providers: [BalanceService],
 })
