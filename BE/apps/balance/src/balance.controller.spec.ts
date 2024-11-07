@@ -10,7 +10,7 @@ describe('BalanceController', () => {
     balanceController = new BalanceController(balanceService);
   });
 
-  describe('자산 목록 조회회', () => {
+  describe('자산 목록 조회', () => {
     it('자산 목록 조회에 성공한다.', async () => {
       const mockAssets = [
         {
