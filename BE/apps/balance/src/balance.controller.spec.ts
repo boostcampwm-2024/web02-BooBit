@@ -1,22 +1,32 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { BalanceController } from './balance.controller';
 import { BalanceService } from './balance.service';
 
 describe('BalanceController', () => {
   let balanceController: BalanceController;
+  let balanceService: BalanceService;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
-      controllers: [BalanceController],
-      providers: [BalanceService],
-    }).compile();
-
-    balanceController = app.get<BalanceController>(BalanceController);
+    balanceService = new BalanceService({} as any);
+    balanceController = new BalanceController(balanceService);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(balanceController.getHello()).toBe('Hello World!');
+  describe('자산 목록 조회회', () => {
+    it('자산 목록 조회에 성공한다.', async () => {
+      const mockAssets = [
+        {
+          currencyCode: 'KRW',
+          availableBalance: 100,
+          lockedBalance: 50,
+          currency: { name: '원화' },
+        },
+      ];
+
+      balanceService.getAssets = jest.fn().mockResolvedValue(mockAssets);
+
+      const response = await balanceController.getAssets();
+
+      expect(response.assets).toEqual(mockAssets);
+      expect(balanceService.getAssets).toHaveBeenCalledWith(1);
     });
   });
 });
