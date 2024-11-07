@@ -4,8 +4,10 @@ import logo from '../../shared/images/BuBuWithLogo.png';
 import LabeledInput from './UI/LabeledInput';
 import Guideline from './UI/Guideline';
 import useSignupForm from './model/useSignupForm';
+import useSignup from './model/useSignup';
 
 const SignUp = () => {
+  const { mutate } = useSignup();
   const {
     formData,
     passwordCheck,
@@ -20,7 +22,7 @@ const SignUp = () => {
       return;
     }
 
-    alert(JSON.stringify(formData));
+    mutate(formData);
   };
 
   return (

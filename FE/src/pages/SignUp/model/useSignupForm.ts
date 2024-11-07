@@ -1,10 +1,5 @@
 import { useState, ChangeEvent } from 'react';
-
-interface FormData {
-  email: string;
-  name: string;
-  password: string;
-}
+import { FormData } from './formDataType';
 
 interface FormValidation {
   email: { hasError: boolean; message: string };
