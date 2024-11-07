@@ -31,6 +31,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.22.0",
+    "decimal.js": "^10.4.3",
     "mysql2": "^3.11.4",
     "nestjs-cls": "^4.4.1",
     "reflect-metadata": "^0.2.0",
