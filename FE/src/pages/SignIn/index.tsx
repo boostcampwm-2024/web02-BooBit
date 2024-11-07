@@ -4,8 +4,10 @@ import SubmitButton from '../../shared/UI/SubmitButton';
 import { useNavigate } from 'react-router-dom';
 import InputField from '../../shared/UI/InputFeild';
 import useSigninForm from './model/useSigninForm';
+import useSignin from './model/useSignin';
 
 const SignIn = () => {
+  const { mutate } = useSignin();
   const { formData, error, handleChange, validateForm, resetError } = useSigninForm();
   const navigate = useNavigate();
 
@@ -13,7 +15,7 @@ const SignIn = () => {
     if (!validateForm()) return;
 
     resetError();
-    alert(JSON.stringify(formData));
+    mutate(formData);
   };
 
   const moveToSignup = () => {

@@ -1,9 +1,5 @@
 import { ChangeEvent, useState } from 'react';
-
-interface FormData {
-  email: string;
-  password: string;
-}
+import { FormData } from './formDataType';
 
 interface FormError {
   isError: boolean;
