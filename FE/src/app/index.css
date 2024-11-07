@@ -6,3 +6,17 @@ body {
   background-color: #121212;
   font-family: 'Pretendard Variable';
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  height: 30%;
+  background: #2b2b3d;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e2f;
+}
