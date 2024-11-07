@@ -1,23 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
-import { BalanceService, TransactionType } from './balance.service';
-import { PrismaService } from '@app/prisma';
+import { BalanceService } from './balance.service';
+import { BalanceRepository } from './balance.repository';
 import { CurrencyCode } from '@app/common';
 import { Decimal } from '@prisma/client/runtime/library';
 
 describe('BalanceService', () => {
   let service: BalanceService;
+  let repository: BalanceRepository;
 
-  const mockPrismaService = {
-    $transaction: jest.fn((callback) => callback(mockPrismaService)),
-    asset: {
-      upsert: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
-    },
-    depositWithdrawal: {
-      create: jest.fn(),
-    },
+  const mockBalanceRepository = {
+    deposit: jest.fn(),
+    withdraw: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -25,13 +19,14 @@ describe('BalanceService', () => {
       providers: [
         BalanceService,
         {
-          provide: PrismaService,
-          useValue: mockPrismaService,
+          provide: BalanceRepository,
+          useValue: mockBalanceRepository,
         },
       ],
     }).compile();
 
     service = module.get<BalanceService>(BalanceService);
+    repository = module.get<BalanceRepository>(BalanceRepository);
     jest.clearAllMocks();
   });
 
@@ -47,51 +42,23 @@ describe('BalanceService', () => {
       await expect(service.deposit(userId, invalidDepositDto)).rejects.toThrow(BadRequestException);
     });
 
-    it('새로운 자산을 생성하고 입금이 성공적으로 처리되어야 한다', async () => {
-      const mockAsset = {
-        user_id: userId,
-        currency_code: CurrencyCode.KRW,
-        available_balance: new Decimal(10000),
-        locked_balance: new Decimal(0),
+    it('입금이 성공적으로 처리되어야 한다', async () => {
+      const mockResponse = {
+        depositTransactionResult: {
+          tx_id: 'testuuid',
+          user_id: userId,
+          currency_code: CurrencyCode.KRW,
+          amount: new Decimal(10000),
+        },
+        newBalance: new Decimal(10000),
       };
 
-      const mockTransaction = {
-        tx_id: 'testuuid',
-        user_id: userId,
-        currency_code: CurrencyCode.KRW,
-        tx_type: TransactionType.DEPOSIT,
-        amount: new Decimal(10000),
-      };
-
-      mockPrismaService.asset.upsert.mockResolvedValue(mockAsset);
-      mockPrismaService.depositWithdrawal.create.mockResolvedValue(mockTransaction);
+      mockBalanceRepository.deposit.mockResolvedValue(mockResponse);
 
       const result = await service.deposit(userId, depositDto);
 
-      expect(mockPrismaService.asset.upsert).toHaveBeenCalledWith({
-        where: {
-          user_id_currency_code: {
-            user_id: userId,
-            currency_code: CurrencyCode.KRW,
-          },
-        },
-        create: {
-          user_id: userId,
-          currency_code: CurrencyCode.KRW,
-          available_balance: new Decimal(10000),
-          locked_balance: new Decimal(0),
-        },
-        update: {
-          available_balance: {
-            increment: new Decimal(10000),
-          },
-        },
-      });
-
-      expect(result).toEqual({
-        depositTransaction: mockTransaction,
-        newBalance: mockAsset.available_balance,
-      });
+      expect(repository.deposit).toHaveBeenCalledWith(userId, depositDto);
+      expect(result).toEqual(mockResponse);
     });
   });
 
@@ -109,59 +76,23 @@ describe('BalanceService', () => {
       );
     });
 
-    it('잔액이 부족한 경우 에러를 반환해야 한다', async () => {
-      mockPrismaService.asset.findUnique.mockResolvedValue({
-        available_balance: new Decimal(1000),
-      });
-
-      await expect(service.withdraw(userId, withdrawDto)).rejects.toThrow(BadRequestException);
-    });
-
     it('출금이 성공적으로 처리되어야 한다', async () => {
-      const mockAsset = {
-        user_id: userId,
-        currency_code: CurrencyCode.KRW,
-        available_balance: new Decimal(10000),
-        locked_balance: new Decimal(0),
+      const mockResponse = {
+        makeHistoryResult: {
+          tx_id: 'testuuid',
+          user_id: userId,
+          currency_code: CurrencyCode.KRW,
+          amount: new Decimal(5000),
+        },
+        newBalance: new Decimal(5000),
       };
 
-      const mockUpdatedAsset = {
-        ...mockAsset,
-        available_balance: new Decimal(5000),
-      };
-
-      const mockTransaction = {
-        tx_id: 'testuuid',
-        user_id: userId,
-        currency_code: CurrencyCode.KRW,
-        tx_type: TransactionType.WITHDRAWAL,
-        amount: new Decimal(5000),
-      };
-
-      mockPrismaService.asset.findUnique.mockResolvedValue(mockAsset);
-      mockPrismaService.asset.update.mockResolvedValue(mockUpdatedAsset);
-      mockPrismaService.depositWithdrawal.create.mockResolvedValue(mockTransaction);
+      mockBalanceRepository.withdraw.mockResolvedValue(mockResponse);
 
       const result = await service.withdraw(userId, withdrawDto);
 
-      expect(mockPrismaService.asset.update).toHaveBeenCalledWith({
-        where: {
-          user_id_currency_code: {
-            user_id: userId,
-            currency_code: CurrencyCode.KRW,
-          },
-        },
-        data: {
-          available_balance: {
-            decrement: new Decimal(5000),
-          },
-        },
-      });
-
-      expect(result).toEqual({
-        transaction: mockTransaction,
-        newBalance: mockUpdatedAsset.available_balance,
-      });
+      expect(repository.withdraw).toHaveBeenCalledWith(userId, withdrawDto);
+      expect(result).toEqual(mockResponse);
     });
   });
 });
