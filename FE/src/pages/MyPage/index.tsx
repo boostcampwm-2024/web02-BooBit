@@ -8,6 +8,7 @@ import CategoryItem from './UI/CategoryItem';
 import Title from './UI/Title';
 
 import CATEGORY from './consts/category';
+import MyAssetInfo from '../../entities/MyAssetInfo';
 
 const Home = () => {
   const [selectedCateIdx, setSelectedCateIdx] = useState(0);
@@ -35,6 +36,7 @@ const Home = () => {
 
         <MainviewLayout>
           <Title content={CATEGORY[selectedCateIdx]} />
+          <MyAssetInfo currency_code="KRW" amount={17000} />
         </MainviewLayout>
       </Layout>
     </div>
