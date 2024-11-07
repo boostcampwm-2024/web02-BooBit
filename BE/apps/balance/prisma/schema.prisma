@@ -8,30 +8,35 @@ datasource db {
 }
 
 model Currency {
-  currency_code String @id @db.VarChar(20)
-  name String @db.VarChar(50)
-  assets Asset[]
-  transactions DepositWithdrawal[]
+  currency_code String              @id @db.VarChar(20)
+  name          String              @db.VarChar(50)
+  assets        Asset[]
+  transactions  DepositWithdrawal[]
+
+  @@map("currency")
 }
 
 model Asset {
-  asset_id BigInt @id @default(autoincrement())
-  user_id BigInt 
-  currency Currency @relation(fields: [currency_code], references: [currency_code]) 
-  currency_code String @db.VarChar(20)
-  available_balance Decimal @db.Decimal(24, 8) 
-  locked_balance Decimal @db.Decimal(24, 8)
-  updated_at DateTime @db.Timestamp(3) @updatedAt 
-  
+  asset_id          BigInt   @id @default(autoincrement())
+  user_id           BigInt
+  currency          Currency @relation(fields: [currency_code], references: [currency_code])
+  currency_code     String   @db.VarChar(20)
+  available_balance Decimal  @db.Decimal(24, 8)
+  locked_balance    Decimal  @db.Decimal(24, 8)
+  updated_at        DateTime @updatedAt @db.Timestamp(3)
+
   @@unique([user_id, currency_code])
+  @@map("asset")
 }
 
 model DepositWithdrawal {
-  tx_id BigInt @id @default(autoincrement())
-  user_id BigInt
-  currency Currency @relation(fields: [currency_code], references: [currency_code]) 
-  currency_code String @db.VarChar(20)
-  tx_type String @db.VarChar(20) 
-  amount Decimal @db.Decimal(24, 8) 
-  created_at DateTime @db.Timestamp(3) @default(now()) 
+  tx_id         BigInt   @id @default(autoincrement())
+  user_id       BigInt
+  currency      Currency @relation(fields: [currency_code], references: [currency_code])
+  currency_code String   @db.VarChar(20)
+  tx_type       String   @db.VarChar(20)
+  amount        Decimal  @db.Decimal(24, 8)
+  created_at    DateTime @default(now()) @db.Timestamp(3)
+
+  @@map("deposit_withdrawal")
 }
