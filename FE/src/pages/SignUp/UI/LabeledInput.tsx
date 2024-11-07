@@ -8,6 +8,8 @@ interface LabeledInputProps {
   name: string;
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  isError?: boolean;
+  errorMessage?: string;
 }
 
 const LabeledInput: React.FC<LabeledInputProps> = ({
@@ -17,6 +19,8 @@ const LabeledInput: React.FC<LabeledInputProps> = ({
   name,
   value,
   onChange,
+  isError = false,
+  errorMessage = '',
 }) => (
   <div className="w-[100%]">
     <div className="text-available-medium-16 text-text-light mb-[6px]">{label}</div>
@@ -26,6 +30,8 @@ const LabeledInput: React.FC<LabeledInputProps> = ({
       name={name}
       value={value}
       onChange={onChange}
+      isError={isError}
+      errorMessage={errorMessage}
     />
   </div>
 );
