@@ -41,7 +41,10 @@ const Home = () => {
           <Title content={CATEGORY[selectedCateIdx]} />
           {selectedCateIdx === 1 ? (
             <div>
-              <MyAssetList assetList={mockAssetListData.assets} />
+              <MyAssetList
+                assetList={mockAssetListData.assets}
+                setSelectedAssetIdx={setSelectedAssetIdx}
+              />
               <div>{JSON.stringify(mockAssetListData.assets[selectedAssetIdx])}</div>
             </div>
           ) : null}
