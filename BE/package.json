@@ -18,7 +18,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e:balance": "jest --config ./apps/balance/test/jest-e2e.json",
-    "prisma:generate:balance": "npx prisma generate --schema ./apps/balance/prisma/schema.sqlite.prisma"
+    "deploy:dev:balance": "dotenv -e apps/balance/.env -- npx prisma migrate dev --schema apps/balance/prisma/schema.prisma",
+    "deploy:balance": "dotenv -e apps/balance/.env -- \"npx prisma migrate deploy --schema apps/balance/prisma/schema.prisma && npx prisma generate --schema apps/balance/prisma/schema.prisma\"",
+    "deploy:dev:login": "dotenv -e apps/login/.env -- npx prisma migrate dev --schema apps/login/prisma/schema.prisma",
+    "deploy:login": "dotenv -e apps/login/.env -- \"npx prisma migrate deploy --schema apps/login/prisma/schema.prisma && npx prisma generate --schema apps/login/prisma/schema.prisma\"",
+    "deploy:dev:transaction": "dotenv -e apps/transaction/.env -- npx prisma migrate dev --schema apps/transaction/prisma/schema.prisma",
+    "deploy:transaction": "dotenv -e apps/transaction/.env -- \"npx prisma migrate deploy --schema apps/transaction/prisma/schema.prisma && npx prisma generate --schema apps/transaction/prisma/schema.prisma\""
   },
   "lint-staged": {
     "*.ts": [
@@ -31,6 +36,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.22.0",
+    "dotenv-cli": "^7.4.2",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
   },
