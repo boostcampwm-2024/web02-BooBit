@@ -1,5 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
 import { BalanceService } from './balance.service';
+import { Decimal } from '@prisma/client/runtime/library';
+
+export class CreateTransactionDto {
+  currency_code: string;
+  amount: Decimal;
+}
 
 @Controller('api/users')
 export class BalanceController {
@@ -7,7 +13,8 @@ export class BalanceController {
 
   @Get('/assets')
   async getAssets() {
-    const assets = await this.balanceService.getAssets(1);
+    const userId = 1;
+    const assets = await this.balanceService.getAssets(userId);
     return { assets };
   }
 }

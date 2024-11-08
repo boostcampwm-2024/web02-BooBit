@@ -17,7 +17,13 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/be/test/jest-e2e.json"
+    "test:e2e:balance": "jest --config ./apps/balance/test/jest-e2e.json",
+    "deploy:dev:balance": "dotenv -e apps/balance/.env -- npx prisma migrate dev --schema apps/balance/prisma/schema.prisma",
+    "deploy:balance": "dotenv -e apps/balance/.env -- \"npx prisma migrate deploy --schema apps/balance/prisma/schema.prisma && npx prisma generate --schema apps/balance/prisma/schema.prisma\"",
+    "deploy:dev:login": "dotenv -e apps/login/.env -- npx prisma migrate dev --schema apps/login/prisma/schema.prisma",
+    "deploy:login": "dotenv -e apps/login/.env -- \"npx prisma migrate deploy --schema apps/login/prisma/schema.prisma && npx prisma generate --schema apps/login/prisma/schema.prisma\"",
+    "deploy:dev:transaction": "dotenv -e apps/transaction/.env -- npx prisma migrate dev --schema apps/transaction/prisma/schema.prisma",
+    "deploy:transaction": "dotenv -e apps/transaction/.env -- \"npx prisma migrate deploy --schema apps/transaction/prisma/schema.prisma && npx prisma generate --schema apps/transaction/prisma/schema.prisma\""
   },
   "lint-staged": {
     "*.ts": [
@@ -25,12 +31,13 @@
     ]
   },
   "dependencies": {
-    "@nestjs/common": "^10.4.7",
+    "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.3.0",
-    "@nestjs/core": "^10.4.7",
+    "@nestjs/core": "^10.0.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.22.0",
+    "dotenv-cli": "^7.4.2",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -64,6 +71,7 @@
     "prisma": "^5.22.0",
     "prisma": "^5.22.0",
     "source-map-support": "^0.5.21",
+    "sqlite": "^5.1.1",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
@@ -92,7 +100,8 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1"
     }
   }
 }
