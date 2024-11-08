@@ -1,4 +1,4 @@
-import Decimal from 'decimal.js';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export class AssetDto {
   currencyCode: string;
@@ -7,12 +7,10 @@ export class AssetDto {
 
   constructor(
     currencyCode: string,
-    name: string,
     availableBalance: Decimal,
     lockedBalance: Decimal,
   ) {
     this.currencyCode = currencyCode;
-    this.name = name;
     this.amount = availableBalance.add(lockedBalance);
   }
 }

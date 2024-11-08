@@ -1,8 +1,7 @@
-import Decimal from 'decimal.js';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export type asset = {
   currency_code: string;
-  currency: { name: string };
   available_balance: Decimal;
   locked_balance: Decimal;
 };

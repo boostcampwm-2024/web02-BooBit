@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { CreateTransactionDto } from './balance.controller';
 import { Prisma } from '@prisma/client';
+import { asset } from './dto/asset.type';
 
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
@@ -11,7 +12,7 @@ export enum TransactionType {
 @Injectable()
 export class BalanceRepository {
   constructor(private prisma: PrismaService) {}
-  async deposit(userId: string, createTransactionDto: CreateTransactionDto) {
+  async deposit(userId: bigint, createTransactionDto: CreateTransactionDto) {
     const { currency_code, amount } = createTransactionDto;
     return await this.prisma.$transaction(async (prisma) => {
       const asset = prisma.asset.upsert({
@@ -55,7 +56,7 @@ export class BalanceRepository {
     });
   }
 
-  async withdraw(userId: string, createTransactionDto: CreateTransactionDto) {
+  async withdraw(userId: bigint, createTransactionDto: CreateTransactionDto) {
     return this.prisma.$transaction(async (prisma) => {
       const { currency_code, amount } = createTransactionDto;
 
@@ -108,16 +109,11 @@ export class BalanceRepository {
   }
 
   async getAssets(userId: number): Promise<asset[]> {
-    return await this.txHost.tx.asset.findMany({
+    return await this.prisma.asset.findMany({
       select: {
         currency_code: true,
         available_balance: true,
         locked_balance: true,
-        currency: {
-          select: {
-            name: true,
-          },
-        },
       },
       where: { user_id: userId },
     });

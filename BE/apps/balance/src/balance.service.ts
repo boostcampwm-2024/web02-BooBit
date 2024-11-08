@@ -2,12 +2,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './balance.controller';
 import { Decimal } from '@prisma/client/runtime/library';
 import { BalanceRepository } from './balance.repository';
+import { BalanceException } from './exception/balance.exception';
+import { BALANCE_EXCEPTIONS } from './exception/balance.exceptions';
+import { AssetDto } from './dto/asset.dto';
 
 @Injectable()
 export class BalanceService {
   constructor(private balanceRepository: BalanceRepository) {}
 
-  async deposit(userId: string, createTransactionDto: CreateTransactionDto) {
+  async deposit(userId: bigint, createTransactionDto: CreateTransactionDto) {
     const { amount } = createTransactionDto;
 
     if (amount <= new Decimal(0)) {
@@ -17,7 +20,7 @@ export class BalanceService {
     return await this.balanceRepository.deposit(userId, createTransactionDto);
   }
 
-  async withdraw(userId: string, createTransactionDto: CreateTransactionDto) {
+  async withdraw(userId: bigint, createTransactionDto: CreateTransactionDto) {
     const { amount } = createTransactionDto;
 
     if (amount <= new Decimal(0)) {
@@ -35,13 +38,7 @@ export class BalanceService {
     }
 
     return assets.map(
-      (asset) =>
-        new AssetDto(
-          asset.currency_code,
-          asset.currency.name,
-          asset.available_balance,
-          asset.locked_balance,
-        ),
+      (asset) => new AssetDto(asset.currency_code, asset.available_balance, asset.locked_balance),
     );
   }
 }

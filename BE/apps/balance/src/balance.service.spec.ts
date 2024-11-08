@@ -4,6 +4,9 @@ import { BalanceService } from './balance.service';
 import { BalanceRepository } from './balance.repository';
 import { CurrencyCode } from '@app/common';
 import { Decimal } from '@prisma/client/runtime/library';
+import { BalanceException } from './exception/balance.exception';
+import { BALANCE_EXCEPTIONS } from './exception/balance.exceptions';
+import { AssetDto } from './dto/asset.dto';
 
 describe('BalanceService', () => {
   let service: BalanceService;
@@ -12,6 +15,7 @@ describe('BalanceService', () => {
   const mockBalanceRepository = {
     deposit: jest.fn(),
     withdraw: jest.fn(),
+    getAssets: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -31,7 +35,7 @@ describe('BalanceService', () => {
   });
 
   describe('deposit', () => {
-    const userId = 'testuuid';
+    const userId = BigInt(1);
     const depositDto = {
       currency_code: CurrencyCode.KRW,
       amount: new Decimal(10000),
@@ -63,7 +67,7 @@ describe('BalanceService', () => {
   });
 
   describe('withdraw', () => {
-    const userId = 'testuuid';
+    const userId = BigInt(1);
     const withdrawDto = {
       currency_code: CurrencyCode.KRW,
       amount: new Decimal(5000),
@@ -96,41 +100,37 @@ describe('BalanceService', () => {
     });
   });
 
-  describe('자산 목록 조회', () => {
-    it('자산 목록 조회에 성공한다.', async () => {
-      const mockAssets = [
-        {
-          currency_code: 'KRW',
-          available_balance: new Decimal(100),
-          locked_balance: new Decimal(50),
-          currency: { name: '원화' },
-        },
-        {
-          currency_code: 'BTC',
-          available_balance: new Decimal(200),
-          locked_balance: new Decimal(30),
-          currency: { name: '비트코인' },
-        },
-      ];
-      balanceRepository.getAssets = jest.fn().mockResolvedValue(mockAssets);
+  describe('getAssets', () => {
+    const userId = 1;
 
-      const result = await balanceService.getAssets(1);
+    it('사용자의 자산이 없으면 에러를 반환해야 한다', async () => {
+      mockBalanceRepository.getAssets.mockResolvedValue([]);
 
-      expect(result).toEqual([
-        new AssetDto('KRW', '원화', new Decimal(100), new Decimal(50)),
-        new AssetDto('BTC', '비트코인', new Decimal(200), new Decimal(30)),
-      ]);
-      expect(balanceRepository.getAssets).toHaveBeenCalledWith(1);
+      await expect(service.getAssets(userId)).rejects.toThrow(BalanceException);
+      await expect(service.getAssets(userId)).rejects.toThrowError(
+        new BalanceException(BALANCE_EXCEPTIONS.USER_ASSETS_NOT_FOUND),
+      );
     });
 
-    it('자산 목록이 없으면 BalanceException이 발생한다.', async () => {
-      balanceRepository.getAssets = jest.fn().mockResolvedValue([]);
+    it('사용자의 자산이 성공적으로 반환되어야 한다', async () => {
+      const mockAssets = [
+        {
+          currency_code: CurrencyCode.KRW,
+          available_balance: new Decimal(10000),
+          locked_balance: new Decimal(0),
+        },
+      ];
 
-      await expect(balanceService.getAssets(1)).rejects.toThrow(BalanceException);
-      await expect(balanceService.getAssets(1)).rejects.toThrow(
-        BALANCE_EXCEPTIONS.USER_ASSETS_NOT_FOUND.message,
+      const expectedAssets = mockAssets.map(
+        (asset) => new AssetDto(asset.currency_code, asset.available_balance, asset.locked_balance),
       );
-      expect(balanceRepository.getAssets).toHaveBeenCalledWith(1);
+
+      mockBalanceRepository.getAssets.mockResolvedValue(mockAssets);
+
+      const result = await service.getAssets(userId);
+
+      expect(repository.getAssets).toHaveBeenCalledWith(userId);
+      expect(result).toEqual(expectedAssets);
     });
   });
 });

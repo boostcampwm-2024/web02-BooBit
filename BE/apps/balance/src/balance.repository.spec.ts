@@ -36,7 +36,7 @@ describe('BalanceRepository', () => {
   });
 
   describe('deposit', () => {
-    const userId = 'testuuid';
+    const userId = BigInt(1);
     const depositDto = {
       currency_code: CurrencyCode.KRW,
       amount: new Decimal(10000),
@@ -91,7 +91,7 @@ describe('BalanceRepository', () => {
   });
 
   describe('withdraw', () => {
-    const userId = 'testuuid';
+    const userId = BigInt(1);
     const withdrawDto = {
       currency_code: CurrencyCode.KRW,
       amount: new Decimal(5000),
