@@ -7,10 +7,14 @@ import VerticalDivider from './UI/VerticalDivider';
 import CategoryItem from './UI/CategoryItem';
 import Title from './UI/Title';
 
+import MyAssetList from '../../entities/MyAssetList';
+
 import CATEGORY from './consts/category';
+import mockAssetListData from './consts/mockData';
 
 const Home = () => {
   const [selectedCateIdx, setSelectedCateIdx] = useState(0);
+  const [selectedAssetIdx, setSelectedAssetIdx] = useState(0);
 
   const moveCategory = (categoryIdx: number) => {
     setSelectedCateIdx(categoryIdx);
@@ -35,6 +39,15 @@ const Home = () => {
 
         <MainviewLayout>
           <Title content={CATEGORY[selectedCateIdx]} />
+          {selectedCateIdx === 1 ? (
+            <div>
+              <MyAssetList
+                assetList={mockAssetListData.assets}
+                setSelectedAssetIdx={setSelectedAssetIdx}
+              />
+              <div>{JSON.stringify(mockAssetListData.assets[selectedAssetIdx])}</div>
+            </div>
+          ) : null}
         </MainviewLayout>
       </Layout>
     </div>
