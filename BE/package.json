@@ -19,7 +19,9 @@
     "test:e2e:balance": "jest --config ./apps/balance/test/jest-e2e.json",
     "deploy:dev:balance": "dotenv -e apps/balance/.env -- npx prisma migrate dev --schema apps/balance/prisma/schema.prisma --name balance",
     "generate:balance": "npx prisma generate --schema apps/balance/prisma/schema.prisma",
-    "start:prod:balance": "npx prisma migrate deploy && node dist/apps/balance/main"
+    "start:prod:balance": "npx prisma migrate deploy && node dist/apps/balance/main",
+    "generate:auth": "npx prisma generate --schema apps/auth/prisma/schema.prisma",
+    "start:prod:auth": "npx prisma migrate deploy && node dist/apps/auth/main"
   },
   "lint-staged": {
     "*.ts": [

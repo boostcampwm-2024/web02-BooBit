@@ -5,7 +5,7 @@ services:
     image: mysql:8.0.22
     container_name: mysql-server
     ports:
-      - '${MYSQL_PORT}:3306'
+      - '${HOST_PORT}:${MYSQL_PORT}'
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
@@ -29,11 +29,27 @@ services:
       context: .
       dockerfile: ./apps/balance/DockerFile
       args:
-        DATABASE_URL: mysql://boobit:Boobit123@mysql-server:3306/boobit
+        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: mysql://boobit:Boobit123@mysql-server:3306/boobit
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+  auth:
+    container_name: auth-server
+    build:
+      context: .
+      dockerfile: ./apps/auth/DockerFile
+      args:
+        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
     depends_on:
       db:
         condition: service_healthy
