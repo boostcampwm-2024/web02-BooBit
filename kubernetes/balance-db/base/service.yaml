@@ -1,0 +1,14 @@
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: balance-db # 서비스 이름
+spec:
+  type: NodePort # 서비스 타입
+  ports:
+    - port: 3306 # 서비스가 노출하는 포트
+      targetPort: 3306 # Pod의 포트
+      nodePort: 31000 # 노드에 열리는 포트 (30000-32767 범위)
+      name: balance-db # 포트 이름
+  selector:
+    app: balance-db # 어떤 Pod를 연결할지 선택
