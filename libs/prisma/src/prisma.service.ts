@@ -55,7 +55,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     }
   }
 
-  // 트랜잭션 헬퍼 메소드
+  async enableShutdownHooks() {
+    process.on('beforeExit', async () => {
+      await this.$disconnect();
+    });
+  }
+
   async executeInTransaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
     return this.$transaction(async (tx) => {
       return await fn(tx);

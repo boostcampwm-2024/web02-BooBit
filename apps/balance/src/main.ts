@@ -1,10 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { BalanceModule } from './balance.module';
-import { PrismaService } from './databases/prisma/prisma.service';
+import { PrismaService } from '@app/prisma';
 
 async function bootstrap() {
   const app = await NestFactory.create(BalanceModule);
-
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks();
 
