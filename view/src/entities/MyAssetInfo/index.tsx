@@ -6,8 +6,8 @@ type MyAssetInfoProps = {
   amount: number;
 };
 
-const MyAssetInfo: React.FC<MyAssetInfoProps> = () => {
-  return <BoxContainer>ff</BoxContainer>;
+const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
+  return <BoxContainer>{currency_code}</BoxContainer>;
 };
 
 export default MyAssetInfo;

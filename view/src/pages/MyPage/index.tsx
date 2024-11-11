@@ -10,10 +10,8 @@ import Title from './UI/Title';
 import MyAssetList from '../../entities/MyAssetList';
 
 import CATEGORY from './consts/category';
-<<<<<<< HEAD
+import assetList from './consts/mockData';
 import MyAssetInfo from '../../entities/MyAssetInfo';
-=======
->>>>>>> e37feb5c2b5f29c516f5194243adbca16b3646de
 
 const Home = () => {
   const [selectedCateIdx, setSelectedCateIdx] = useState(0);
@@ -42,10 +40,14 @@ const Home = () => {
 
         <MainviewLayout>
           <Title content={CATEGORY[selectedCateIdx]} />
-<<<<<<< HEAD
-          <MyAssetInfo currency_code="KRW" amount={17000} />
-=======
->>>>>>> e37feb5c2b5f29c516f5194243adbca16b3646de
+          <MyAssetList
+            assetList={assetList.assets}
+            setSelectedAssetIdx={setSelectedAssetIdx}
+          ></MyAssetList>
+          <MyAssetInfo
+            currency_code={assetList.assets[selectedAssetIdx].currency_code}
+            amount={assetList.assets[selectedAssetIdx].amount}
+          ></MyAssetInfo>
         </MainviewLayout>
       </Layout>
     </div>
