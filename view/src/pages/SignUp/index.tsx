@@ -75,7 +75,7 @@ const SignUp = () => {
       ) : (
         ''
       )}
-      <SubmitButton content="가입하기" onClick={handleSumbit} />
+      <SubmitButton height="h-[4rem]" content="가입하기" onClick={handleSumbit} />
     </AuthLayout>
   );
 };
