@@ -8,10 +8,12 @@ spec:
   selector:
     matchLabels:
       app: balance-db
+      type: database
   template:
     metadata:
       labels:
         app: balance-db
+        type: database
     spec:
       nodeSelector:
         kubernetes.io/hostname: nodepool-w-612e

@@ -8,10 +8,12 @@ spec:
   selector:
     matchLabels:
       app: auth-db
+      type: database
   template:
     metadata:
       labels:
         app: auth-db
+        type: database
     spec:
       nodeSelector:
         kubernetes.io/hostname: nodepool-w-612e
