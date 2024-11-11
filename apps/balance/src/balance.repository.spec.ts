@@ -38,24 +38,24 @@ describe('BalanceRepository', () => {
   describe('deposit', () => {
     const userId = BigInt(1);
     const depositDto = {
-      currency_code: CurrencyCode.KRW,
-      amount: new Decimal(10000),
+      currencyCode: CurrencyCode.KRW,
+      amount: 10000,
     };
 
     it('새로운 자산을 생성하고 입금이 성공적으로 처리되어야 한다', async () => {
       const mockAsset = {
-        user_id: userId,
-        currency_code: CurrencyCode.KRW,
-        available_balance: new Decimal(10000),
-        locked_balance: new Decimal(0),
+        userId: userId,
+        currencyCode: CurrencyCode.KRW,
+        availableBalance: 10000,
+        lockedBalance: 0,
       };
 
       const mockTransaction = {
-        tx_id: 'testuuid',
-        user_id: userId,
-        currency_code: CurrencyCode.KRW,
-        tx_type: TransactionType.DEPOSIT,
-        amount: new Decimal(10000),
+        txId: 'testuuid',
+        userId: userId,
+        currencyCode: CurrencyCode.KRW,
+        txType: TransactionType.DEPOSIT,
+        amount: 10000,
       };
 
       mockPrismaService.asset.upsert.mockResolvedValue(mockAsset);
@@ -65,27 +65,27 @@ describe('BalanceRepository', () => {
 
       expect(mockPrismaService.asset.upsert).toHaveBeenCalledWith({
         where: {
-          user_id_currency_code: {
-            user_id: userId,
-            currency_code: CurrencyCode.KRW,
+          userId_currencyCode: {
+            userId: userId,
+            currencyCode: CurrencyCode.KRW,
           },
         },
         create: {
-          user_id: userId,
-          currency_code: CurrencyCode.KRW,
-          available_balance: new Decimal(10000),
-          locked_balance: new Decimal(0),
+          userId: userId,
+          currencyCode: CurrencyCode.KRW,
+          availableBalance: 10000,
+          lockedBalance: 0,
         },
         update: {
-          available_balance: {
-            increment: new Decimal(10000),
+          availableBalance: {
+            increment: 10000,
           },
         },
       });
 
       expect(result).toEqual({
         depositTransactionResult: mockTransaction,
-        newBalance: mockAsset.available_balance,
+        newBalance: mockAsset.availableBalance,
       });
     });
   });
@@ -93,13 +93,13 @@ describe('BalanceRepository', () => {
   describe('withdraw', () => {
     const userId = BigInt(1);
     const withdrawDto = {
-      currency_code: CurrencyCode.KRW,
-      amount: new Decimal(5000),
+      currencyCode: CurrencyCode.KRW,
+      amount: 5000,
     };
 
     it('잔액이 부족한 경우 에러를 반환해야 한다', async () => {
       mockPrismaService.asset.findUnique.mockResolvedValue({
-        available_balance: new Decimal(1000),
+        availableBalance: new Decimal(1000),
       });
 
       await expect(repository.withdraw(userId, withdrawDto)).rejects.toThrow(BadRequestException);
@@ -107,23 +107,23 @@ describe('BalanceRepository', () => {
 
     it('출금이 성공적으로 처리되어야 한다', async () => {
       const mockAsset = {
-        user_id: userId,
-        currency_code: CurrencyCode.KRW,
-        available_balance: new Decimal(10000),
-        locked_balance: new Decimal(0),
+        userId: userId,
+        currencyCode: CurrencyCode.KRW,
+        availableBalance: new Decimal(10000),
+        lockedBalance: 0,
       };
 
       const mockUpdatedAsset = {
         ...mockAsset,
-        available_balance: new Decimal(5000),
+        availableBalance: new Decimal(5000),
       };
 
       const mockTransaction = {
-        tx_id: 'testuuid',
-        user_id: userId,
-        currency_code: CurrencyCode.KRW,
-        tx_type: TransactionType.WITHDRAWAL,
-        amount: new Decimal(5000),
+        txId: 'testuuid',
+        userId: userId,
+        currencyCode: CurrencyCode.KRW,
+        txType: TransactionType.WITHDRAWAL,
+        amount: 5000,
       };
 
       mockPrismaService.asset.findUnique.mockResolvedValue(mockAsset);
@@ -134,7 +134,7 @@ describe('BalanceRepository', () => {
 
       expect(result).toEqual({
         makeHistoryResult: mockTransaction,
-        newBalance: mockUpdatedAsset.available_balance,
+        newBalance: mockUpdatedAsset.availableBalance,
       });
     });
   });

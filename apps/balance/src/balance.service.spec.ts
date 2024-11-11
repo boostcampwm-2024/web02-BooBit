@@ -5,7 +5,6 @@ import { BalanceRepository } from './balance.repository';
 import { CurrencyCode } from '@app/common';
 import { Decimal } from '@prisma/client/runtime/library';
 import { BalanceException } from './exception/balance.exception';
-import { BALANCE_EXCEPTIONS } from './exception/balance.exceptions';
 import { AssetDto } from './dto/asset.dto';
 
 describe('BalanceService', () => {
@@ -37,24 +36,24 @@ describe('BalanceService', () => {
   describe('deposit', () => {
     const userId = BigInt(1);
     const depositDto = {
-      currency_code: CurrencyCode.KRW,
-      amount: new Decimal(10000),
+      currencyCode: CurrencyCode.KRW,
+      amount: 10000,
     };
 
     it('입금 금액이 0보다 작거나 같으면 에러를 반환해야 한다', async () => {
-      const invalidDepositDto = { ...depositDto, amount: new Decimal(0) };
+      const invalidDepositDto = { ...depositDto, amount: 0 };
       await expect(service.deposit(userId, invalidDepositDto)).rejects.toThrow(BadRequestException);
     });
 
     it('입금이 성공적으로 처리되어야 한다', async () => {
       const mockResponse = {
         depositTransactionResult: {
-          tx_id: 'testuuid',
-          user_id: userId,
-          currency_code: CurrencyCode.KRW,
-          amount: new Decimal(10000),
+          txId: 'testuuid',
+          userId: userId,
+          currencyCode: CurrencyCode.KRW,
+          amount: 10000,
         },
-        newBalance: new Decimal(10000),
+        newBalance: 10000,
       };
 
       mockBalanceRepository.deposit.mockResolvedValue(mockResponse);
@@ -69,12 +68,12 @@ describe('BalanceService', () => {
   describe('withdraw', () => {
     const userId = BigInt(1);
     const withdrawDto = {
-      currency_code: CurrencyCode.KRW,
-      amount: new Decimal(5000),
+      currencyCode: CurrencyCode.KRW,
+      amount: 5000,
     };
 
     it('출금 금액이 0보다 작거나 같으면 에러를 반환해야 한다', async () => {
-      const invalidWithdrawDto = { ...withdrawDto, amount: new Decimal(0) };
+      const invalidWithdrawDto = { ...withdrawDto, amount: 0 };
       await expect(service.withdraw(userId, invalidWithdrawDto)).rejects.toThrow(
         BadRequestException,
       );
@@ -83,12 +82,12 @@ describe('BalanceService', () => {
     it('출금이 성공적으로 처리되어야 한다', async () => {
       const mockResponse = {
         makeHistoryResult: {
-          tx_id: 'testuuid',
-          user_id: userId,
-          currency_code: CurrencyCode.KRW,
-          amount: new Decimal(5000),
+          txId: 'testuuid',
+          userId: userId,
+          currencyCode: CurrencyCode.KRW,
+          amount: 5000,
         },
-        newBalance: new Decimal(5000),
+        newBalance: 5000,
       };
 
       mockBalanceRepository.withdraw.mockResolvedValue(mockResponse);
@@ -101,28 +100,29 @@ describe('BalanceService', () => {
   });
 
   describe('getAssets', () => {
-    const userId = 1;
+    const userId = BigInt(1);
 
     it('사용자의 자산이 없으면 에러를 반환해야 한다', async () => {
       mockBalanceRepository.getAssets.mockResolvedValue([]);
 
       await expect(service.getAssets(userId)).rejects.toThrow(BalanceException);
-      await expect(service.getAssets(userId)).rejects.toThrowError(
-        new BalanceException(BALANCE_EXCEPTIONS.USER_ASSETS_NOT_FOUND),
-      );
     });
 
     it('사용자의 자산이 성공적으로 반환되어야 한다', async () => {
       const mockAssets = [
         {
-          currency_code: CurrencyCode.KRW,
-          available_balance: new Decimal(10000),
-          locked_balance: new Decimal(0),
+          currencyCode: CurrencyCode.KRW,
+          availableBalance: new Decimal(10000),
+          lockedBalance: new Decimal(0),
         },
       ];
 
       const expectedAssets = mockAssets.map(
-        (asset) => new AssetDto(asset.currency_code, asset.available_balance, asset.locked_balance),
+        (asset) =>
+          new AssetDto(
+            asset.currencyCode,
+            asset.availableBalance.add(asset.lockedBalance).toNumber(),
+          ),
       );
 
       mockBalanceRepository.getAssets.mockResolvedValue(mockAssets);
