@@ -15,14 +15,21 @@ const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
   const [selectedCate, setSelectedCate] = useState('내역');
   const [withdrawlAmount, setWithdrawlAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
+  const [depositError, setDepositError] = useState(false);
 
   const handleWithdrawl = () => {
+    if (Number(withdrawlAmount) === 0) return;
     alert(`{
 	"currency_code": ${currency_code},
 	"amount": ${withdrawlAmount}
 }`);
   };
   const handleDeposit = () => {
+    if (Number(depositAmount) === 0) return;
+    if (Number(depositAmount) > amount) {
+      setDepositError(true);
+      return;
+    }
     alert(`{
 	"currency_code": ${currency_code},
 	"amount": ${depositAmount}
@@ -54,6 +61,7 @@ const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
           handleSubmit={handleDeposit}
           amount={depositAmount}
           setAmount={setDepositAmount}
+          isError={depositError}
         />
       )}
     </BoxContainer>
