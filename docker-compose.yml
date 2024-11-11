@@ -1,27 +1,21 @@
-version: '3.8'
-
 services:
-  db:
-    image: mysql:8.0.22
-    container_name: mysql-server
+  redis:
+    image: redis:7.2 # LTS 버전 지정
+    container_name: session-server
     ports:
-      - '${HOST_PORT}:${MYSQL_PORT}'
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+      - '6379:6379'
     volumes:
-      - ./data:/var/lib/mysql
-      - ./docker_init/mysql_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./redis_db_data:/data
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    restart: always
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 1m30s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
 
   balance:
     container_name: balance-server
@@ -29,13 +23,13 @@ services:
       context: .
       dockerfile: ./apps/balance/DockerFile
       args:
-        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${BALANCE_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
     ports:
-      - '3000:3000'
+      - '${BALANCE_HOST_SERVICE_PORT}:3000'
     environment:
-      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${BALANCE_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
     depends_on:
-      db:
+      balance-db:
         condition: service_healthy
     restart: always
 
@@ -45,12 +39,56 @@ services:
       context: .
       dockerfile: ./apps/auth/DockerFile
       args:
-        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${AUTH_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
     ports:
-      - '3000:3000'
+      - '${AUTH_HOST_SERVICE_PORT}:3000'
     environment:
-      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${AUTH_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
     depends_on:
-      db:
+      auth-db:
         condition: service_healthy
     restart: always
+
+  balance-db:
+    image: mysql:8.0.22
+    container_name: balance-db
+    ports:
+      - '${BALANCE_HOST_DB_PORT}:${MYSQL_PORT}'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./db_data_balance:/var/lib/mysql
+      - ./docker_init/mysql_init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-db:
+    image: mysql:8.0.22
+    container_name: auth-db
+    ports:
+      - '${AUTH_HOST_DB_PORT}:${MYSQL_PORT}'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./db_data_auth:/var/lib/mysql
+      - ./docker_init/mysql_init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
