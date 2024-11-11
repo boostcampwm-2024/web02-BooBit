@@ -13,6 +13,22 @@ type MyAssetInfoProps = {
 
 const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
   const [selectedCate, setSelectedCate] = useState('내역');
+  const [withdrawlAmount, setWithdrawlAmount] = useState('');
+  const [depositAmount, setDepositAmount] = useState('');
+
+  const handleWithdrawl = () => {
+    alert(`{
+	"currency_code": ${currency_code},
+	"amount": ${withdrawlAmount}
+}`);
+  };
+  const handleDeposit = () => {
+    alert(`{
+	"currency_code": ${currency_code},
+	"amount": ${depositAmount}
+}`);
+  };
+
   return (
     <BoxContainer>
       <Title currency_code={currency_code} amount={amount} />
@@ -24,8 +40,22 @@ const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
           ))}
         </ul>
       )}
-      {selectedCate === '입금' && <TransactionForm type="입금" />}
-      {selectedCate === '출금' && <TransactionForm type="출금" />}
+      {selectedCate === '입금' && (
+        <TransactionForm
+          type="입금"
+          handleSubmit={handleWithdrawl}
+          amount={withdrawlAmount}
+          setAmount={setWithdrawlAmount}
+        />
+      )}
+      {selectedCate === '출금' && (
+        <TransactionForm
+          type="출금"
+          handleSubmit={handleDeposit}
+          amount={depositAmount}
+          setAmount={setDepositAmount}
+        />
+      )}
     </BoxContainer>
   );
 };
