@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BoxContainer from './UI/BoxContainer';
 import Title from './UI/Title';
 import Tab from './UI/Tab';
@@ -35,6 +35,12 @@ const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
 	"amount": ${depositAmount}
 }`);
   };
+
+  useEffect(() => {
+    setWithdrawlAmount('');
+    setDepositAmount('');
+    setDepositError(false);
+  }, [selectedCate]);
 
   return (
     <BoxContainer>
