@@ -5,7 +5,7 @@ const Title: React.FC<{
   amount: number;
 }> = ({ currency_code, amount }) => {
   return (
-    <div className="mx-12 mt-7 mb-4 text-display-bold-20">
+    <div className="mx-9 my-5 text-display-bold-20">
       {currency_code}
       <div className="w-[19vw] flex justify-between mt-2 text-available-medium-16">
         <div>총 소유</div>
