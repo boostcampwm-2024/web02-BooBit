@@ -7,11 +7,17 @@ import VerticalDivider from './UI/VerticalDivider';
 import CategoryItem from './UI/CategoryItem';
 import Title from './UI/Title';
 
+import MyAssetList from '../../entities/MyAssetList';
+
 import CATEGORY from './consts/category';
+<<<<<<< HEAD
 import MyAssetInfo from '../../entities/MyAssetInfo';
+=======
+>>>>>>> e37feb5c2b5f29c516f5194243adbca16b3646de
 
 const Home = () => {
   const [selectedCateIdx, setSelectedCateIdx] = useState(0);
+  const [selectedAssetIdx, setSelectedAssetIdx] = useState(0);
 
   const moveCategory = (categoryIdx: number) => {
     setSelectedCateIdx(categoryIdx);
@@ -36,7 +42,10 @@ const Home = () => {
 
         <MainviewLayout>
           <Title content={CATEGORY[selectedCateIdx]} />
+<<<<<<< HEAD
           <MyAssetInfo currency_code="KRW" amount={17000} />
+=======
+>>>>>>> e37feb5c2b5f29c516f5194243adbca16b3646de
         </MainviewLayout>
       </Layout>
     </div>

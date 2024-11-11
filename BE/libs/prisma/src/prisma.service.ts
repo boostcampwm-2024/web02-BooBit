@@ -13,7 +13,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       log: ['query', 'info', 'warn', 'error'],
       datasources: {
         db: {
-          url: configService.get<string>('DATABASE_URL')
+          url: configService.get<string>('DATABASE_URL'),
         },
       },
     });
@@ -56,9 +56,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   // 트랜잭션 헬퍼 메소드
-  async executeInTransaction<T>(
-    fn: (tx: Prisma.TransactionClient) => Promise<T>
-  ): Promise<T> {
+  async executeInTransaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
     return this.$transaction(async (tx) => {
       return await fn(tx);
     });

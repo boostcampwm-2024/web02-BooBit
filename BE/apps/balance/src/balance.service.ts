@@ -1,110 +1,44 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './balance.controller';
-import { PrismaService } from '@app/prisma';
-import { Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-
-export enum TransactionType {
-  DEPOSIT = 'DEPOSIT',
-  WITHDRAWAL = 'WITHDRAWAL'
-}
+import { BalanceRepository } from './balance.repository';
+import { BalanceException } from './exception/balance.exception';
+import { BALANCE_EXCEPTIONS } from './exception/balance.exceptions';
+import { AssetDto } from './dto/asset.dto';
 
 @Injectable()
 export class BalanceService {
-  constructor(private prisma: PrismaService) {}
-  
-  async deposit(userId: string, createTransactionDto: CreateTransactionDto) {
-    const { currency_code, amount } = createTransactionDto;
+  constructor(private balanceRepository: BalanceRepository) {}
+
+  async deposit(userId: bigint, createTransactionDto: CreateTransactionDto) {
+    const { amount } = createTransactionDto;
 
     if (amount <= new Decimal(0)) {
       throw new BadRequestException('Deposit amount must be greater than 0');
     }
 
-    return this.prisma.$transaction(async (prisma) => {
-      const asset = await prisma.asset.upsert({
-        where: { 
-          user_id_currency_code: {
-            user_id: userId,
-            currency_code,
-          },
-        },
-        create: {
-          user_id: userId,
-          currency_code,
-          available_balance: new Decimal(amount),
-          locked_balance: new Decimal(0),
-        },
-        update: {
-          available_balance: {
-            increment: amount,
-          },
-        },
-      });
-
-      const depositTransaction = await prisma.depositWithdrawal.create({
-        data: {
-          user_id: userId,
-          currency_code,
-          tx_type: TransactionType.DEPOSIT,
-          amount: new Decimal(amount),
-        },
-      });
-
-      return {
-        depositTransaction,
-        newBalance: asset.available_balance,
-      };
-    });
+    return await this.balanceRepository.deposit(userId, createTransactionDto);
   }
 
-  async withdraw(userId: string, createTransactionDto: CreateTransactionDto) {
-    const { currency_code, amount } = createTransactionDto;
+  async withdraw(userId: bigint, createTransactionDto: CreateTransactionDto) {
+    const { amount } = createTransactionDto;
 
     if (amount <= new Decimal(0)) {
       throw new BadRequestException('Withdrawal amount must be greater than 0');
     }
 
-    return this.prisma.$transaction(async (prisma) => {
-      const asset = await prisma.asset.findUnique({
-        where: {
-          user_id_currency_code: {
-            user_id: userId,
-            currency_code,
-          },
-        },
-      });
+    return await this.balanceRepository.withdraw(userId, createTransactionDto);
+  }
 
-      if (!asset || asset.available_balance.lessThan(amount)) {
-        throw new BadRequestException('잔액 불충분');
-      }
+  async getAssets(userId: number) {
+    const assets = await this.balanceRepository.getAssets(userId);
 
-      const updatedAsset = await prisma.asset.update({
-        where: {
-          user_id_currency_code: {
-            user_id: userId,
-            currency_code,
-          },
-        },
-        data: {
-          available_balance: {
-            decrement: amount,
-          },
-        },
-      });
+    if (assets.length === 0) {
+      throw new BalanceException(BALANCE_EXCEPTIONS.USER_ASSETS_NOT_FOUND);
+    }
 
-      const transaction = await prisma.depositWithdrawal.create({
-        data: {
-          user_id: userId,
-          currency_code,
-          tx_type: TransactionType.WITHDRAWAL,
-          amount: new Decimal(amount),
-        },
-      });
-
-      return {
-        transaction,
-        newBalance: updatedAsset.available_balance,
-      };
-    });
+    return assets.map(
+      (asset) => new AssetDto(asset.currency_code, asset.available_balance, asset.locked_balance),
+    );
   }
 }

@@ -34,6 +34,7 @@ module.exports = {
         primary: '#5A4F9C',
         accent: '#63D1FF',
         'surface-default': '#1E1E2F',
+        'surface-hover-light': '#2B2B3D',
         'surface-alt': '#5A90E8',
         'background-default': '#121212',
         'text-light': '#E0E0E0',
