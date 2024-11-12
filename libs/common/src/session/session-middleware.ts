@@ -1,8 +1,8 @@
-import session from 'express-session';
+import * as session from 'express-session';
 import { createClient } from 'redis';
 import RedisStore from 'connect-redis';
 import * as crypto from 'crypto';
-import passport from 'passport';
+import * as passport from 'passport';
 
 export const createSessionConfig = async () => {
   const redisClient = createClient({
