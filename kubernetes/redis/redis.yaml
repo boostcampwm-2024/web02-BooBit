@@ -1,0 +1,46 @@
+# redis-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+      type: database # 공통 selector
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        type: database # 공통 selector
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: boobit-w-617b
+      containers:
+      - name: redis
+        image: redis:7.2-alpine
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+---
+# redis-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+  - port: 6379 # 서비스가 노출하는 포트
+    targetPort: 6379 # Pod의 포트
+    # nodePort: 32123 # 노드에 열리는 포트 (30000-32767 범위)
+    name: redis # 포트 이름
