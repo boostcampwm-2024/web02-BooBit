@@ -43,7 +43,7 @@ const SignIn = () => {
         isError={error.isError}
         errorMessage={error.errorMessage}
       />
-      <SubmitButton content="로그인" onClick={handleSumbit} />
+      <SubmitButton height="h-[4rem]" content="로그인" onClick={handleSumbit} />
       <button
         className="ml-[52%] mb-[5rem] text-available-medium-16 text-text-dark hover:underline"
         onClick={moveToSignup}

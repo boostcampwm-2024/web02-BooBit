@@ -12,7 +12,7 @@ const MyAssetList = ({ assetList, setSelectedAssetIdx }: AssetListProps) => {
   return (
     <BoxContainer>
       <InfoBar />
-      <ul className="h-[calc(100%-2rem)] overflow-y-scroll">
+      <ul className="h-[10rem] overflow-y-auto">
         {assetList.map((a, i) => {
           return (
             <AssetItem key={a.currency_code} asset={a} handleClick={() => setSelectedAssetIdx(i)} />
