@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 import Logo from './UI/Logo';
 import { useAuth } from '../../shared/store/auth/authContext';
+import useSignout from './model/useSignout';
 
 const Header = () => {
   const { state } = useAuth();
+  const { mutate } = useSignout();
 
   const handleLogout = () => {
-    alert('로그아웃하기');
+    mutate();
   };
 
   return (
