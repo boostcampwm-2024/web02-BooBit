@@ -1,8 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
-import { CreateTransactionDto } from './balance.controller';
-import { Prisma } from '@prisma/client';
-import { asset } from './dto/asset.type';
+import { CreateTransactionDto } from './dto/create.transaction.dto';
 
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
@@ -12,24 +10,25 @@ export enum TransactionType {
 @Injectable()
 export class BalanceRepository {
   constructor(private prisma: PrismaService) {}
+
   async deposit(userId: bigint, createTransactionDto: CreateTransactionDto) {
-    const { currency_code, amount } = createTransactionDto;
+    const { currencyCode, amount } = createTransactionDto;
     return await this.prisma.$transaction(async (prisma) => {
       const asset = prisma.asset.upsert({
         where: {
-          user_id_currency_code: {
-            user_id: userId,
-            currency_code,
+          userId_currencyCode: {
+            userId,
+            currencyCode,
           },
         },
         create: {
-          user_id: userId,
-          currency_code,
-          available_balance: new Prisma.Decimal(amount),
-          locked_balance: new Prisma.Decimal(0),
+          userId,
+          currencyCode,
+          availableBalance: amount,
+          lockedBalance: 0,
         },
         update: {
-          available_balance: {
+          availableBalance: {
             increment: amount,
           },
         },
@@ -37,10 +36,10 @@ export class BalanceRepository {
 
       const depositTransaction = prisma.depositWithdrawal.create({
         data: {
-          user_id: userId,
-          currency_code,
-          tx_type: TransactionType.DEPOSIT,
-          amount: new Prisma.Decimal(amount),
+          userId,
+          currencyCode,
+          txType: TransactionType.DEPOSIT,
+          amount: amount,
         },
       });
 
@@ -51,37 +50,37 @@ export class BalanceRepository {
 
       return {
         depositTransactionResult,
-        newBalance: assetResult.available_balance,
+        newBalance: assetResult.availableBalance,
       };
     });
   }
 
   async withdraw(userId: bigint, createTransactionDto: CreateTransactionDto) {
     return this.prisma.$transaction(async (prisma) => {
-      const { currency_code, amount } = createTransactionDto;
+      const { currencyCode, amount } = createTransactionDto;
 
       const asset = await prisma.asset.findUnique({
         where: {
-          user_id_currency_code: {
-            user_id: userId,
-            currency_code,
+          userId_currencyCode: {
+            userId,
+            currencyCode,
           },
         },
       });
 
-      if (!asset || asset.available_balance.lessThan(amount)) {
+      if (!asset || asset.availableBalance.lessThan(amount)) {
         throw new BadRequestException('잔액 불충분');
       }
 
       const updatedAsset = prisma.asset.update({
         where: {
-          user_id_currency_code: {
-            user_id: userId,
-            currency_code,
+          userId_currencyCode: {
+            userId,
+            currencyCode,
           },
         },
         data: {
-          available_balance: {
+          availableBalance: {
             decrement: amount,
           },
         },
@@ -89,10 +88,10 @@ export class BalanceRepository {
 
       const makeHistory = prisma.depositWithdrawal.create({
         data: {
-          user_id: userId,
-          currency_code,
-          tx_type: TransactionType.WITHDRAWAL,
-          amount: new Prisma.Decimal(amount),
+          userId,
+          currencyCode,
+          txType: TransactionType.WITHDRAWAL,
+          amount: amount,
         },
       });
 
@@ -103,19 +102,19 @@ export class BalanceRepository {
 
       return {
         makeHistoryResult,
-        newBalance: updatedAssetResult.available_balance,
+        newBalance: updatedAssetResult.availableBalance,
       };
     });
   }
 
-  async getAssets(userId: number): Promise<asset[]> {
+  async getAssets(userId: bigint) {
     return await this.prisma.asset.findMany({
       select: {
-        currency_code: true,
-        available_balance: true,
-        locked_balance: true,
+        currencyCode: true,
+        availableBalance: true,
+        lockedBalance: true,
       },
-      where: { user_id: userId },
+      where: { userId },
     });
   }
 }

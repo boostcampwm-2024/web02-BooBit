@@ -1,16 +1,13 @@
-import { Decimal } from '@prisma/client/runtime/library';
+import { CurrencyCodeName } from '@app/common';
 
 export class AssetDto {
   currencyCode: string;
   name: string;
-  amount: Decimal;
+  amount: number;
 
-  constructor(
-    currencyCode: string,
-    availableBalance: Decimal,
-    lockedBalance: Decimal,
-  ) {
+  constructor(currencyCode: string, amount: number) {
     this.currencyCode = currencyCode;
-    this.amount = availableBalance.add(lockedBalance);
+    this.name = CurrencyCodeName[currencyCode];
+    this.amount = amount;
   }
 }
