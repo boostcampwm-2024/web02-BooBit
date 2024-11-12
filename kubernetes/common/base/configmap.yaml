@@ -1,0 +1,9 @@
+# configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-script
+data:
+  init.sql: |
+    GRANT ALL PRIVILEGES ON *.* TO 'boobit'@'%' WITH GRANT OPTION;
+    FLUSH PRIVILEGES;

@@ -57,4 +57,11 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 
 #testDB
-data*
+/data
+/db_data_auth
+/db_data_balance
+/db_data_transaction
+/db_data_redis
+
+#kubernetes secret
+/kubernetes/common/base/secret.yaml
