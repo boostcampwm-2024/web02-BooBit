@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  user_id       BigInt    @id @default(autoincrement())
+  userId        BigInt    @id @default(autoincrement()) @map("user_id")
   email         String    @unique @db.VarChar(100)
   password_hash String    @db.VarChar(200)
   name          String    @db.VarChar(50)

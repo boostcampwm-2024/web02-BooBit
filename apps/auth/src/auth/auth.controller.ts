@@ -29,7 +29,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(@Request() req) {
     return {
-      user_id: req.user.user_id,
+      userId: req.user.userId,
       email: req.user.email,
       name: req.user.name,
     };
