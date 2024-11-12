@@ -4,7 +4,7 @@ import { AuthController } from '../src/auth/auth.controller';
 import { AuthService } from '../src/auth/auth.service';
 import { ConflictException } from '@nestjs/common';
 import { LocalAuthGuard } from '../src/auth/guards/local-auth.guard';
-import { AuthenticatedGuard } from '../src/auth/guards/authenticated.guard';
+import { AuthenticatedGuard } from '@app/common/session/authenticated.guard';
 import { Response } from 'express';
 
 describe('AuthController', () => {

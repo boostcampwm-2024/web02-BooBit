@@ -12,7 +12,7 @@ import {
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { AuthenticatedGuard } from './guards/authenticated.guard';
+import { AuthenticatedGuard } from '@app/common/session/authenticated.guard';
 import { SignUpDto } from './dto/signup.dto';
 
 @Controller('api/auth')
