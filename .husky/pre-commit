@@ -1,2 +1,1 @@
-(cd BE && npx lint-staged)
-(cd FE && npx lint-staged)
+npx lint-staged
