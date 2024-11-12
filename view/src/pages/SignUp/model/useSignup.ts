@@ -1,11 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
 import signUpApi from '../api/signupApi';
+import { useNavigate } from 'react-router-dom';
 
 const useSignup = () => {
+  const navigate = useNavigate();
+
   return useMutation({
     mutationFn: signUpApi,
     onSuccess: () => {
       alert('회원가입 성공:');
+      navigate('/signin');
     },
     onError: (error: unknown) => {
       if (error instanceof Error) {
