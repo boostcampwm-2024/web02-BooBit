@@ -16,7 +16,7 @@ spec:
         type: database
     spec:
       nodeSelector:
-        kubernetes.io/hostname: nodepool-w-612e
+        kubernetes.io/hostname: boobit-w-617b
       containers:
         - name: auth-db
           image: mysql:8.0.22
