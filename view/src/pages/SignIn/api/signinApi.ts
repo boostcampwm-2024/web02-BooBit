@@ -1,7 +1,6 @@
 import { FormData } from '../model/formDataType';
 
-// signUpApi.js
-const BASE_URL = 'https://05cefaaa-612e-4624-8010-16fe9ea8a806.mock.pstmn.io';
+const BASE_URL = 'http://localhost:3100';
 
 const signinApi = async (formData: FormData) => {
   const response = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -13,7 +12,7 @@ const signinApi = async (formData: FormData) => {
   });
 
   if (!response.ok) {
-    throw new Error('로그인에 실패했습니다.');
+    throw new Error(response.status.toString());
   }
 
   return response.json();

@@ -7,14 +7,13 @@ import useSigninForm from './model/useSigninForm';
 import useSignin from './model/useSignin';
 
 const SignIn = () => {
-  const { mutate } = useSignin();
-  const { formData, error, handleChange, validateForm, resetError } = useSigninForm();
+  const { formData, error, handleChange, validateForm, updateErrorMessage } = useSigninForm();
+  const { mutate } = useSignin(updateErrorMessage);
   const navigate = useNavigate();
 
   const handleSumbit = () => {
     if (!validateForm()) return;
 
-    resetError();
     mutate(formData);
   };
 
