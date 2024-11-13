@@ -11,8 +11,8 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { AuthenticatedGuard } from '@app/common/session/authenticated.guard';
+import { LocalAuthGuard } from './passport/local.auth.guard';
+import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
 import { SignUpDto } from './dto/signup.dto';
 
 @Controller('api/auth')

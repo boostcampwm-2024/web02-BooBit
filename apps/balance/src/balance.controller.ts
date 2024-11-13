@@ -1,8 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import { CreateTransactionDto } from './dto/create.transaction.dto';
-import { AuthenticatedGuard } from '@app/common/session/authenticated.guard';
-
+import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
 @Controller('api/users')
 export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}

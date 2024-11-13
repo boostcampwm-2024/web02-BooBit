@@ -1,5 +1,5 @@
 // test/auth/session.serializer.spec.ts
-import { SessionSerializer } from '../src/auth/session.serializer';
+import { SessionSerializer } from './session.serializer';
 
 describe('SessionSerializer', () => {
   let serializer: SessionSerializer;
@@ -11,7 +11,7 @@ describe('SessionSerializer', () => {
   describe('serializeUser', () => {
     it('필요한 사용자 정보만 세션에 저장', (done) => {
       const user = {
-        user_id: '1',
+        userId: '1',
         email: 'test@example.com',
         name: 'Test User',
         password_hash: 'hash',
@@ -42,7 +42,11 @@ describe('SessionSerializer', () => {
 
       serializer.deserializeUser(sessionUser, (err, deserialized) => {
         expect(err).toBeNull();
-        expect(deserialized).toEqual(sessionUser);
+        expect(deserialized).toEqual({
+          userId: '1',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
         done();
       });
     });

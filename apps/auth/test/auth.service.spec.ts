@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from '../src/auth/auth.service';
+import { AuthService } from '../src/auth.service';
 import { ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '@app/prisma';
@@ -110,7 +110,7 @@ describe('AuthService', () => {
 
       const hashedPassword = await bcrypt.hash(loginDto.password, 12);
       const mockUser = {
-        user_id: '1',
+        userId: '1',
         email: loginDto.email,
         name: 'Test User',
         password_hash: hashedPassword,
@@ -121,7 +121,7 @@ describe('AuthService', () => {
       const result = await service.validateUser(loginDto.email, loginDto.password);
 
       expect(result).toEqual({
-        user_id: '1',
+        userId: '1',
         email: loginDto.email,
         name: 'Test User',
       });

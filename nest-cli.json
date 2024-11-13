@@ -51,6 +51,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/prisma/tsconfig.lib.json"
       }
+    },
+    "session": {
+      "type": "library",
+      "root": "libs/session",
+      "entryFile": "index",
+      "sourceRoot": "libs/session/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/session/tsconfig.lib.json"
+      }
     }
   }
 }
