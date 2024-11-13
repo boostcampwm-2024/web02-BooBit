@@ -16,10 +16,10 @@ const useSignin = (onErrorCallback: (message: string) => void) => {
       if (error instanceof Error) {
         if (error.message === '401') {
           onErrorCallback('이메일 혹은 비밀 번호를 확인해주세요.');
-          console.error('로그인 실패:', error.message);
         }
+        onErrorCallback('로그인에 실패했습니다. 다시 시도해주세요.');
       } else {
-        console.error('로그인 실패: 알 수 없는 오류');
+        onErrorCallback('로그인에 실패했습니다. 다시 시도해주세요.');
       }
     },
   });
