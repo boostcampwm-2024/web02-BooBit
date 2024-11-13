@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Header from '../../widgets/header_temp';
+import Header from '../../widgets/Header';
 import Layout from '../../widgets/Layout';
 import MainviewLayout from './UI/MainviewLayout';
 import SubviewLayout from './UI/SubviewLayout';
