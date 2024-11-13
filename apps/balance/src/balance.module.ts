@@ -4,10 +4,20 @@ import { BalanceService } from './balance.service';
 import { PrismaModule } from '@app/prisma';
 import { BalanceRepository } from './balance.repository';
 import { SessionModule } from '@app/session';
+import { Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [PrismaModule, SessionModule],
   controllers: [BalanceController],
   providers: [BalanceService, BalanceRepository],
 })
-export class BalanceModule {}
+export class BalanceModule {
+  static grpcOptions = {
+    transport: Transport.GRPC,
+    options: {
+      package: 'order',
+      protoPath: '@app/grpc/order.proto',
+      url: '0.0.0.0:5001',
+    },
+  };
+}

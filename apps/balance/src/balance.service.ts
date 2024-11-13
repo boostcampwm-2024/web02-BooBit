@@ -4,6 +4,7 @@ import { BalanceException } from './exception/balance.exception';
 import { BALANCE_EXCEPTIONS } from './exception/balance.exceptions';
 import { AssetDto } from './dto/asset.dto';
 import { CreateTransactionDto } from './dto/create.transaction.dto';
+import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
 
 @Injectable()
 export class BalanceService {
@@ -44,5 +45,13 @@ export class BalanceService {
           asset.availableBalance.add(asset.lockedBalance).toNumber(),
         ),
     );
+  }
+
+  async makeBuyOrder(orderRequest: OrderRequestDto) {
+    return await this.balanceRepository.makeBuyOrder(orderRequest);
+  }
+
+  async makeSellOrder(orderRequest: OrderRequestDto) {
+    return await this.balanceRepository.makeSellOrder(orderRequest);
   }
 }

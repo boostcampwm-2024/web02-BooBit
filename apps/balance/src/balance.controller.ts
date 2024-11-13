@@ -2,6 +2,10 @@ import { Body, Controller, Get, Post, UseGuards, Request, HttpCode } from '@nest
 import { BalanceService } from './balance.service';
 import { CreateTransactionDto } from './dto/create.transaction.dto';
 import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
+import { GrpcMethod } from '@nestjs/microservices';
+import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
+import { OrderResponseDto } from '@app/grpc/dto/order.response.dto';
+
 @Controller('api/users')
 export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}
@@ -31,5 +35,15 @@ export class BalanceController {
     const userId = req.user.userId;
     await this.balanceService.withdraw(userId, createTransactionDto);
     return;
+  }
+
+  @GrpcMethod('OrderService', 'makeBuyOrder')
+  async makeBuyOrder(buyOrderRequest: OrderRequestDto): Promise<OrderResponseDto> {
+    return await this.balanceService.makeBuyOrder(buyOrderRequest);
+  }
+
+  @GrpcMethod('OrderService', 'makeSellOrder')
+  async makeSellOrder(sellOrderRequest: OrderRequestDto): Promise<OrderResponseDto> {
+    return await this.balanceService.makeSellOrder(sellOrderRequest);
   }
 }

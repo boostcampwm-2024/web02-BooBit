@@ -1,0 +1,5 @@
+export enum GrpcOrderStatusCode {
+  NO_BALANCE = 'NO_BALANCE',
+  SUCCESS = 'SUCCESS',
+  TRANSACTION_ERROR = 'TRANSACTION_ERROR',
+}

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package order;
+
+service OrderService {
+  rpc makeBuyOrder(OrderRequest) returns (OrderResponse);
+  rpc makeSellOrder(OrderRequest) returns (OrderResponse);
+}
+
+message OrderRequest {
+  uint64 userId = 1;
+  string coinCode = 2;
+  double amount = 3;
+  double price = 4;
+}
+
+message OrderResponse {
+  string status = 1;
+  uint64 orderId = 2;
+}

@@ -34,7 +34,6 @@ model DepositWithdrawal {
 model OrderHistory {
   historyId BigInt   @id @default(autoincrement()) @map("history_id")
   orderType String   @map("order_type") @db.VarChar(10)
-  orderid   BigInt   @map("order_id")
   userId    BigInt   @map("user_id")
   coinCode  String   @map("coin_code") @db.VarChar(20)
   price     Decimal  @db.Decimal(24, 8)

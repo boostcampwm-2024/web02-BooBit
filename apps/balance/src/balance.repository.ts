@@ -1,7 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { CreateTransactionDto } from './dto/create.transaction.dto';
-
+import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
+import { OrderResponseDto } from '@app/grpc/dto/order.response.dto';
+import { GrpcOrderStatusCode } from '@app/common/enums/grpc-status.enum';
+import { CurrencyCode } from '@app/common';
+import { OrderStatus } from '@app/common/enums/order-status.enum';
+import { OrderType } from '@app/common/enums/order-type.enum';
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
   WITHDRAWAL = 'WITHDRAWAL',
@@ -116,5 +121,104 @@ export class BalanceRepository {
       },
       where: { userId },
     });
+  }
+
+  async makeBuyOrder(orderRequest: OrderRequestDto): Promise<OrderResponseDto> {
+    const { userId, coinCode, amount, price } = orderRequest;
+    const orderPrice = amount * price;
+    try {
+      return await this.prisma.$transaction(async (prisma) => {
+        const asset = await this.getAvailableBalance(prisma, userId, CurrencyCode.KRW);
+        if (asset.availableBalance < orderPrice) {
+          return new OrderResponseDto(GrpcOrderStatusCode.NO_BALANCE, 'NONE');
+        }
+
+        await this.lockBalance(prisma, userId, orderPrice);
+        const historyId = await this.createOrderHistory(
+          prisma,
+          OrderType.BUY,
+          userId,
+          coinCode,
+          price,
+          amount,
+        );
+        return new OrderResponseDto(GrpcOrderStatusCode.SUCCESS, historyId);
+      });
+    } catch {
+      return new OrderResponseDto(GrpcOrderStatusCode.TRANSACTION_ERROR, 'NONE');
+    }
+  }
+
+  async makeSellOrder(orderRequest: OrderRequestDto): Promise<OrderResponseDto> {
+    const { userId, coinCode, amount, price } = orderRequest;
+    try {
+      return await this.prisma.$transaction(async (prisma) => {
+        const asset = await this.getAvailableBalance(prisma, userId, coinCode);
+        if (asset.availableBalance < amount) {
+          return new OrderResponseDto(GrpcOrderStatusCode.NO_BALANCE, 'NONE');
+        }
+
+        await this.lockBalance(prisma, userId, amount);
+        const historyId = await this.createOrderHistory(
+          prisma,
+          OrderType.SELL,
+          userId,
+          coinCode,
+          price,
+          amount,
+        );
+        return new OrderResponseDto(GrpcOrderStatusCode.SUCCESS, historyId);
+      });
+    } catch {
+      return new OrderResponseDto(GrpcOrderStatusCode.TRANSACTION_ERROR, 'NONE');
+    }
+  }
+
+  async getAvailableBalance(prisma, userId, currencyCode) {
+    return await prisma.asset.findUnique({
+      select: { availableBalance: true },
+      where: {
+        userId_currencyCode: {
+          userId,
+          currencyCode,
+        },
+      },
+    });
+  }
+
+  async lockBalance(prisma, userId, orderPrice) {
+    return await prisma.asset.update({
+      where: {
+        userId_currencyCode: {
+          userId,
+          currencyCode: CurrencyCode.KRW,
+        },
+      },
+      data: {
+        availableBalance: {
+          decrement: orderPrice,
+        },
+        lockedBalance: {
+          increment: orderPrice,
+        },
+      },
+    });
+  }
+
+  async createOrderHistory(prisma, orderType, userId, coinCode, price, quantity) {
+    const orderHistory = await prisma.orderHistory.create({
+      data: {
+        orderType: orderType,
+        userId: userId,
+        coinCode: coinCode,
+        price: price,
+        status: OrderStatus.PENDING,
+        quantity: quantity,
+      },
+      select: {
+        historyId: true,
+      },
+    });
+    return orderHistory.historyId;
   }
 }
