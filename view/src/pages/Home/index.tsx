@@ -1,4 +1,4 @@
-import Header from '../../widgets/Header';
+import Header from '../../widgets/header_temp';
 import Layout from '../../widgets/Layout';
 
 const Home = () => {
