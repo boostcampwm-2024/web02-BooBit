@@ -1,11 +1,6 @@
 import { useState, ChangeEvent } from 'react';
 import { FormData } from './formDataType';
-
-interface FormValidation {
-  email: { hasError: boolean; message: string };
-  password: { hasError: boolean; message: string };
-  passwordCheck: { hasError: boolean; message: string };
-}
+import FormValidationType from './formValidationType';
 
 const useSignupForm = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -14,14 +9,14 @@ const useSignupForm = () => {
     password: '',
   });
   const [passwordCheck, setPasswordCheck] = useState('');
-  const [formValidation, setFormValidation] = useState<FormValidation>({
+  const [formValidation, setFormValidation] = useState<FormValidationType>({
     email: { hasError: false, message: '' },
     password: { hasError: false, message: '' },
     passwordCheck: { hasError: false, message: '' },
+    total: { hasError: false, message: '' },
   });
-  const [nullError, setNullError] = useState(false);
 
-  const setError = (field: keyof FormValidation, isError: boolean, message = '') => {
+  const setError = (field: keyof FormValidationType, isError: boolean, message = '') => {
     setFormValidation((prevErrors) => ({
       ...prevErrors,
       [field]: { hasError: isError, message: message },
@@ -62,14 +57,14 @@ const useSignupForm = () => {
     setError(
       'passwordCheck',
       isInvalid,
-      isInvalid ? '비밀번호가 일치하지 않습니다. 다시 입력해 주세요' : ''
+      isInvalid ? '비밀번호가 일치하지 않습니다. 다시 입력해 주세요.' : ''
     );
     return isInvalid;
   };
 
   const validateNull = () => {
     const isNull = Object.values(formData).some((value) => value === '') || passwordCheck === '';
-    setNullError(isNull);
+    setError('total', isNull, isNull ? '모든 항목을 입력해주세요.' : '');
     return isNull;
   };
 
@@ -81,10 +76,10 @@ const useSignupForm = () => {
     formData,
     passwordCheck,
     formValidation,
-    nullError,
     handleChange,
     handlePasswordCheckChange,
     validateForm,
+    setError,
   };
 };
 
