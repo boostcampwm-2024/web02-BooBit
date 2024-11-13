@@ -4,9 +4,9 @@ import { SessionMiddleware } from './session.middleware';
 import { SessionSerializer } from './passport/session.serializer';
 import { AuthenticatedGuard } from './guard/authenticated.guard';
 import { PassportModule } from '@nestjs/passport';
-
+import { ConfigModule } from '@nestjs/config';
 @Module({
-  imports: [PassportModule.register({ session: true })],
+  imports: [ConfigModule, PassportModule.register({ session: true })],
   providers: [SessionSerializer, AuthenticatedGuard],
   exports: [SessionSerializer, AuthenticatedGuard],
 })

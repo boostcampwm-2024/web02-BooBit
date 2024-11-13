@@ -5,17 +5,16 @@ import * as session from 'express-session'; // import 수정
 import RedisStore from 'connect-redis'; // import 수정
 import { Redis } from 'ioredis';
 import * as passport from 'passport';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SessionMiddleware implements NestMiddleware {
   private readonly redisClient: Redis;
   private readonly sessionMiddleware: any;
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     // Redis 클라이언트 초기화
-    this.redisClient = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: Number(process.env.REDIS_PORT) || 6379,
+    this.redisClient = new Redis(configService.get<string>('REDIS_URL'), {
       keepAlive: 10000,
     });
     this.redisClient.on('error', (err) => {
@@ -31,13 +30,13 @@ export class SessionMiddleware implements NestMiddleware {
     // 세션 미들웨어 설정
     this.sessionMiddleware = session({
       store: redisStore,
-      secret: process.env.SESSION_SECRET || 'your-secret-key',
+      secret: configService.get<string>('SESSION_SECRET') || 'your-secret-key',
       resave: false,
       saveUninitialized: false,
       cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 24시간
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: configService.get<string>('NODE_ENV') === 'production',
       },
     });
   }
