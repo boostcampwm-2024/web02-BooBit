@@ -7,16 +7,17 @@ import useSignupForm from './model/useSignupForm';
 import useSignup from './model/useSignup';
 
 const SignUp = () => {
-  const { mutate } = useSignup();
   const {
     formData,
     passwordCheck,
     formValidation,
-    nullError,
     handleChange,
     handlePasswordCheckChange,
     validateForm,
+    setError,
   } = useSignupForm();
+  const { mutate } = useSignup(setError);
+
   const handleSumbit = () => {
     if (validateForm()) {
       return;
@@ -70,10 +71,10 @@ const SignUp = () => {
         isError={formValidation.passwordCheck.hasError}
         errorMessage={formValidation.passwordCheck.message}
       />
-      {nullError ? (
-        <div className="text-negative  text-available-medium-14">모든 항목을 입력해주세요</div>
-      ) : (
-        ''
+      {formValidation.total.hasError && (
+        <div className="text-negative  text-available-medium-14">
+          {formValidation.total.message}
+        </div>
       )}
       <SubmitButton height="h-[4rem]" content="가입하기" onClick={handleSumbit} />
     </AuthLayout>
