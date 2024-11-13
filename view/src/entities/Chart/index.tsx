@@ -7,6 +7,7 @@ interface CandleData {
   high: number;
   low: number;
   close: number;
+  volume: number;
 }
 
 interface CandleChartProps {
@@ -22,6 +23,18 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
     const margin = { top: 20, right: 90, bottom: 50, left: 40 };
     const width = 1076 - margin.left - margin.right;
     const height = 460 - margin.top - margin.bottom;
+    const volumnHeight = 80;
+
+    const svg = d3.select(svgRef.current);
+    svg.selectAll('*').remove();
+
+    //배경 그리기
+    const mainGroup = svg
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+      .style('background-color', '#1E1E2F')
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
 
     // X축과 Y축 스케일 설정
     const x = d3
@@ -38,16 +51,7 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
       .scaleLinear()
       .domain([yMin - (yMax - yMin) * paddingRatio, yMax + (yMax - yMin) * paddingRatio])
       .nice()
-      .range([height, 0]);
-
-    //배경 그리기
-    const svg = d3
-      .select(svgRef.current)
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .style('background-color', '#1E1E2F')
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+      .range([height - volumnHeight, 0]);
 
     // x축 y축
     const xAxisG = d3
@@ -82,7 +86,7 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
     yAxisG.call(yAxis);
 
     // 고점과 저점 선 그리기
-    svg
+    mainGroup
       .selectAll('.line')
       .data(data)
       .enter()
@@ -95,7 +99,7 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
       .attr('stroke-width', 1);
 
     // rect 그리기
-    svg
+    mainGroup
       .append('g')
       .selectAll('.bar')
       .data(data)
@@ -105,6 +109,48 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
       .attr('y', (d) => y(Math.max(d.open, d.close)))
       .attr('width', x.bandwidth())
       .attr('height', (d) => Math.abs(y(d.open) - y(d.close)))
+      .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'));
+
+    // # 구분선
+    mainGroup
+      .append('line')
+      .attr('x1', 0)
+      .attr('x2', width)
+      .attr('y1', height - volumnHeight)
+      .attr('y2', height - volumnHeight)
+      .attr('stroke', '#A0A0A0')
+      .attr('stroke-width', 0.5);
+
+    // # 거래량 그래프
+
+    const volumeMax = d3.max(data, (d) => d.volume)!;
+    const yVolumn = d3
+      .scaleLinear()
+      .domain([0, volumeMax + volumeMax * 0.2])
+      .range([volumnHeight, 0]);
+
+    const yVolumeAxisG = d3
+      .select(svgRef.current)
+      .append('g')
+      .attr(
+        'transform',
+        `translate(${margin.left + width}, ${margin.top + height - volumnHeight})`
+      );
+
+    const yVolumeAxis = d3.axisRight(yVolumn).ticks(3);
+
+    yVolumeAxisG.call(yVolumeAxis);
+
+    mainGroup
+      .append('g')
+      .selectAll('.volumn-bar')
+      .data(data)
+      .enter()
+      .append('rect')
+      .attr('x', (d) => x(d.date.toISOString())!)
+      .attr('y', (d) => height - volumnHeight + yVolumn(d.volume))
+      .attr('width', x.bandwidth())
+      .attr('height', (d) => volumnHeight - yVolumn(d.volume))
       .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'));
   }, [data]);
 
