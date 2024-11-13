@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model buyOrder {
+  historyId     String @id @map("_id") 
+  userId        String    @map("user_id")
+  coinCode      String   @map("coin_code")
+  price         String 
+  originalQuote String @map("original_quote")
+  remainingQuote String @map("remaining_quote")
+  createdAt    DateTime @map("created_at") @default(now())
+  
+  @@map("buy_order")
+}
+
+model sellOrder {
+  historyId     String @id @map("_id") 
+  userId        String    @map("user_id")
+  coinCode      String   @map("coin_code")
+  price         String 
+  originalQuote String @map("original_quote")
+  remainingBase String @map("remaining_base")
+  createdAt    DateTime @map("created_at") @default(now())
+  
+  @@map("sell_order")
+}
