@@ -41,9 +41,9 @@
     "connect-redis": "^7.1.1",
     "dotenv-cli": "^7.4.2",
     "express-session": "^1.18.1",
+    "ioredis": "^5.4.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "redis": "^4.7.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
   },
@@ -99,7 +99,9 @@
     ],
     "moduleNameMapper": {
       "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
-      "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1"
+      "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1",
+      "^@app/session(|/.*)$": "<rootDir>/libs/session/src/$1",
+      "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1"
     }
   }
 }

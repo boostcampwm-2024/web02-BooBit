@@ -12,7 +12,7 @@ services:
       - '${AUTH_HOST_SERVICE_PORT}:3000'
     environment:
       DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${AUTH_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
-      REDIS_URL: 'redis://${REDIS}:${REDIS_PORT}'
+      REDIS_URL: 'redis://${REDIS_HOST}:${REDIS_PORT}'
     depends_on:
       auth-db:
         condition: service_healthy
@@ -30,7 +30,7 @@ services:
       - '${BALANCE_HOST_SERVICE_PORT}:3000'
     environment:
       DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${BALANCE_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
-      REDIS_URL: 'redis://${REDIS}:6379'
+      REDIS_URL: 'redis://${REDIS_HOST}:6379'
     depends_on:
       balance-db:
         condition: service_healthy
