@@ -1,12 +1,33 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Request, Post, UseGuards, Body } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
+import { AuthenticatedGuard } from '@app/common/session/authenticated.guard';
+import { OrderLimitRequestDto } from './dto/order.limit.request.dto';
+import { TransactionGrcpService } from './transaction.grcp.service';
+import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
+import { firstValueFrom } from 'rxjs';
 
-@Controller()
+@Controller('api/orders')
 export class TransactionController {
-  constructor(private readonly transactionService: TransactionService) {}
+  constructor(
+    private readonly transactionService: TransactionService,
+    private readonly transactionGrcpService: TransactionGrcpService,
+  ) {}
 
-  @Get()
-  getHello(): string {
-    return this.transactionService.getHello();
+  @Post('/limit/buy')
+  @UseGuards(AuthenticatedGuard)
+  async buyLimitOrder(@Request() req, @Body() buyLimitRequest: OrderLimitRequestDto) {
+    const userId = req.user.userId;
+    const orderRequest = new OrderRequestDto(userId, buyLimitRequest);
+    const response = await firstValueFrom(this.transactionGrcpService.makeBuyOrder(orderRequest));
+    return await this.transactionService.registerBuyOrder(orderRequest, response);
+  }
+
+  @Post('/limit/sell')
+  @UseGuards(AuthenticatedGuard)
+  async sellLimitOrder(@Request() req, @Body() sellLimitRequest: OrderLimitRequestDto) {
+    const userId = req.user.userId;
+    const orderRequest = new OrderRequestDto(userId, sellLimitRequest);
+    const response = await firstValueFrom(this.transactionGrcpService.makeSellOrder(orderRequest));
+    return await this.transactionService.registerSellOrder(orderRequest, response);
   }
 }
