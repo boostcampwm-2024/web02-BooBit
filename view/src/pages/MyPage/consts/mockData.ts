@@ -3,12 +3,12 @@ export default {
     {
       currencyCode: 'KRW',
       name: '원화',
-      amount: 14000,
+      amount: -1,
     },
     {
       currencyCode: 'BTC',
       name: '비트코인',
-      amount: 17,
+      amount: -1,
     },
     /*
     {
