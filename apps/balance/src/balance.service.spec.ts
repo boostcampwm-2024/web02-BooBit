@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import { BalanceRepository } from './balance.repository';
 import { CurrencyCode } from '@app/common';
@@ -42,26 +41,14 @@ describe('BalanceService', () => {
 
     it('입금 금액이 0보다 작거나 같으면 에러를 반환해야 한다', async () => {
       const invalidDepositDto = { ...depositDto, amount: 0 };
-      await expect(service.deposit(userId, invalidDepositDto)).rejects.toThrow(BadRequestException);
+      await expect(service.deposit(userId, invalidDepositDto)).rejects.toThrow(BalanceException);
     });
 
     it('입금이 성공적으로 처리되어야 한다', async () => {
-      const mockResponse = {
-        depositTransactionResult: {
-          txId: 'testuuid',
-          userId: userId,
-          currencyCode: CurrencyCode.KRW,
-          amount: 10000,
-        },
-        newBalance: 10000,
-      };
-
-      mockBalanceRepository.deposit.mockResolvedValue(mockResponse);
-
+      mockBalanceRepository.deposit.mockResolvedValue(true);
       const result = await service.deposit(userId, depositDto);
-
       expect(repository.deposit).toHaveBeenCalledWith(userId, depositDto);
-      expect(result).toEqual(mockResponse);
+      expect(result).toBe(true);
     });
   });
 
@@ -74,28 +61,14 @@ describe('BalanceService', () => {
 
     it('출금 금액이 0보다 작거나 같으면 에러를 반환해야 한다', async () => {
       const invalidWithdrawDto = { ...withdrawDto, amount: 0 };
-      await expect(service.withdraw(userId, invalidWithdrawDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.withdraw(userId, invalidWithdrawDto)).rejects.toThrow(BalanceException);
     });
 
     it('출금이 성공적으로 처리되어야 한다', async () => {
-      const mockResponse = {
-        makeHistoryResult: {
-          txId: 'testuuid',
-          userId: userId,
-          currencyCode: CurrencyCode.KRW,
-          amount: 5000,
-        },
-        newBalance: 5000,
-      };
-
-      mockBalanceRepository.withdraw.mockResolvedValue(mockResponse);
-
+      mockBalanceRepository.withdraw.mockResolvedValue(true);
       const result = await service.withdraw(userId, withdrawDto);
-
       expect(repository.withdraw).toHaveBeenCalledWith(userId, withdrawDto);
-      expect(result).toEqual(mockResponse);
+      expect(result).toBe(true);
     });
   });
 

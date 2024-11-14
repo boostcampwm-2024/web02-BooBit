@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BalanceRepository } from './balance.repository';
 import { BalanceException } from './exception/balance.exception';
 import { BALANCE_EXCEPTIONS } from './exception/balance.exceptions';
@@ -13,20 +13,21 @@ export class BalanceService {
     const { amount } = createTransactionDto;
 
     if (amount <= 0) {
-      throw new BadRequestException('Deposit amount must be greater than 0');
+      throw new BalanceException(BALANCE_EXCEPTIONS.INVALID_DEPOSIT_AMOUNT);
     }
-
-    return await this.balanceRepository.deposit(userId, createTransactionDto);
+    await this.balanceRepository.deposit(userId, createTransactionDto);
+    return true;
   }
 
   async withdraw(userId: bigint, createTransactionDto: CreateTransactionDto) {
     const { amount } = createTransactionDto;
 
     if (amount <= 0) {
-      throw new BadRequestException('Withdrawal amount must be greater than 0');
+      throw new BalanceException(BALANCE_EXCEPTIONS.INVALID_WITHDRAWAL_AMOUNT);
     }
 
-    return await this.balanceRepository.withdraw(userId, createTransactionDto);
+    await this.balanceRepository.withdraw(userId, createTransactionDto);
+    return true;
   }
 
   async getAssets(userId: bigint) {
