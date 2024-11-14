@@ -1,6 +1,6 @@
 import { FormData } from '../model/formDataType';
 
-const BASE_URL = 'http://localhost:3100';
+const BASE_URL = 'http://localhost:3000';
 
 const signUpApi = async (formData: FormData) => {
   const response = await fetch(`${BASE_URL}/api/auth/signup`, {

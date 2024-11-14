@@ -4,7 +4,7 @@ import SubmitButton from '../../../shared/UI/SubmitButton';
 interface TransactionFormProps {
   type: string;
   amount: string;
-  handleSubmit: () => void;
+  handleSubmit: (e: React.MouseEvent<HTMLButtonElement>) => void;
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   isError?: boolean;
 }

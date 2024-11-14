@@ -1,5 +1,4 @@
-export interface MyAsset {
+export interface AssetType {
   currencyCode: string;
-  name: string;
   amount: number;
 }

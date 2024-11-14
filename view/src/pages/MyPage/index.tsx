@@ -45,7 +45,7 @@ const Home = () => {
             setSelectedAssetIdx={setSelectedAssetIdx}
           ></MyAssetList>
           <MyAssetInfo
-            currency_code={assetList.assets[selectedAssetIdx].currency_code}
+            currencyCode={assetList.assets[selectedAssetIdx].currencyCode}
             amount={assetList.assets[selectedAssetIdx].amount}
           ></MyAssetInfo>
         </MainviewLayout>

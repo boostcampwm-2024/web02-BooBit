@@ -5,69 +5,68 @@ import Tab from './UI/Tab';
 import TransactionForm from './UI/TransactionForm';
 import assetHistory from './consts/historyMockData';
 import TransactionLogItem from './UI/TransactionLogItem';
+import useDeposit from './model/useDeposit';
+import { AssetType } from './consts/AssetType';
+import useWithdraw from './model/useWithdraw';
 
-type MyAssetInfoProps = {
-  currency_code: string;
-  amount: number;
-};
-
-const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
+const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
   const [selectedCate, setSelectedCate] = useState('내역');
-  const [withdrawlAmount, setWithdrawlAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
-  const [depositError, setDepositError] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawError, setWithdrawError] = useState(false);
+  const { mutate: deposit } = useDeposit();
+  const { mutate: withdraw } = useWithdraw();
 
-  const handleWithdrawl = () => {
-    if (Number(withdrawlAmount) === 0) return;
-    alert(`{
-	"currency_code": ${currency_code},
-	"amount": ${withdrawlAmount}
-}`);
+  const handleDeposit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const amount = Number(depositAmount);
+    if (amount === 0) return;
+    deposit({ currencyCode, amount });
   };
-  const handleDeposit = () => {
-    if (Number(depositAmount) === 0) return;
-    if (Number(depositAmount) > amount) {
-      setDepositError(true);
+
+  const handleWithdraw = () => {
+    const withdrawAmountToNum = Number(withdrawAmount);
+    if (withdrawAmountToNum === 0) return;
+    if (withdrawAmountToNum > amount) {
+      setWithdrawError(true);
       return;
     }
-    alert(`{
-	"currency_code": ${currency_code},
-	"amount": ${depositAmount}
-}`);
+    setWithdrawError(false);
+    withdraw({ currencyCode, amount: withdrawAmountToNum });
   };
 
   useEffect(() => {
-    setWithdrawlAmount('');
+    setWithdrawAmount('');
     setDepositAmount('');
-    setDepositError(false);
+    setWithdrawError(false);
   }, [selectedCate]);
 
   return (
     <BoxContainer>
-      <Title currency_code={currency_code} amount={amount} />
+      <Title currency_code={currencyCode} amount={amount} />
       <Tab selectedCate={selectedCate} setSelectedCate={setSelectedCate} />
       {selectedCate === '내역' && (
         <ul className="w-[100%] h-[17rem] px-[3vw] overflow-y-auto">
           {assetHistory.transactions.map((log) => (
-            <TransactionLogItem log={log} currency_code={currency_code} />
+            <TransactionLogItem key={log.timestamp} log={log} currency_code={currencyCode} />
           ))}
         </ul>
       )}
       {selectedCate === '입금' && (
         <TransactionForm
           type="입금"
-          handleSubmit={handleWithdrawl}
-          amount={withdrawlAmount}
-          setAmount={setWithdrawlAmount}
+          handleSubmit={handleDeposit}
+          amount={depositAmount}
+          setAmount={setDepositAmount}
         />
       )}
       {selectedCate === '출금' && (
         <TransactionForm
           type="출금"
-          handleSubmit={handleDeposit}
-          amount={depositAmount}
-          setAmount={setDepositAmount}
-          isError={depositError}
+          handleSubmit={handleWithdraw}
+          amount={withdrawAmount}
+          setAmount={setWithdrawAmount}
+          isError={withdrawError}
         />
       )}
     </BoxContainer>

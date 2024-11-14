@@ -1,19 +1,20 @@
 export default {
   assets: [
     {
-      currency_code: 'BTC',
+      currencyCode: 'KRW',
+      name: '원화',
+      amount: 14000,
+    },
+    {
+      currencyCode: 'BTC',
       name: '비트코인',
       amount: 17,
     },
+    /*
     {
       currency_code: 'ETH',
       name: '이더리움',
       amount: 125,
-    },
-    {
-      currency_code: 'KRW',
-      name: '원화',
-      amount: 14000,
     },
     {
       currency_code: 'LTC',
@@ -49,6 +50,6 @@ export default {
       currency_code: 'LINK',
       name: '체인링크',
       amount: 90,
-    },
+    },*/
   ],
 };
