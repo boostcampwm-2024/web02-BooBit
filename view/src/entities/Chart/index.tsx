@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
+import addText from './lib/addText';
 
 interface CandleData {
   date: Date;
@@ -16,6 +17,7 @@ interface CandleChartProps {
 
 const Chart: React.FC<CandleChartProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const [marketValues, setMarketValues] = useState<CandleData>();
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -45,7 +47,7 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
 
     const yMin = d3.min(data, (d) => d.low)!;
     const yMax = d3.max(data, (d) => d.high)!;
-    const paddingRatio = 0.0;
+    const paddingRatio = 0.02;
 
     const yScale = d3
       .scaleLinear()
@@ -104,7 +106,11 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
       .attr('y', (d) => yScale(Math.max(d.open, d.close)))
       .attr('width', xScale.bandwidth())
       .attr('height', (d) => Math.abs(yScale(d.open) - yScale(d.close)))
-      .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'));
+      .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'))
+      .on('mouseover', (e, d) => {
+        e.preventDefault();
+        setMarketValues(d);
+      });
 
     // Divider line
     mainGroup
@@ -114,7 +120,7 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
       .attr('y1', height - volumeHeight)
       .attr('y2', height - volumeHeight)
       .attr('stroke', '#A0A0A0')
-      .attr('stroke-width', 0.5);
+      .attr('stroke-width', 0.4);
 
     // Volume chart
     const volumeMax = d3.max(data, (d) => d.volume)!;
@@ -143,8 +149,29 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
       .attr('y', (d) => height - volumeHeight + yVolumeScale(d.volume))
       .attr('width', xScale.bandwidth())
       .attr('height', (d) => volumeHeight - yVolumeScale(d.volume))
-      .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'));
+      .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'))
+      .on('mouseover', (e, d) => {
+        e.preventDefault();
+        setMarketValues(d);
+      });
   }, [data]);
+
+  useEffect(() => {
+    if (!marketValues) return;
+    d3.select(svgRef.current).selectAll('.market-text').remove();
+
+    const mainGroup = d3.select(svgRef.current).select('g');
+    addText(mainGroup, 10, [
+      `시가: ${marketValues.open}`,
+      `종가: ${marketValues.close}`,
+      `PRICE: ${marketValues.open}`,
+    ]);
+    addText(mainGroup, 22, [
+      `고가: ${marketValues.high}`,
+      `저가: ${marketValues.low}`,
+      `VOL: ${marketValues.volume}`,
+    ]);
+  }, [marketValues]);
 
   return <svg ref={svgRef} />;
 };
