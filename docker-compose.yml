@@ -102,7 +102,35 @@ services:
       timeout: 5s
       retries: 5
 
+  # Mongo DB
+  mongo-db:
+    image: mongo:8.0
+    container_name: mongo-db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MYSQL_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-db:/data/db
+
+  # MongoDB 관리를 위한 Web UI (선택사항)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: always
+    ports:
+      - '8081:8081'
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MYSQL_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MYSQL_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@mongo-db:27017/
+    depends_on:
+      - mongo-db
+
 volumes:
   redis-db:
   auth-db:
   balance-db:
+  mongo-db:
