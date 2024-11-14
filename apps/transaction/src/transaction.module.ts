@@ -1,17 +1,16 @@
-import { PassportModule } from '@nestjs/passport';
 import { Module } from '@nestjs/common';
 import { TransactionController } from './transaction.controller';
 import { TransactionService } from './transaction.service';
 import { TransactionRepository } from './transaction.repository';
-import { SessionSerializer } from '@app/common/session/session.serializer';
 import { PrismaModule } from '@app/prisma';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TransactionGrcpService } from './transaction.grcp.service';
+import { SessionModule } from '@app/session';
 
 @Module({
   imports: [
     PrismaModule,
-    PassportModule.register({ session: true }),
+    SessionModule,
     ClientsModule.register([
       {
         name: 'ORDER_PACKAGE',
@@ -25,6 +24,6 @@ import { TransactionGrcpService } from './transaction.grcp.service';
     ]),
   ],
   controllers: [TransactionController],
-  providers: [TransactionService, TransactionRepository, SessionSerializer, TransactionGrcpService],
+  providers: [TransactionService, TransactionRepository, TransactionGrcpService],
 })
 export class TransactionModule {}

@@ -1,6 +1,6 @@
 import { Controller, Request, Post, UseGuards, Body } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
-import { AuthenticatedGuard } from '@app/common/session/authenticated.guard';
+import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
 import { OrderLimitRequestDto } from './dto/order.limit.request.dto';
 import { TransactionGrcpService } from './transaction.grcp.service';
 import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
