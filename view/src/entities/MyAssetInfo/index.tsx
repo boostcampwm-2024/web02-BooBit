@@ -5,6 +5,7 @@ import Tab from './UI/Tab';
 import TransactionForm from './UI/TransactionForm';
 import assetHistory from './consts/historyMockData';
 import TransactionLogItem from './UI/TransactionLogItem';
+import useDeposit from './model/useDeposit';
 
 type MyAssetInfoProps = {
   currency_code: string;
@@ -16,14 +17,15 @@ const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [withdrawError, setWithdrawError] = useState(false);
+  const { mutate } = useDeposit();
 
-  const handleDeposit = () => {
-    if (Number(depositAmount) === 0) return;
-    alert(`{
-	"currency_code": ${currency_code},
-	"amount": ${depositAmount}
-}`);
+  const handleDeposit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const amount = Number(depositAmount);
+    if (amount === 0) return;
+    mutate({ currencyCode: currency_code, amount });
   };
+
   const handleWithdraw = () => {
     if (Number(withdrawAmount) === 0) return;
     if (Number(withdrawAmount) > amount) {
@@ -49,7 +51,7 @@ const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
       {selectedCate === '내역' && (
         <ul className="w-[100%] h-[17rem] px-[3vw] overflow-y-auto">
           {assetHistory.transactions.map((log) => (
-            <TransactionLogItem log={log} currency_code={currency_code} />
+            <TransactionLogItem key={log.timestamp} log={log} currency_code={currency_code} />
           ))}
         </ul>
       )}
