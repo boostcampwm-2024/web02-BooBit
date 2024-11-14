@@ -1,5 +1,5 @@
 {
-  "name": "be",
+  "name": "boobit",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -20,7 +20,9 @@
     "generate:balance": "npx prisma generate --schema apps/balance/prisma/schema.prisma",
     "start:prod:balance": "npx prisma migrate deploy && node dist/apps/balance/main",
     "generate:auth": "npx prisma generate --schema apps/auth/prisma/schema.prisma",
-    "start:prod:auth": "npx prisma migrate deploy && node dist/apps/auth/main"
+    "start:prod:auth": "npx prisma migrate deploy && node dist/apps/auth/main",
+    "dev:auth": "concurrently -s all \"npx prisma generate --schema apps/auth/prisma/schema.prisma\" \"npx prisma migrate deploy --schema apps/auth/prisma/schema.prisma\" \"nest start auth --watch --debug\"",
+    "dev:balance": "concurrently -s all \"npx prisma generate --schema apps/balance/prisma/schema.prisma\" \"npx prisma migrate deploy --schema apps/balance/prisma/schema.prisma\" \"nest start balance --watch --debug\""
   },
   "lint-staged": {
     "*.ts": [
@@ -58,6 +60,7 @@
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.13.0",
     "@typescript-eslint/parser": "^8.13.0",
+    "concurrently": "^9.1.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",

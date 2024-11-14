@@ -13,6 +13,7 @@ services:
     environment:
       DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${AUTH_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
       REDIS_URL: 'redis://${SESSION_DB}:${REDIS_PORT}'
+      SESSION_SECRET: ${SESSION_SECRET}
     depends_on:
       auth-db:
         condition: service_healthy
@@ -31,6 +32,7 @@ services:
     environment:
       DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${BALANCE_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
       REDIS_URL: 'redis://${SESSION_DB}:${REDIS_PORT}'
+      SESSION_SECRET: ${SESSION_SECRET}
     depends_on:
       balance-db:
         condition: service_healthy
