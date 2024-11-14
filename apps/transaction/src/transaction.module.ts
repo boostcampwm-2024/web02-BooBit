@@ -18,7 +18,7 @@ import { TransactionGrcpService } from './transaction.grcp.service';
         transport: Transport.GRPC,
         options: {
           package: 'order',
-          protoPath: '@app/grpc/order.proto',
+          protoPath: 'libs/grpc/src/order.proto',
           url: 'localhost:5001',
         },
       },

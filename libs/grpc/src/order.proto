@@ -8,7 +8,7 @@ service OrderService {
 }
 
 message OrderRequest {
-  uint64 userId = 1;
+  string userId = 1;
   string coinCode = 2;
   double amount = 3;
   double price = 4;
@@ -16,5 +16,5 @@ message OrderRequest {
 
 message OrderResponse {
   string status = 1;
-  uint64 orderId = 2;
+  string orderId = 2;
 }
