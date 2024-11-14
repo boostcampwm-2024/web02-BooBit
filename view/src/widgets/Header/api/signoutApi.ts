@@ -1,4 +1,4 @@
-const BASE_URL = 'http://172.31.99.241:3000';
+const BASE_URL = 'http://localhost:3000';
 
 const signoutApi = async () => {
   const response = await fetch(`${BASE_URL}/api/auth/logout`, {
@@ -6,6 +6,7 @@ const signoutApi = async () => {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
   });
 
   if (!response.ok) {

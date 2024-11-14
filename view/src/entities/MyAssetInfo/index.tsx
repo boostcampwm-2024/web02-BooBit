@@ -7,31 +7,32 @@ import assetHistory from './consts/historyMockData';
 import TransactionLogItem from './UI/TransactionLogItem';
 import useDeposit from './model/useDeposit';
 import { AssetType } from './consts/AssetType';
+import useWithdraw from './model/useWithdraw';
 
 const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
   const [selectedCate, setSelectedCate] = useState('내역');
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [withdrawError, setWithdrawError] = useState(false);
-  const { mutate } = useDeposit();
+  const { mutate: deposit } = useDeposit();
+  const { mutate: withdraw } = useWithdraw();
 
   const handleDeposit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const amount = Number(depositAmount);
     if (amount === 0) return;
-    mutate({ currencyCode: currencyCode, amount });
+    deposit({ currencyCode, amount });
   };
 
   const handleWithdraw = () => {
-    if (Number(withdrawAmount) === 0) return;
-    if (Number(withdrawAmount) > amount) {
+    const withdrawAmountToNum = Number(withdrawAmount);
+    if (withdrawAmountToNum === 0) return;
+    if (withdrawAmountToNum > amount) {
       setWithdrawError(true);
       return;
     }
-    alert(`{
-	"currency_code": ${currencyCode},
-	"amount": ${withdrawAmount}
-}`);
+    setWithdrawError(false);
+    withdraw({ currencyCode, amount: withdrawAmountToNum });
   };
 
   useEffect(() => {
