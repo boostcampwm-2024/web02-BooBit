@@ -13,33 +13,33 @@ type MyAssetInfoProps = {
 
 const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
   const [selectedCate, setSelectedCate] = useState('내역');
-  const [withdrawlAmount, setWithdrawlAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
-  const [depositError, setDepositError] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawError, setWithdrawError] = useState(false);
 
-  const handleWithdrawl = () => {
-    if (Number(withdrawlAmount) === 0) return;
-    alert(`{
-	"currency_code": ${currency_code},
-	"amount": ${withdrawlAmount}
-}`);
-  };
   const handleDeposit = () => {
     if (Number(depositAmount) === 0) return;
-    if (Number(depositAmount) > amount) {
-      setDepositError(true);
-      return;
-    }
     alert(`{
 	"currency_code": ${currency_code},
 	"amount": ${depositAmount}
 }`);
   };
+  const handleWithdraw = () => {
+    if (Number(withdrawAmount) === 0) return;
+    if (Number(withdrawAmount) > amount) {
+      setWithdrawError(true);
+      return;
+    }
+    alert(`{
+	"currency_code": ${currency_code},
+	"amount": ${withdrawAmount}
+}`);
+  };
 
   useEffect(() => {
-    setWithdrawlAmount('');
+    setWithdrawAmount('');
     setDepositAmount('');
-    setDepositError(false);
+    setWithdrawError(false);
   }, [selectedCate]);
 
   return (
@@ -56,18 +56,18 @@ const MyAssetInfo: React.FC<MyAssetInfoProps> = ({ currency_code, amount }) => {
       {selectedCate === '입금' && (
         <TransactionForm
           type="입금"
-          handleSubmit={handleWithdrawl}
-          amount={withdrawlAmount}
-          setAmount={setWithdrawlAmount}
+          handleSubmit={handleDeposit}
+          amount={depositAmount}
+          setAmount={setDepositAmount}
         />
       )}
       {selectedCate === '출금' && (
         <TransactionForm
           type="출금"
-          handleSubmit={handleDeposit}
-          amount={depositAmount}
-          setAmount={setDepositAmount}
-          isError={depositError}
+          handleSubmit={handleWithdraw}
+          amount={withdrawAmount}
+          setAmount={setWithdrawAmount}
+          isError={withdrawError}
         />
       )}
     </BoxContainer>
