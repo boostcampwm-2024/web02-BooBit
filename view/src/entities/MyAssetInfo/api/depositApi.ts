@@ -1,11 +1,8 @@
-type DepositParams = {
-  currencyCode: string;
-  amount: number;
-};
+import { AssetType } from '../consts/AssetType';
 
 const BASE_URL = 'http://localhost:3100';
 
-const depositApi = async ({ currencyCode, amount }: DepositParams) => {
+const depositApi = async ({ currencyCode, amount }: AssetType) => {
   const response = await fetch(`${BASE_URL}/api/users/deposit`, {
     method: 'POST',
     credentials: 'include',

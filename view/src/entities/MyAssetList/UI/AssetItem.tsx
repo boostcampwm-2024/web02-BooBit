@@ -18,14 +18,14 @@ const AssetItem: React.FC<AssetItemProps> = ({ asset, handleClick }) => {
         <div className="flex flex-col">
           <div className="h-[1rem] text-display-bold-16">{asset.name}</div>
           <div className="h-[1rem] text-available-medium-14 text-text-dark">
-            {asset.currency_code}
+            {asset.currencyCode}
           </div>
         </div>
       </div>
 
       <div className="flex">
         <div className="text-display-bold-16 mr-[0.5rem]">{asset.amount.toLocaleString()}</div>
-        <div>{asset.currency_code}</div>
+        <div>{asset.currencyCode}</div>
       </div>
     </li>
   );

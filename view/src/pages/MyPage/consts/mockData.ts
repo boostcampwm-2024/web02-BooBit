@@ -1,12 +1,12 @@
 export default {
   assets: [
     {
-      currency_code: 'KRW',
+      currencyCode: 'KRW',
       name: '원화',
       amount: 14000,
     },
     {
-      currency_code: 'BTC',
+      currencyCode: 'BTC',
       name: '비트코인',
       amount: 17,
     },
