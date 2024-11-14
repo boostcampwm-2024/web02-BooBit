@@ -16,5 +16,5 @@ message OrderRequest {
 
 message OrderResponse {
   string status = 1;
-  string orderId = 2;
+  string historyId = 2;
 }
