@@ -60,6 +60,17 @@
       "compilerOptions": {
         "tsConfigPath": "libs/session/tsconfig.lib.json"
       }
+    },
+    "grpc": {
+      "type": "library",
+      "root": "libs/grpc",
+      "entryFile": "index",
+      "sourceRoot": "libs/grpc/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/grpc/tsconfig.lib.json",
+        "assets": ["**/*.proto"],
+        "watchAssets": true
+      }
     }
   }
 }
