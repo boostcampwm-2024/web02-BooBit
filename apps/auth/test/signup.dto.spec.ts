@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { SignUpDto } from '../src/auth/dto/signup.dto';
+import { SignUpDto } from '../src/dto/signup.dto';
 
 describe('SignUpDto', () => {
   const createDto = (data: Partial<SignUpDto> = {}): SignUpDto => {

@@ -17,7 +17,6 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e:balance": "jest --config ./apps/balance/test/jest-e2e.json",
-    "deploy:dev:balance": "dotenv -e apps/balance/.env -- npx prisma migrate dev --schema apps/balance/prisma/schema.prisma --name balance",
     "generate:balance": "npx prisma generate --schema apps/balance/prisma/schema.prisma",
     "start:prod:balance": "npx prisma migrate deploy && node dist/apps/balance/main",
     "generate:auth": "npx prisma generate --schema apps/auth/prisma/schema.prisma",
@@ -39,11 +38,10 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "connect-redis": "^7.1.1",
-    "dotenv-cli": "^7.4.2",
     "express-session": "^1.18.1",
+    "ioredis": "^5.4.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "redis": "^4.7.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
   },
@@ -99,7 +97,9 @@
     ],
     "moduleNameMapper": {
       "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
-      "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1"
+      "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1",
+      "^@app/session(|/.*)$": "<rootDir>/libs/session/src/$1",
+      "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1"
     }
   }
 }

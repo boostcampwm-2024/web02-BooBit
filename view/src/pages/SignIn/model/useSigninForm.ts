@@ -26,9 +26,10 @@ const useSigninForm = () => {
     return true;
   };
 
-  const resetError = () => setError({ isError: false, errorMessage: '' });
-
-  return { formData, error, handleChange, validateForm, resetError };
+  const updateErrorMessage = (message: string) => {
+    setError({ isError: true, errorMessage: message });
+  };
+  return { formData, error, handleChange, validateForm, updateErrorMessage };
 };
 
 export default useSigninForm;

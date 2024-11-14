@@ -27,7 +27,7 @@ export class AuthService {
         name,
       },
       select: {
-        user_id: true,
+        userId: true,
         email: true,
         name: true,
       },
@@ -40,7 +40,7 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email },
       select: {
-        user_id: true,
+        userId: true,
         email: true,
         name: true,
         password_hash: true,
@@ -50,7 +50,7 @@ export class AuthService {
     if (user && (await bcrypt.compare(password, user.password_hash))) {
       // const { password_hash, ...result } = user;
       return {
-        user_id: user.user_id,
+        userId: user.userId,
         email: user.email,
         name: user.name,
       };

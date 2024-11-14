@@ -1,27 +1,31 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
 import { BalanceService } from './balance.service';
-
+import { CreateTransactionDto } from './dto/create.transaction.dto';
+import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
 @Controller('api/users')
 export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}
 
   @Get('/assets')
-  async getAssets() {
-    const userId = BigInt(1);
+  @UseGuards(AuthenticatedGuard)
+  async getAssets(@Request() req) {
+    const userId = req.user.userId;
     const assets = await this.balanceService.getAssets(userId);
     return { assets };
   }
 
   @Post('/deposit')
-  async deposit(@Body() createTransactionDto: CreateTransactionDto) {
-    const userId = 1n;
+  @UseGuards(AuthenticatedGuard)
+  async deposit(@Body() createTransactionDto: CreateTransactionDto, @Request() req) {
+    const userId = req.user.userId;
     const assets = await this.balanceService.deposit(userId, createTransactionDto);
     return { assets };
   }
 
   @Post('/withdraw')
-  async withdraw(@Body() createTransactionDto: CreateTransactionDto) {
-    const userId = 1n;
+  @UseGuards(AuthenticatedGuard)
+  async withdraw(@Body() createTransactionDto: CreateTransactionDto, @Request() req) {
+    const userId = req.user.userId;
     const assets = await this.balanceService.withdraw(userId, createTransactionDto);
     return { assets };
   }

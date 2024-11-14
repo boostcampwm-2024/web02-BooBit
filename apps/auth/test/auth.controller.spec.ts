@@ -1,11 +1,12 @@
 // auth.controller.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from '../src/auth/auth.controller';
-import { AuthService } from '../src/auth/auth.service';
+import { AuthController } from '../src/auth.controller';
+import { AuthService } from '../src/auth.service';
 import { ConflictException } from '@nestjs/common';
-import { LocalAuthGuard } from '../src/auth/guards/local-auth.guard';
-import { AuthenticatedGuard } from '@app/common/session/authenticated.guard';
 import { Response } from 'express';
+
+import { LocalAuthGuard } from '../src/passport/local.auth.guard';
+import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -56,7 +57,7 @@ describe('AuthController', () => {
 
     it('회원가입 성공시 사용자 정보 반환', async () => {
       const expectedResponse = {
-        user_id: '1',
+        userId: '1',
         email: signupDto.email,
         name: signupDto.name,
       };
@@ -78,7 +79,7 @@ describe('AuthController', () => {
 
   describe('login', () => {
     const mockUser = {
-      user_id: '1',
+      userId: '1',
       email: 'test@example.com',
       name: 'Test User',
     };
@@ -91,7 +92,7 @@ describe('AuthController', () => {
       const result = await controller.login(mockRequest);
 
       expect(result).toEqual({
-        user_id: mockUser.user_id,
+        userId: mockUser.userId,
         email: mockUser.email,
         name: mockUser.name,
       });
@@ -100,7 +101,7 @@ describe('AuthController', () => {
 
   describe('getProfile', () => {
     const mockUser = {
-      user_id: '1',
+      userId: '1',
       email: 'test@example.com',
       name: 'Test User',
     };

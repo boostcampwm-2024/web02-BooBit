@@ -19,6 +19,12 @@ const InputField: React.FC<InputFieldProps> = ({
   isError = false,
   errorMessage = '',
 }) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
   return (
     <form className="w-[100%] mb-[1rem]">
       <input
@@ -28,6 +34,7 @@ const InputField: React.FC<InputFieldProps> = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        onKeyDown={handleKeyDown}
       />
       {isError ? (
         <label className="text-negative  text-available-medium-14">{errorMessage}</label>

@@ -3,9 +3,10 @@ import { BalanceController } from './balance.controller';
 import { BalanceService } from './balance.service';
 import { PrismaModule } from '@app/prisma';
 import { BalanceRepository } from './balance.repository';
+import { SessionModule } from '@app/session';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, SessionModule],
   controllers: [BalanceController],
   providers: [BalanceService, BalanceRepository],
 })

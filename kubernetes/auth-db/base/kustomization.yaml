@@ -5,8 +5,8 @@ kind: Kustomization
 # 리소스 적용 순서 정의
 resources:
   - storage.yaml # 1. PV/PVC 생성
-  - statefulset.yaml # 2. StatefulSet 생성
-  - service.yaml # 3. Service 생성
+  - service.yaml # 2. Service 생성
+  - statefulset.yaml # 3. StatefulSet 생성
 
 # 공통 메타데이터
 commonLabels:
