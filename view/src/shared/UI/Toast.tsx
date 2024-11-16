@@ -1,5 +1,8 @@
 import React from 'react';
 import { useToast } from '../store/ToastContext';
+import success from '../images/success.svg';
+import error from '../images/error.svg';
+import info from '../images/info.svg';
 
 const Toast: React.FC = () => {
   const { toasts, removeToast } = useToast();
@@ -9,7 +12,7 @@ const Toast: React.FC = () => {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`w-[20rem] h-[4rem] px-6 flex items-center rounded cursor-pointer text-available-medium-16 text-text-light
+          className={`w-[24rem] h-[4rem] px-8 flex items-center gap-[1rem] rounded cursor-pointer text-available-medium-16 text-text-light
             ${
               toast.type === 'success'
                 ? 'bg-positive'
@@ -21,7 +24,13 @@ const Toast: React.FC = () => {
             }`}
           onClick={() => removeToast(toast.id)}
         >
-          {toast.message}
+          <img
+            src={toast.type === 'success' ? success : toast.type === 'error' ? error : info}
+            alt="icon"
+            width={30}
+            height={30}
+          />
+          <div>{toast.message}</div>
         </div>
       ))}
     </div>
