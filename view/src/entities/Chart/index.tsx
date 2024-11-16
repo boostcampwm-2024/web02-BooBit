@@ -1,15 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import addText from './lib/addText';
-
-interface CandleData {
-  date: Date;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-}
+import { CandleData } from './model/candleDataType';
+import { createXAxisScale } from './lib/createXAxisScale';
+import { createYAxisScale } from './lib/createYAxisScale';
+import { createBarAxisScale } from './lib/createBarYAsixScale';
 
 interface CandleChartProps {
   data: CandleData[];
@@ -38,49 +33,20 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // X and Y axis scales
-    const xScale = d3
-      .scaleBand()
-      .domain(data.map((d) => d.date.toISOString()))
-      .range([0, width])
-      .padding(0.3);
+    const { xScale, tickValues, tickFormat } = createXAxisScale(data, width, '1d');
+    const { yScale } = createYAxisScale(data, height, volumeHeight);
 
-    const yMin = d3.min(data, (d) => d.low)!;
-    const yMax = d3.max(data, (d) => d.high)!;
-    const paddingRatio = 0.02;
-
-    const yScale = d3
-      .scaleLinear()
-      .domain([yMin - (yMax - yMin) * paddingRatio, yMax + (yMax - yMin) * paddingRatio])
-      .nice()
-      .range([height - volumeHeight, 0]);
-
-    // Axes
-    const xAxisG = svg
+    const xAxis = d3.axisBottom(xScale).tickValues(tickValues).tickFormat(tickFormat);
+    svg
       .append('g')
-      .attr('transform', `translate(${margin.left}, ${margin.top + height})`);
-    const yAxisG = svg
-      .append('g')
-      .attr('transform', `translate(${margin.left + width}, ${margin.top})`);
-
-    const xAxis = d3
-      .axisBottom(xScale)
-      .tickValues(
-        data
-          .map((d) => {
-            return d.date.getDate() === 1 || d.date.getDate() === 16 ? d.date.toISOString() : null;
-          })
-          .filter((d) => d !== null)
-      )
-      .tickFormat((d) => {
-        const date = new Date(d as string);
-        const day = date.getDate();
-        return day === 1 ? d3.timeFormat('%b')(date) : '16';
-      });
+      .attr('transform', `translate(${margin.left}, ${margin.top + height})`)
+      .call(xAxis);
 
     const yAxis = d3.axisRight(yScale).ticks(5);
-    xAxisG.call(xAxis);
-    yAxisG.call(yAxis);
+    svg
+      .append('g')
+      .attr('transform', `translate(${margin.left + width}, ${margin.top})`)
+      .call(yAxis);
 
     // Candlestick lines
     mainGroup
@@ -123,21 +89,13 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
       .attr('stroke-width', 0.4);
 
     // Volume chart
-    const volumeMax = d3.max(data, (d) => d.volume)!;
-    const yVolumeScale = d3
-      .scaleLinear()
-      .domain([0, volumeMax * 1.2])
-      .range([volumeHeight, 0]);
-
-    const yVolumeAxisG = svg
-      .append('g')
-      .attr(
-        'transform',
-        `translate(${margin.left + width}, ${margin.top + height - volumeHeight})`
-      );
+    const { yScale: yVolumeScale } = createBarAxisScale(data, volumeHeight);
 
     const yVolumeAxis = d3.axisRight(yVolumeScale).ticks(3);
-    yVolumeAxisG.call(yVolumeAxis);
+    svg
+      .append('g')
+      .attr('transform', `translate(${margin.left + width}, ${margin.top + height - volumeHeight})`)
+      .call(yVolumeAxis);
 
     mainGroup
       .append('g')
