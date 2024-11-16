@@ -5,12 +5,14 @@ import { CandleData } from './model/candleDataType';
 import { createXAxisScale } from './lib/createXAxisScale';
 import { createYAxisScale } from './lib/createYAxisScale';
 import { createBarAxisScale } from './lib/createBarYAsixScale';
+import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 
 interface CandleChartProps {
   data: CandleData[];
+  scaleType: ChartTimeScaleType;
 }
 
-const Chart: React.FC<CandleChartProps> = ({ data }) => {
+const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [marketValues, setMarketValues] = useState<CandleData>();
 
@@ -33,7 +35,7 @@ const Chart: React.FC<CandleChartProps> = ({ data }) => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const { xScale, tickValues, tickFormat } = createXAxisScale(data, width, '1d');
+    const { xScale, tickValues, tickFormat } = createXAxisScale(data, width, scaleType);
     const { yScale } = createYAxisScale(data, height, volumeHeight);
 
     const xAxis = d3.axisBottom(xScale).tickValues(tickValues).tickFormat(tickFormat);

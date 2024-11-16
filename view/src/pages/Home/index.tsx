@@ -26,7 +26,6 @@ const Home = () => {
     const baseDate = new Date('2024-01-01T10:00:00');
     const newData = generateCandleData(baseDate, timeScaleMap[selectedTimeScale], 60);
     setCandleData(newData);
-    console.log(newData);
   }, [selectedTimeScale]);
 
   const handleButtonClick = () => {
@@ -48,7 +47,7 @@ const Home = () => {
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
         />
-        <Chart data={candleData} />
+        <Chart data={candleData} scaleType={selectedTimeScale} />
         <button onClick={handleButtonClick}>Generate More Data</button>
       </Layout>
     </div>
