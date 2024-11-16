@@ -1,4 +1,4 @@
-import { TimeScaleValueType } from '../model/TimeScaleValueType';
+import { TimeScaleValueType } from '../../../shared/types/ChartTimeScaleType';
 
 type TimeScaleType = {
   value: TimeScaleValueType;

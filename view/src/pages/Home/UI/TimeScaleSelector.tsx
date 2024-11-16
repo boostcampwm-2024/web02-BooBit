@@ -1,4 +1,4 @@
-import { TimeScaleValueType } from '../model/TimeScaleValueType';
+import { TimeScaleValueType } from '../../../shared/types/ChartTimeScaleType';
 import TimeScaleItem from './TimeScaleItem';
 
 const timeScaleOptions: Array<{

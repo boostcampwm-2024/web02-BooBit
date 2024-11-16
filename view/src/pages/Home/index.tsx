@@ -5,7 +5,7 @@ import Layout from '../../widgets/Layout';
 import d1candleData from './consts/d1candleData';
 import generateCandleData from './lib/generateCandleData';
 import TimeScaleSelector from './UI/TimeScaleSelector';
-import { TimeScaleValueType } from './model/TimeScaleValueType';
+import { TimeScaleValueType } from '../../shared/types/ChartTimeScaleType';
 
 const timeScaleMap = {
   '1s': 1000,
@@ -34,7 +34,10 @@ const Home = () => {
       const lastDate = prevData[prevData.length - 1].date; // 마지막 데이터의 날짜
       const newBaseDate = new Date(lastDate.getTime() + timeScaleMap[selectedTimeScale]); // 다음 캔들의 시작 날짜
 
-      return [...prevData, ...generateCandleData(newBaseDate, timeScaleMap[selectedTimeScale], 5)];
+      return [
+        ...prevData.slice(5),
+        ...generateCandleData(newBaseDate, timeScaleMap[selectedTimeScale], 5),
+      ];
     });
   };
   return (
