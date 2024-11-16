@@ -1,9 +1,11 @@
+import { ChartTimeScaleType } from '../../../shared/types/ChartTimeScaleType';
+
 type TimeScaleType = {
-  value: string;
+  value: ChartTimeScaleType;
   label: string;
   rightBorder: boolean;
-  selectedTimeScale: string;
-  setSelectedTimeScale: React.Dispatch<React.SetStateAction<string>>;
+  selectedTimeScale: ChartTimeScaleType;
+  setSelectedTimeScale: React.Dispatch<React.SetStateAction<ChartTimeScaleType>>;
 };
 
 const TimeScaleItem: React.FC<TimeScaleType> = ({
