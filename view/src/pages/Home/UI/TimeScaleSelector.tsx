@@ -1,6 +1,11 @@
+import { TimeScaleValueType } from '../model/TimeScaleValueType';
 import TimeScaleItem from './TimeScaleItem';
 
-const timeScaleOptions = [
+const timeScaleOptions: Array<{
+  value: TimeScaleValueType;
+  label: string;
+  rightBorder: boolean;
+}> = [
   { value: '1s', label: '초', rightBorder: true },
   { value: '1m', label: '1분', rightBorder: false },
   { value: '10m', label: '10분', rightBorder: false },
@@ -12,14 +17,15 @@ const timeScaleOptions = [
 ];
 
 const TimeScaleSelector: React.FC<{
-  selectedTimeScale: string;
-  setSelectedTimeScale: React.Dispatch<React.SetStateAction<string>>;
+  selectedTimeScale: TimeScaleValueType;
+  setSelectedTimeScale: React.Dispatch<React.SetStateAction<TimeScaleValueType>>;
 }> = ({ selectedTimeScale, setSelectedTimeScale }) => {
   return (
     <div className="w-[100%] h-[2.625rem] px-[2.5rem] flex items-center bg-surface-alt">
       {timeScaleOptions.map((s) => {
         return (
           <TimeScaleItem
+            key={s.value}
             value={s.value}
             label={s.label}
             rightBorder={s.rightBorder}

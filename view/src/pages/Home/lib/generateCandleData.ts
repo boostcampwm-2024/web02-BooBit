@@ -1,29 +1,21 @@
-const generateCandleData = (
-  existingData: {
-    date: Date;
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-    volume: number;
-  }[]
-) => {
-  const lastDate = existingData[existingData.length - 1].date;
-  const newData = [];
+const generateCandleData = (baseDate: Date, interval: number, count: number) => {
+  let previousClose = Math.floor(Math.random() * 100 + 100); // 초기 값 설정
 
-  for (let i = 1; i <= 5; i++) {
-    const date = new Date(lastDate);
-    date.setDate(date.getDate() + i); // 날짜를 하루씩 증가시킴
+  return Array.from({ length: count }, (_, index) => {
+    const date = new Date(baseDate.getTime() + index * interval);
 
-    const open = Math.floor(Math.random() * 150) + 100;
-    const high = open + Math.floor(Math.random() * 20) + 5;
-    const low = open - Math.floor(Math.random() * 20) - 5;
-    const close = open + Math.floor(Math.random() * (high - low)) - (high - low) / 2;
-    const volume = Math.floor(Math.random() * 2000) + 1000;
+    // 현재 캔들 데이터 생성
+    const open = previousClose; // 이전 종가를 다음 캔들의 시가로 설정
+    const high = open + Math.floor(Math.random() * 10); // 시가보다 높음
+    const low = open - Math.floor(Math.random() * 10); // 시가보다 낮음
+    const close = Math.floor(Math.random() * (high - low) + low); // 고가와 저가 사이
+    const volume = Math.floor(Math.random() * 1000 + 500); // 랜덤 거래량
 
-    newData.push({ date, open, high, low, close, volume });
-  }
+    // 다음 캔들을 위해 종가 업데이트
+    previousClose = close;
 
-  return [...existingData, ...newData]; // 기존 데이터에 새 데이터를 추가하여 반환
+    return { date, open, high, low, close, volume };
+  });
 };
+
 export default generateCandleData;

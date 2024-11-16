@@ -1,9 +1,11 @@
+import { TimeScaleValueType } from '../model/TimeScaleValueType';
+
 type TimeScaleType = {
-  value: string;
+  value: TimeScaleValueType;
   label: string;
   rightBorder: boolean;
-  selectedTimeScale: string;
-  setSelectedTimeScale: React.Dispatch<React.SetStateAction<string>>;
+  selectedTimeScale: TimeScaleValueType;
+  setSelectedTimeScale: React.Dispatch<React.SetStateAction<TimeScaleValueType>>;
 };
 
 const TimeScaleItem: React.FC<TimeScaleType> = ({
