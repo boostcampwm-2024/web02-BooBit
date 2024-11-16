@@ -5,15 +5,21 @@ import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthActions } from '../shared/store/auth/authActions';
+import { useToast } from '../shared/store/ToastContext';
+import Toast from '../shared/UI/Toast';
+import errorMessages from '../shared/consts/errorMessages';
 
 const App = () => {
   const navigate = useNavigate();
   const { logout } = useAuthActions();
+  const { addToast } = useToast();
+
   const queryClient = new QueryClient({
     queryCache: new QueryCache({
       onError: (error) => {
         if (error instanceof Error) {
           if (error.message === '403') {
+            addToast(errorMessages[403], 'error');
             logout();
             navigate('signin');
           }
@@ -24,7 +30,9 @@ const App = () => {
       onError: (error) => {
         if (error instanceof Error) {
           if (error.message === '403') {
-            navigate('signin'); // 403 에러 처리
+            addToast(errorMessages[403], 'error');
+            logout();
+            navigate('signin');
           }
         }
       },
@@ -32,6 +40,7 @@ const App = () => {
   });
   return (
     <QueryClientProvider client={queryClient}>
+      <Toast />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/mypage" element={<MyPage />} />
