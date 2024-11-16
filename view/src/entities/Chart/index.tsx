@@ -114,7 +114,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
         e.preventDefault();
         setMarketValues(d);
       });
-  }, [data]);
+  }, [data, scaleType]);
 
   useEffect(() => {
     if (!marketValues) return;
