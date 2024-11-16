@@ -1,10 +1,11 @@
 import * as d3 from 'd3';
 import { CandleData } from '../model/candleDataType';
+import { ChartTimeScaleType } from '../../../shared/types/ChartTimeScaleType';
 
 export const createXAxisScale = (
   data: CandleData[],
   width: number,
-  scaleType: '1d' | '1m' | '1s'
+  scaleType: ChartTimeScaleType
 ) => {
   const xScale = d3
     .scaleBand()

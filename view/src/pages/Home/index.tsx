@@ -5,7 +5,7 @@ import Layout from '../../widgets/Layout';
 import d1candleData from './consts/d1candleData';
 import generateCandleData from './lib/generateCandleData';
 import TimeScaleSelector from './UI/TimeScaleSelector';
-import { TimeScaleValueType } from '../../shared/types/ChartTimeScaleType';
+import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 
 const timeScaleMap = {
   '1s': 1000,
@@ -20,7 +20,7 @@ const timeScaleMap = {
 
 const Home = () => {
   const [candleData, setCandleData] = useState(d1candleData);
-  const [selectedTimeScale, setSelectedTimeScale] = useState<TimeScaleValueType>('1d'); // 타입 지정
+  const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1d'); // 타입 지정
 
   useEffect(() => {
     const baseDate = new Date('2024-01-01T10:00:00');

@@ -1,8 +1,8 @@
-import { TimeScaleValueType } from '../../../shared/types/ChartTimeScaleType';
+import { ChartTimeScaleType } from '../../../shared/types/ChartTimeScaleType';
 import TimeScaleItem from './TimeScaleItem';
 
 const timeScaleOptions: Array<{
-  value: TimeScaleValueType;
+  value: ChartTimeScaleType;
   label: string;
   rightBorder: boolean;
 }> = [
@@ -17,8 +17,8 @@ const timeScaleOptions: Array<{
 ];
 
 const TimeScaleSelector: React.FC<{
-  selectedTimeScale: TimeScaleValueType;
-  setSelectedTimeScale: React.Dispatch<React.SetStateAction<TimeScaleValueType>>;
+  selectedTimeScale: ChartTimeScaleType;
+  setSelectedTimeScale: React.Dispatch<React.SetStateAction<ChartTimeScaleType>>;
 }> = ({ selectedTimeScale, setSelectedTimeScale }) => {
   return (
     <div className="w-[100%] h-[2.625rem] px-[2.5rem] flex items-center bg-surface-alt">
