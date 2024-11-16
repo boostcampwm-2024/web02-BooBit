@@ -21,6 +21,7 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
     e.preventDefault();
     const amount = Number(depositAmount);
     if (amount === 0) return;
+    setDepositAmount('');
     deposit({ currencyCode, amount });
   };
 
@@ -32,6 +33,7 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
       return;
     }
     setWithdrawError(false);
+    setWithdrawAmount('');
     withdraw({ currencyCode, amount: withdrawAmountToNum });
   };
 
