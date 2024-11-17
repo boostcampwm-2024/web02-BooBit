@@ -23,7 +23,9 @@
       "@app/prisma": ["libs/prisma/src"],
       "@app/prisma/*": ["libs/prisma/src/*"],
       "@app/session": ["libs/session/src"],
-      "@app/session/*": ["libs/session/src/*"]
+      "@app/session/*": ["libs/session/src/*"],
+      "@app/grpc": ["libs/grpc/src"],
+      "@app/grpc/*": ["libs/grpc/src/*"]
     }
   }
 }

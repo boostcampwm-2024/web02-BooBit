@@ -14,7 +14,7 @@ describe('SessionSerializer', () => {
         userId: '1',
         email: 'test@example.com',
         name: 'Test User',
-        password_hash: 'hash',
+        passwordHash: 'hash',
         created_at: new Date(),
       };
 
@@ -25,7 +25,7 @@ describe('SessionSerializer', () => {
           email: 'test@example.com',
           name: 'Test User',
         });
-        expect(serialized).not.toHaveProperty('password_hash');
+        expect(serialized).not.toHaveProperty('passwordHash');
         expect(serialized).not.toHaveProperty('created_at');
         done();
       });

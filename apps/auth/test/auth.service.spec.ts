@@ -69,8 +69,8 @@ describe('AuthService', () => {
       await service.signup(signupDto);
 
       const createCall = mockPrismaService.user.create.mock.calls[0][0];
-      expect(createCall.data.password_hash).not.toBe(signupDto.password);
-      expect(await bcrypt.compare(signupDto.password, createCall.data.password_hash)).toBe(true);
+      expect(createCall.data.passwordHash).not.toBe(signupDto.password);
+      expect(await bcrypt.compare(signupDto.password, createCall.data.passwordHash)).toBe(true);
     });
   });
 
@@ -94,7 +94,7 @@ describe('AuthService', () => {
         user_id: '1',
         email: loginDto.email,
         name: 'Test User',
-        password_hash: hashedPassword,
+        passwordHash: hashedPassword,
       });
 
       const result = await service.validateUser(loginDto.email, loginDto.password);
@@ -113,7 +113,7 @@ describe('AuthService', () => {
         userId: '1',
         email: loginDto.email,
         name: 'Test User',
-        password_hash: hashedPassword,
+        passwordHash: hashedPassword,
       };
 
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
