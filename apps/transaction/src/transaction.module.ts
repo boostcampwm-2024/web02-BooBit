@@ -4,7 +4,7 @@ import { TransactionService } from './transaction.service';
 import { TransactionRepository } from './transaction.repository';
 import { PrismaModule } from '@app/prisma';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { TransactionGrcpService } from './transaction.grcp.service';
+import { TransactionOrderService } from './transaction.order.service';
 import { SessionModule } from '@app/session';
 
 @Module({
@@ -24,6 +24,6 @@ import { SessionModule } from '@app/session';
     ]),
   ],
   controllers: [TransactionController],
-  providers: [TransactionService, TransactionRepository, TransactionGrcpService],
+  providers: [TransactionService, TransactionRepository, TransactionOrderService],
 })
 export class TransactionModule {}

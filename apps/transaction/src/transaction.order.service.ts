@@ -10,7 +10,7 @@ interface OrderService {
 }
 
 @Injectable()
-export class TransactionGrcpService implements OnModuleInit {
+export class TransactionOrderService implements OnModuleInit {
   private orderService: OrderService;
   constructor(@Inject('ORDER_PACKAGE') private readonly client: ClientGrpc) {}
 
