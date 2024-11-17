@@ -21,6 +21,7 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
     e.preventDefault();
     const amount = Number(depositAmount);
     if (amount === 0) return;
+    setDepositAmount('');
     deposit({ currencyCode, amount });
   };
 
@@ -32,6 +33,7 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
       return;
     }
     setWithdrawError(false);
+    setWithdrawAmount('');
     withdraw({ currencyCode, amount: withdrawAmountToNum });
   };
 
@@ -48,7 +50,11 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
       {selectedCate === '내역' && (
         <ul className="w-[100%] h-[17rem] px-[3vw] overflow-y-auto">
           {assetHistory.transactions.map((log) => (
-            <TransactionLogItem key={log.timestamp} log={log} currency_code={currencyCode} />
+            <TransactionLogItem
+              key={log.timestamp}
+              log={log}
+              currency_code={currencyCode}
+            />
           ))}
         </ul>
       )}

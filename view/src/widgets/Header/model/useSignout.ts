@@ -1,21 +1,25 @@
 import { useMutation } from '@tanstack/react-query';
 import { useAuthActions } from '../../../shared/store/auth/authActions';
 import signoutApi from '../api/signoutApi';
+import { useNavigate } from 'react-router-dom';
+import errorMessages from '../../../shared/consts/errorMessages';
+import { useToast } from '../../../shared/store/ToastContext';
 
 const useSignout = () => {
+  const navigate = useNavigate();
+  const { addToast } = useToast();
   const { logout } = useAuthActions();
   return useMutation({
     mutationFn: signoutApi,
     onSuccess: () => {
-      alert('로그아웃 성공:');
+      navigate('/');
       logout();
     },
     onError: (error: unknown) => {
       if (error instanceof Error) {
-        console.error('로그아웃 실패:', error.message);
-        alert(`로그아웃 실패: ${error.message}`);
+        addToast(errorMessages.default.signout, 'error');
       } else {
-        console.error('로그아웃 실패: 알 수 없는 오류');
+        addToast(errorMessages.default.general, 'error');
       }
     },
   });

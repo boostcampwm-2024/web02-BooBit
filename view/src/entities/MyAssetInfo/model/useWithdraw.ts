@@ -1,17 +1,23 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import withdrawApi from '../api/withdrawApi';
+import { useToast } from '../../../shared/store/ToastContext';
+import successMessages from '../../../shared/consts/successMessage';
+import errorMessages from '../../../shared/consts/errorMessages';
 
 const useWithdraw = () => {
+  const { addToast } = useToast();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: withdrawApi,
     onSuccess: () => {
-      alert('출금 성공');
+      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      addToast(successMessages.withdraw, 'success');
     },
     onError: (error: unknown) => {
       if (error instanceof Error) {
-        alert('출금에 실패했습니다. 다시 시도해주세요.');
+        addToast(errorMessages.default.withdraw, 'error');
       } else {
-        alert('출금에 실패했습니다. 다시 시도해주세요.');
+        addToast(errorMessages.default.general, 'error');
       }
     },
   });

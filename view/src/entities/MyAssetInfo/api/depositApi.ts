@@ -1,9 +1,8 @@
+import { BASE_URLS } from '../../../shared/consts/baseUrl';
 import { AssetType } from '../consts/AssetType';
 
-const BASE_URL = 'http://localhost:3100';
-
 const depositApi = async ({ currencyCode, amount }: AssetType) => {
-  const response = await fetch(`${BASE_URL}/api/users/deposit`, {
+  const response = await fetch(`${BASE_URLS.BALANCE}/api/users/deposit`, {
     method: 'POST',
     credentials: 'include',
     headers: {
