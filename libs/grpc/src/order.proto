@@ -3,8 +3,8 @@ syntax = "proto3";
 package order;
 
 service OrderService {
-  rpc makeBuyOrder(OrderRequest) returns (OrderResponse);
-  rpc makeSellOrder(OrderRequest) returns (OrderResponse);
+  rpc MakeBuyOrder(OrderRequest) returns (OrderResponse);
+  rpc MakeSellOrder(OrderRequest) returns (OrderResponse);
 }
 
 message OrderRequest {

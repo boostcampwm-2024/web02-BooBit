@@ -37,12 +37,12 @@ export class BalanceController {
     return;
   }
 
-  @GrpcMethod('OrderService', 'makeBuyOrder')
+  @GrpcMethod('OrderService', 'MakeBuyOrder')
   async makeBuyOrder(buyOrderRequest: OrderRequestDto): Promise<OrderResponseDto> {
     return await this.balanceService.makeBuyOrder(buyOrderRequest);
   }
 
-  @GrpcMethod('OrderService', 'makeSellOrder')
+  @GrpcMethod('OrderService', 'MakeSellOrder')
   async makeSellOrder(sellOrderRequest: OrderRequestDto): Promise<OrderResponseDto> {
     return await this.balanceService.makeSellOrder(sellOrderRequest);
   }
