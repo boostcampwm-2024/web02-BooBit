@@ -105,7 +105,6 @@
       "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1",
       "^@app/session(|/.*)$": "<rootDir>/libs/session/src/$1",
-      "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
       "^@app/grpc(|/.*)$": "<rootDir>/libs/grpc/src/$1"
     }
   }
