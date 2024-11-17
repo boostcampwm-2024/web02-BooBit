@@ -23,7 +23,7 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         email,
-        password_hash: passwordHash,
+        passwordHash,
         name,
       },
       select: {
@@ -43,12 +43,11 @@ export class AuthService {
         userId: true,
         email: true,
         name: true,
-        password_hash: true,
+        passwordHash: true,
       },
     });
 
-    if (user && (await bcrypt.compare(password, user.password_hash))) {
-      // const { password_hash, ...result } = user;
+    if (user && (await bcrypt.compare(password, user.passwordHash))) {
       return {
         userId: user.userId,
         email: user.email,
