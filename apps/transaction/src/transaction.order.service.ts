@@ -1,13 +1,9 @@
+import { OrderService } from '@app/grpc/order.interface';
 import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
 import { OrderResponseDto } from '@app/grpc/dto/order.response.dto';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-
-interface OrderService {
-  makeBuyOrder(buyOrderRequest: OrderRequestDto): Observable<OrderResponseDto>;
-  makeSellOrder(buyOrderRequest: OrderRequestDto): Observable<OrderResponseDto>;
-}
 
 @Injectable()
 export class TransactionOrderService implements OnModuleInit {
