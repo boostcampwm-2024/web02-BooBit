@@ -26,7 +26,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       this.logger.log('Successfully connected to database');
 
       // 데이터베이스 연결 테스트를 위한 쿼리 실행
-      this.logger.log('Database connection test successful');
+      // await this.$queryRawUnsafe`SELECT 1`;
+      // this.logger.log('Database connection test successful');
     } catch (error) {
       this.logger.error('Failed to connect to database:', error);
       throw error;
