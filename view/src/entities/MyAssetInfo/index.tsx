@@ -50,7 +50,11 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
       {selectedCate === '내역' && (
         <ul className="w-[100%] h-[17rem] px-[3vw] overflow-y-auto">
           {assetHistory.transactions.map((log) => (
-            <TransactionLogItem key={log.timestamp} log={log} currency_code={currencyCode} />
+            <TransactionLogItem
+              key={log.timestamp}
+              log={log}
+              currency_code={currencyCode}
+            />
           ))}
         </ul>
       )}
