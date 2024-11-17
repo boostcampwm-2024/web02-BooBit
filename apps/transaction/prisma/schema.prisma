@@ -8,25 +8,25 @@ datasource db {
 }
 
 model buyOrder {
-  historyId     String @id @map("_id") 
-  userId        String    @map("user_id")
-  coinCode      String   @map("coin_code")
-  price         String 
-  originalQuote String @map("original_quote")
-  remainingQuote String @map("remaining_quote")
-  createdAt    DateTime @map("created_at") @default(now())
-  
+  historyId      String   @id @map("_id")
+  userId         String   @map("user_id")
+  coinCode       String   @map("coin_code")
+  price          String
+  originalQuote  String   @map("original_quote")
+  remainingQuote String   @map("remaining_quote")
+  createdAt      DateTime @default(now()) @map("created_at")
+
   @@map("buy_order")
 }
 
 model sellOrder {
-  historyId     String @id @map("_id") 
-  userId        String    @map("user_id")
+  historyId     String   @id @map("_id")
+  userId        String   @map("user_id")
   coinCode      String   @map("coin_code")
-  price         String 
-  originalQuote String @map("original_quote")
-  remainingBase String @map("remaining_base")
-  createdAt    DateTime @map("created_at") @default(now())
-  
+  price         String
+  originalQuote String   @map("original_quote")
+  remainingBase String   @map("remaining_base")
+  createdAt     DateTime @default(now()) @map("created_at")
+
   @@map("sell_order")
 }
