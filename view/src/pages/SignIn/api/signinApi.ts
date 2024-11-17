@@ -1,9 +1,8 @@
+import { BASE_URLS } from '../../../shared/consts/baseUrl';
 import { FormData } from '../model/formDataType';
 
-const BASE_URL = 'http://localhost:3000';
-
 const signinApi = async (formData: FormData) => {
-  const response = await fetch(`${BASE_URL}/api/auth/login`, {
+  const response = await fetch(`${BASE_URLS.AUTH}/api/auth/login`, {
     method: 'POST',
     credentials: 'include',
     headers: {

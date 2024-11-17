@@ -1,7 +1,7 @@
-const BASE_URL = 'http://localhost:3100';
+import { BASE_URLS } from '../../../shared/consts/baseUrl';
 
 const getAssetsApi = async () => {
-  const response = await fetch(`${BASE_URL}/api/users/assets`, {
+  const response = await fetch(`${BASE_URLS.BALANCE}/api/users/assets`, {
     method: 'GET',
     credentials: 'include',
     headers: {

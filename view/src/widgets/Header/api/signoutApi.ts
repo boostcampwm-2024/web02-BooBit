@@ -1,7 +1,7 @@
-const BASE_URL = 'http://localhost:3000';
+import { BASE_URLS } from '../../../shared/consts/baseUrl';
 
 const signoutApi = async () => {
-  const response = await fetch(`${BASE_URL}/api/auth/logout`, {
+  const response = await fetch(`${BASE_URLS.AUTH}/api/auth/logout`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
