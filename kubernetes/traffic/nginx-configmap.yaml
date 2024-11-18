@@ -21,7 +21,7 @@ data:
         }
 
         upstream redis_backend {
-            server redis:6379;
+            server session-db:6379;
         }
 
         server {
