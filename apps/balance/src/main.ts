@@ -16,7 +16,7 @@ async function bootstrap() {
     transport: Transport.GRPC,
     options: {
       package: 'order',
-      protoPath: 'libs/grpc/src/order.proto',
+      protoPath: 'libs/grpc/proto/order.proto',
       url: '0.0.0.0:5001',
     },
   });

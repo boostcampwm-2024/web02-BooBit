@@ -17,7 +17,7 @@ import { SessionModule } from '@app/session';
         transport: Transport.GRPC,
         options: {
           package: 'order',
-          protoPath: 'libs/grpc/src/order.proto',
+          protoPath: 'libs/grpc/proto/order.proto',
           url: 'localhost:5001',
         },
       },
