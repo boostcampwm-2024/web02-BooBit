@@ -1,10 +1,6 @@
 # Build stage
 FROM node:20-alpine AS builder
 
-# Add build argument
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
-
 WORKDIR /app
 
 # Copy only necessary files for this service

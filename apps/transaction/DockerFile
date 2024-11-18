@@ -7,17 +7,16 @@ WORKDIR /app
 COPY nest-cli.json ./
 COPY package*.json ./
 COPY tsconfig*.json ./
-COPY apps/auth ./apps/auth
+COPY apps/transaction ./apps/transaction
 COPY libs ./libs
 
 # Install and build
 RUN npm ci
-RUN npm run generate:auth
-RUN npm run build auth
+RUN npm run generate:transaction
+RUN npm run build transaction
 
 # Production stage
 FROM node:20-alpine
-
 
 WORKDIR /app
 
@@ -27,13 +26,13 @@ RUN npm ci --only=production
 
 # Copy built assets and Prisma generated files
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/apps/auth/prisma ./prisma
+COPY --from=builder /app/apps/transaction/prisma ./prisma
 COPY --from=builder /app/node_modules ./node_modules
 
 # Expose port
 EXPOSE 3000
 
 # Run application
-CMD ["npm", "run", "start:prod:auth"]
-#CMD ["node", "dist/apps/auth/main"]
+CMD ["npm", "run", "start:prod:transaction"]
+#CMD ["node", "dist/apps/transaction/main"]
 
