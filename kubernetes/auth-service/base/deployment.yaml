@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  labels:
+    app: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - name: auth-service
+          image: auth-service:latest #todo
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: '750m'
+              memory: '3Gi'
+            limits:
+              cpu: '750m'
+              memory: '3Gi'
+          envFrom:
+            - configMapRef:
+                name: auth-service-config
+            - secretRef:
+                name: db-credentials
