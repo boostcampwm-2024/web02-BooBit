@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: balance-service-config
+data:
+  NODE_ENV: 'production'
+  DATABASE_URL: 'mysql://${DB_USER}:${DB_PASSWORD}@auth-db:30000/${DB_SCHEMA}'
+  REDIS_URL: 'redis://session-db:6379'

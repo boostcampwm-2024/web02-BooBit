@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balance-service
+  labels:
+    app: balance-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: balance-service
+  template:
+    metadata:
+      labels:
+        app: balance-service
+    spec:
+      containers:
+        - name: balance-service
+          image: balance-service:latest #todo
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: '750m'
+              memory: '3Gi'
+            limits:
+              cpu: '750m'
+              memory: '3Gi'
+          envFrom:
+            - configMapRef:
+                name: balance-service-config
+            - secretRef:
+                name: db-credentials
