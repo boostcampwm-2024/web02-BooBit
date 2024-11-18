@@ -35,10 +35,17 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const { xScale, tickValues, tickFormat } = createXAxisScale(data, width, scaleType);
+    const { xScale, tickValues, tickFormat } = createXAxisScale(
+      data,
+      width,
+      scaleType
+    );
     const { yScale } = createYAxisScale(data, height, volumeHeight);
 
-    const xAxis = d3.axisBottom(xScale).tickValues(tickValues).tickFormat(tickFormat);
+    const xAxis = d3
+      .axisBottom(xScale)
+      .tickValues(tickValues)
+      .tickFormat(tickFormat);
     svg
       .append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top + height})`)
@@ -96,7 +103,10 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
     const yVolumeAxis = d3.axisRight(yVolumeScale).ticks(3);
     svg
       .append('g')
-      .attr('transform', `translate(${margin.left + width}, ${margin.top + height - volumeHeight})`)
+      .attr(
+        'transform',
+        `translate(${margin.left + width}, ${margin.top + height - volumeHeight})`
+      )
       .call(yVolumeAxis);
 
     mainGroup

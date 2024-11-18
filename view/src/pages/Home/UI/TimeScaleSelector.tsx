@@ -18,7 +18,9 @@ const timeScaleOptions: Array<{
 
 const TimeScaleSelector: React.FC<{
   selectedTimeScale: ChartTimeScaleType;
-  setSelectedTimeScale: React.Dispatch<React.SetStateAction<ChartTimeScaleType>>;
+  setSelectedTimeScale: React.Dispatch<
+    React.SetStateAction<ChartTimeScaleType>
+  >;
 }> = ({ selectedTimeScale, setSelectedTimeScale }) => {
   return (
     <div className="w-[100%] h-[2.625rem] px-[2.5rem] flex items-center bg-surface-alt">
