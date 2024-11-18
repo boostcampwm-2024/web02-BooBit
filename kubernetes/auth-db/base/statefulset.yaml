@@ -15,8 +15,6 @@ spec:
         app: auth-db
         type: database
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: boobit-w-617b
       containers:
         - name: auth-db
           image: mysql:8.0.22
@@ -26,27 +24,9 @@ spec:
           ports:
             - containerPort: 3306
               name: mysql
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-credentials
-                  key: MYSQL_ROOT_PASSWORD
-            - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-credentials
-                  key: MYSQL_USER
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-credentials
-                  key: MYSQL_PASSWORD
-            - name: MYSQL_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-credentials
-                  key: MYSQL_DATABASE
+          envFrom:
+            - secretRef:
+                name: db-credentials
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
