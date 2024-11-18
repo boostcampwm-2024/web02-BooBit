@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-service
+  labels:
+    app: transaction-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transaction-service
+  template:
+    metadata:
+      labels:
+        app: transaction-service
+    spec:
+      containers:
+        - name: transaction-service
+          image: transaction-service:latest #todo
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: '1500m'
+              memory: '3Gi'
+            limits:
+              cpu: '1500m'
+              memory: '3Gi'
+          envFrom:
+            - configMapRef:
+                name: transaction-service-config
+            - secretRef:
+                name: db-credentials
