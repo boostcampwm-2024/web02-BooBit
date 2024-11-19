@@ -17,7 +17,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.GRPC,
         options: {
           package: 'account',
-          protoPath: 'libs/grpc/src/balance.proto',
+          protoPath: 'libs/grpc/src/account.proto',
           url: 'localhost:5001',
         },
       },
