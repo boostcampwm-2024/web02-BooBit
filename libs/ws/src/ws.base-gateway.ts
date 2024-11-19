@@ -29,7 +29,7 @@ export abstract class WsBaseGateway
 
   private handleMessage(client: WebSocket, message: string) {
     try {
-      const { event, data } = JSON.parse(message);
+      const { event, ...data } = JSON.parse(message);
 
       const prototype = Object.getPrototypeOf(this);
       const methodNames = Object.getOwnPropertyNames(prototype);
