@@ -6,21 +6,17 @@ interface InputNumberProps {
   updateRelatedValues?: (value: number) => void;
 }
 
-const InputNumber: React.FC<InputNumberProps> = ({
-  amount,
-  setAmount,
-  updateRelatedValues,
-}) => {
+const InputNumber: React.FC<InputNumberProps> = ({ amount, setAmount, updateRelatedValues }) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value.replace(/,/g, ''));
+    const value = e.target.value.replace(/,/g, '');
 
-    if (isNaN(value)) return;
+    if (!/^\d*\.?\d*$/.test(value)) return;
 
     if (updateRelatedValues) {
-      updateRelatedValues(value);
+      updateRelatedValues(parseFloat(value));
     }
 
-    setAmount(value.toLocaleString());
+    setAmount(value.replace(/\B(?=(\d{3})+(?!\d))/g, ','));
   };
 
   return (
