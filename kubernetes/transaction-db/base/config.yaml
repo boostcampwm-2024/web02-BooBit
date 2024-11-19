@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: transaction-db-config
+data:
+  init.js: |
+    db = db.getSiblingDB('boobit');
+  mongod.conf: |
+    storage:
+      dbPath: /data/db
+    net:
+      bindIp: 0.0.0.0

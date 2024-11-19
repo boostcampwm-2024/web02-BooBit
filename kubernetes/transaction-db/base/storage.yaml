@@ -1,0 +1,23 @@
+# storage.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: transaction-db
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: '/mnt/data/transaction-db'
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transaction-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
