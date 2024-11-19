@@ -16,18 +16,21 @@ spec:
     spec:
       containers:
         - name: balance-service
-          image: balance-service:latest #todo
+          image: boobit-ncr.kr.ncr.ntruss.com/balance-service:latest #todo
           ports:
             - containerPort: 3000
           resources:
             requests:
-              cpu: '750m'
-              memory: '3Gi'
+              cpu: '500m'
+              memory: '1Gi'
             limits:
-              cpu: '750m'
-              memory: '3Gi'
+              cpu: '500m'
+              memory: '1Gi'
+          env:
+            - name: DATABASE_URL
+              value: 'mysql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):3306/$(DB_SCHEMA)'
           envFrom:
             - configMapRef:
-                name: balance-service-config
+                name: auth-service-config
             - secretRef:
                 name: db-credentials

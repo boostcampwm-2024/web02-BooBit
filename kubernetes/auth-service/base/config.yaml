@@ -3,7 +3,6 @@ kind: ConfigMap
 metadata:
   name: auth-service-config
 data:
-  NODE_ENV: 'production'
-  DATABASE_URL: 'mysql://${DB_USER}:${DB_PASSWORD}@auth-db:3306/${DB_SCHEMA}'
+  DB_HOST: 'auth-db'
   REDIS_URL: 'redis://session-db:6379'
   #GRPC관련설정 추가필요

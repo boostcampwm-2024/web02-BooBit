@@ -20,8 +20,8 @@ spec:
             - containerPort: 6379
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 256Mi
             limits:
               cpu: 250m
               memory: 256Mi
@@ -36,6 +36,5 @@ spec:
   selector:
     app: session-db
   ports:
-    - port: 6379 # 서비스가 노출하는 포트
-      targetPort: 6379 # Pod의 포트
-      name: session-db # 포트 이름
+    - port: 6379
+      targetPort: 6379
