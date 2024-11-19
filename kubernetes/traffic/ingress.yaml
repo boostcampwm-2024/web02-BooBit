@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: path-ingress
+  annotations:
+    alb.ingress.kubernetes.io/ncloud-load-balancer-retain-public-ip-on-termination: 'true' # 공인 IP 유지
+    alb.ingress.kubernetes.io/public-ip-instance-no: '100522047'
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 80
+          - path: /api/users
+            pathType: Prefix
+            backend:
+              service:
+                name: balance-service
+                port:
+                  number: 80
