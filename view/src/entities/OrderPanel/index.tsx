@@ -36,6 +36,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
 
   useEffect(() => {
     setCoinCode(selectedOrder === '매수' ? 'KRW' : 'BTC');
+    reset();
 
     if (data) {
       login();
