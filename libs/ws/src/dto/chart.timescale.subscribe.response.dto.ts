@@ -1,13 +1,12 @@
 import { CandleDataDto } from './candle.data.dto';
-import { IsString, ValidateNested } from 'class-validator';
+import { ValidateNested, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
+import { WsBaseDto } from './ws.base.dto';
+import { TimeScale } from '@app/common/enums/chart-timescale.enum';
 
-export class SubscribeResponseDto {
-  @IsString()
-  event: string;
-
-  @IsString()
-  timeScale: string;
+export class SubscribeResponseDto extends WsBaseDto {
+  @IsEnum(TimeScale)
+  timeScale: TimeScale;
 
   @ValidateNested({ each: true })
   @Type(() => CandleDataDto)
