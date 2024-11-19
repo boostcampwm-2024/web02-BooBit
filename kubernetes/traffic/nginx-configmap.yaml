@@ -20,7 +20,11 @@ data:
             server balance-db:3306;
         }
 
-        upstream redis_backend {
+        upstream transaction_db {
+            server transaction-db:27017;
+        }
+
+        upstream session_db {
             server session-db:6379;
         }
 
@@ -35,7 +39,12 @@ data:
         }
 
         server {
+            listen 32000;
+            proxy_pass transaction_db;
+        }
+
+        server {
             listen 32123;
-            proxy_pass redis_backend;
+            proxy_pass session_db;
         }
     }

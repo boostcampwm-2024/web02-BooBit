@@ -18,6 +18,10 @@ spec:
       port: 31000
       targetPort: 31000
       protocol: TCP
+    - name: trasaction-db
+      port: 32000
+      targetPort: 32000
+      protocol: TCP
     - name: session-db
       port: 32123
       targetPort: 32123
