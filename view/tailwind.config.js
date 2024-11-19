@@ -4,44 +4,17 @@ module.exports = {
   theme: {
     extend: {
       fontSize: {
-        'display-bold-32': ['2rem', { lineHeight: 'auto', fontWeight: '700' }], // 24px Bold
-        'display-bold-24': [
-          '1.5rem',
-          { lineHeight: 'auto', fontWeight: '700' },
-        ], // 24px Bold
-        'display-bold-20': [
-          '1.25em',
-          { lineHeight: 'auto', fontWeight: '700' },
-        ], // 20px Bold
-        'display-bold-18': [
-          '1.125rem',
-          { lineHeight: 'auto', fontWeight: '700' },
-        ], // 1px Bold
+        'display-bold-32': ['2rem', { lineHeight: 'auto', fontWeight: '700' }], // 32px Bold
+        'display-bold-28': ['1.75rem', { lineHeight: 'auto', fontWeight: '700' }], // 28px Bold
+        'display-bold-24': ['1.5rem', { lineHeight: 'auto', fontWeight: '700' }], // 24px Bold
+        'display-bold-20': ['1.25em', { lineHeight: 'auto', fontWeight: '700' }], // 20px Bold
         'display-bold-16': ['1rem', { lineHeight: 'auto', fontWeight: '700' }], // 16px Bold
-        'display-bold-14': [
-          '0.875rem',
-          { lineHeight: 'auto', fontWeight: '700' },
-        ], // 14px Bold
-        'display-bold-12': [
-          '0.75rem',
-          { lineHeight: 'auto', fontWeight: '700' },
-        ], // 12px Bold
-        'available-medium-16': [
-          '1rem',
-          { lineHeight: '22px', fontWeight: '500' },
-        ], // 16px Medium
-        'available-medium-14': [
-          '0.875rem',
-          { lineHeight: 'auto', fontWeight: '500' },
-        ], // 14px Medium
-        'available-medium-12': [
-          '0.75rem',
-          { lineHeight: 'auto', fontWeight: '500' },
-        ], // 12px Medium
-        'available-medium-10': [
-          '0.625rem',
-          { lineHeight: 'auto', fontWeight: '500' },
-        ], // 10px Medium
+        'display-bold-14': ['0.875rem', { lineHeight: 'auto', fontWeight: '700' }], // 14px Bold
+        'display-bold-12': ['0.75rem', { lineHeight: 'auto', fontWeight: '700' }], // 12px Bold
+        'available-medium-16': ['1rem', { lineHeight: '22px', fontWeight: '500' }], // 16px Medium
+        'available-medium-14': ['0.875rem', { lineHeight: 'auto', fontWeight: '500' }], // 14px Medium
+        'available-medium-12': ['0.75rem', { lineHeight: 'auto', fontWeight: '500' }], // 12px Medium
+        'available-medium-10': ['0.625rem', { lineHeight: 'auto', fontWeight: '500' }], // 10px Medium
         'hover-medium-16': [
           '1rem',
           {
