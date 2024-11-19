@@ -6,11 +6,13 @@ import { PrismaModule } from '@app/prisma';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TransactionOrderService } from './transaction.order.service';
 import { SessionModule } from '@app/session';
+import { CommonModule } from '@app/common';
 
 @Module({
   imports: [
     PrismaModule,
     SessionModule,
+    CommonModule,
     ClientsModule.register([
       {
         name: 'ORDER_PACKAGE',
