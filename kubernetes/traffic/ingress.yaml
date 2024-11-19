@@ -25,3 +25,10 @@ spec:
                 name: balance-service
                 port:
                   number: 80
+          - path: /api/transaction
+            pathType: Prefix
+            backend:
+              service:
+                name: transaction-service
+                port:
+                  number: 80
