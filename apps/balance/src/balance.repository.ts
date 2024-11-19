@@ -18,7 +18,10 @@ export class BalanceRepository {
 
   async createEmptyAccount(userId: bigint) {
     await this.prisma.asset.create({
-      data: { userId, currencyCode: CurrencyCode.KRW, availableBalance: 0, lockedBalance: 0 },
+      data: [
+        { userId, currencyCode: CurrencyCode.KRW, availableBalance: 0, lockedBalance: 0 },
+        { userId, currencyCode: CurrencyCode.BTC, availableBalance: 0, lockedBalance: 0 },
+      ],
     });
   }
 
