@@ -1,27 +1,29 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Tab from '../../shared/UI/Tab';
 import SectionBlock from './UI/SectionBlock';
 import InputNumber from './UI/InputNumber';
+import Button from './UI/Button';
 
 import CATEGORY from './const/orderCategory';
 import { useAuth } from '../../shared/store/auth/authContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuthActions } from '../../shared/store/auth/authActions';
 import useOrderAmount from './model/useOrderAmount';
-import Button from './UI/Button';
+import useGetAssets from './model/useGetAssets';
 
 interface OrderPanelProps {
   tradePrice: string;
   setTradePrice: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const OrderPanel: React.FC<OrderPanelProps> = ({
-  tradePrice,
-  setTradePrice,
-}) => {
+const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) => {
   const { state: authState } = useAuth();
   const navigate = useNavigate();
+  const [myAsset, setMyAsset] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState('매수');
   const [coinCode, setCoinCode] = useState('KRW');
+  const { data } = useGetAssets();
+  const { login } = useAuthActions();
   const {
     amount,
     setAmount,
@@ -34,7 +36,16 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
 
   useEffect(() => {
     setCoinCode(selectedOrder === '매수' ? 'KRW' : 'BTC');
-  }, [selectedOrder]);
+
+    if (data) {
+      login();
+      if (selectedOrder === '매수') {
+        setMyAsset(data[0] ? data[0].amount : 0);
+      } else {
+        setMyAsset(data[1] ? data[1].amount : 0);
+      }
+    }
+  }, [data, selectedOrder]);
 
   const handleSubClick = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
@@ -73,7 +84,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
       />
       <div className="pt-8 px-10">
         <SectionBlock title="주문 가능">
-          <div className="text-display-bold-16 mr-2">0</div>
+          <div className="text-display-bold-16 mr-2">{authState.isAuthenticated ? myAsset : 0}</div>
           <div className="available-medium-12 text-text-dark">{coinCode}</div>
         </SectionBlock>
         <SectionBlock title={`${selectedOrder} 가격`} subtitle="KRW">
