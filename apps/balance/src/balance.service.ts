@@ -8,10 +8,21 @@ import { CreateTransactionDto } from './dto/create.transaction.dto';
 import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
 import { GrpcMethod } from '@nestjs/microservices';
 import { OrderResponseDto } from '@app/grpc/dto/order.response.dto';
+import { AccountService } from '@app/grpc/account.interface';
 
 @Injectable()
-export class BalanceService implements OrderService {
+export class BalanceService implements OrderService, AccountService {
   constructor(private balanceRepository: BalanceRepository) {}
+
+  @GrpcMethod('AccountService', 'CreateAccount')
+  async createAccount(accountRequest: { userId: string }): Promise<{ status: string }> {
+    try {
+      await this.balanceRepository.createEmptyAccount(BigInt(accountRequest.userId));
+      return { status: 'SUCCESS' };
+    } catch {
+      return { status: 'ERROR' };
+    }
+  }
 
   async deposit(userId: bigint, createTransactionDto: CreateTransactionDto) {
     const { amount } = createTransactionDto;

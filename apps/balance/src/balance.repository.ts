@@ -16,6 +16,12 @@ export enum TransactionType {
 export class BalanceRepository {
   constructor(private prisma: PrismaService) {}
 
+  async createEmptyAccount(userId: bigint) {
+    await this.prisma.asset.create({
+      data: { userId, currencyCode: CurrencyCode.KRW, availableBalance: 0, lockedBalance: 0 },
+    });
+  }
+
   async deposit(userId: bigint, createTransactionDto: CreateTransactionDto) {
     const { currencyCode, amount } = createTransactionDto;
     return await this.prisma.$transaction(async (prisma) => {
