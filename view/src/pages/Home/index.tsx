@@ -67,7 +67,7 @@ const Home = () => {
         />
         <Chart data={candleData} scaleType={selectedTimeScale} />
 
-        <div className="w-full flex justify-between py-[0.75rem] overflow-hidden">
+        <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
             priceChangeRate={currentPriceMockData.priceChangeRate}
             setOrderPrice={setOrderPrice}

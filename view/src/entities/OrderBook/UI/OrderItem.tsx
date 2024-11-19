@@ -17,7 +17,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ setOrderPrice, orderInfo }) => {
     >
       <div className="flex gap-[2rem] ">
         <div className="text-display-bold-16">{price.toLocaleString()}</div>
-        <div>{priceChangeRate}</div>
+        <div>{priceChangeRate}%</div>
       </div>
       <div className="text-text-light">{amount}</div>
     </div>
