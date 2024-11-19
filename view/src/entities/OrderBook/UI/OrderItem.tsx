@@ -1,14 +1,14 @@
 import { OrderType } from '../model/OrderType';
 
 interface OrderItemProps {
-  setOrderPrice: React.Dispatch<React.SetStateAction<number>>;
+  setOrderPrice: React.Dispatch<React.SetStateAction<string>>;
   orderInfo: OrderType;
 }
 
 const OrderItem: React.FC<OrderItemProps> = ({ setOrderPrice, orderInfo }) => {
   const { price, priceChangeRate, amount } = orderInfo;
   const handleClick = () => {
-    setOrderPrice(price);
+    setOrderPrice(price.toLocaleString());
   };
   return (
     <div
