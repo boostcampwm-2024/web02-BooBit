@@ -6,14 +6,14 @@ const timeScaleOptions: Array<{
   label: string;
   rightBorder: boolean;
 }> = [
-  { value: '1s', label: '초', rightBorder: true },
-  { value: '1m', label: '1분', rightBorder: false },
-  { value: '10m', label: '10분', rightBorder: false },
-  { value: '30m', label: '30분', rightBorder: true },
-  { value: '1h', label: '시간', rightBorder: true },
-  { value: '1d', label: '일', rightBorder: true },
-  { value: '1w', label: '주', rightBorder: true },
-  { value: '1M', label: '월', rightBorder: false },
+  { value: '1sec', label: '초', rightBorder: true },
+  { value: '1min', label: '1분', rightBorder: false },
+  { value: '10min', label: '10분', rightBorder: false },
+  { value: '30min', label: '30분', rightBorder: true },
+  { value: '1hour', label: '시간', rightBorder: true },
+  { value: '1day', label: '일', rightBorder: true },
+  { value: '1week', label: '주', rightBorder: true },
+  { value: '1month', label: '월', rightBorder: false },
 ];
 
 const TimeScaleSelector: React.FC<{

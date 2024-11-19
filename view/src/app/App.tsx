@@ -1,22 +1,20 @@
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import Home from '../pages/Home';
 import MyPage from '../pages/MyPage';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
-import {
-  MutationCache,
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+
 import { useAuthActions } from '../shared/store/auth/authActions';
 import { useToast } from '../shared/store/ToastContext';
 import Toast from '../shared/UI/Toast';
 import errorMessages from '../shared/consts/errorMessages';
-import { useState } from 'react';
 
 const App = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuthActions();
   const { addToast } = useToast();
 
@@ -26,9 +24,11 @@ const App = () => {
         onError: (error) => {
           if (error instanceof Error) {
             if (error.message === '403') {
-              addToast(errorMessages[403], 'error');
               logout();
-              navigate('signin');
+              if (location.pathname !== '/') {
+                addToast(errorMessages[403], 'error');
+                navigate('signin');
+              }
             }
           }
         },

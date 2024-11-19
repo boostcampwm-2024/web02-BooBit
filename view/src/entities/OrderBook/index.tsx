@@ -3,7 +3,7 @@ import OrderItem from './UI/OrderItem';
 
 interface OrderBookProps {
   priceChangeRate: number;
-  setOrderPrice: React.Dispatch<React.SetStateAction<number>>;
+  setOrderPrice: React.Dispatch<React.SetStateAction<string>>;
   orderBook: {
     currentPrice: number;
     sell: OrderType[];
