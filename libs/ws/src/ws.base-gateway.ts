@@ -18,12 +18,12 @@ export abstract class WsBaseGateway
   }
 
   handleConnection(client: WebSocket) {
-    console.log('Client connected');
+    console.log(`Client connected at ${new Date().toISOString()}`);
     client.on('message', (message) => this.handleMessage(client, message.toString()));
   }
 
   handleDisconnect(client: WebSocket) {
-    console.log('Client disconnected');
+    console.log(`Client disconnected at ${new Date().toISOString()}`);
     this.wsService.removeClient(client);
   }
 
