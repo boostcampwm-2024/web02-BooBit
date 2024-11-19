@@ -3,9 +3,12 @@ import Chart from '../../entities/Chart';
 import Header from '../../widgets/Header';
 import Layout from '../../widgets/Layout';
 import d1candleData from './consts/d1candleData';
-import generateCandleData from './lib/generateCandleData';
 import TimeScaleSelector from './UI/TimeScaleSelector';
+import Title from './UI/Title';
+
+import generateCandleData from './lib/generateCandleData';
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
+import currentPriceMockData from './consts/currentPriceMockData';
 
 const timeScaleMap = {
   '1s': 1000,
@@ -43,6 +46,7 @@ const Home = () => {
     <div>
       <Header />
       <Layout paddingX="px-[22vw]" flex={false}>
+        <Title currentPrice={currentPriceMockData} />
         <TimeScaleSelector
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
