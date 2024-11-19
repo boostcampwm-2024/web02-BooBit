@@ -10,6 +10,7 @@ import { useAuth } from '../../shared/store/auth/authContext';
 import { useAuthActions } from '../../shared/store/auth/authActions';
 import useOrderAmount from './model/useOrderAmount';
 import useGetAssets from './model/useGetAssets';
+import usePostBuy from './model/usePostBuy';
 
 interface OrderPanelProps {
   tradePrice: string;
@@ -33,6 +34,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
     updateAmountWithPrice,
     reset,
   } = useOrderAmount({ tradePrice });
+  const { mutate: orderBuy } = usePostBuy();
 
   useEffect(() => {
     setCoinCode(selectedOrder === '매수' ? 'KRW' : 'BTC');
@@ -51,11 +53,8 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
   const handleSubClick = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
 
-    if (!authState.isAuthenticated) {
-      navigate('/signup');
-      return;
-    }
-    reset();
+    if (!authState.isAuthenticated) navigate('/signup');
+    else reset();
   };
 
   const handleMainClick = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -65,6 +64,10 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
       navigate('/signin');
       return;
     }
+
+    const requestParam = { coinCode: selectedOrder, amount: Number(amount), price: Number(price) };
+    if (selectedOrder === '매수') orderBuy(requestParam);
+
     reset();
   };
 
