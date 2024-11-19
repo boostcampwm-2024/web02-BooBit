@@ -29,6 +29,7 @@ RUN npm ci --only=production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/apps/auth/prisma ./prisma
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/libs/grpc/proto ./libs/grpc/proto
 
 # Expose port
 EXPOSE 3000
