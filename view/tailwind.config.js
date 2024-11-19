@@ -4,7 +4,8 @@ module.exports = {
   theme: {
     extend: {
       fontSize: {
-        'display-bold-32': ['2rem', { lineHeight: 'auto', fontWeight: '700' }], // 24px Bold
+        'display-bold-32': ['2rem', { lineHeight: 'auto', fontWeight: '700' }], // 32px Bold
+        'display-bold-28': ['1.75rem', { lineHeight: 'auto', fontWeight: '700' }], // 28px Bold
         'display-bold-24': ['1.5rem', { lineHeight: 'auto', fontWeight: '700' }], // 24px Bold
         'display-bold-20': ['1.25em', { lineHeight: 'auto', fontWeight: '700' }], // 20px Bold
         'display-bold-16': ['1rem', { lineHeight: 'auto', fontWeight: '700' }], // 16px Bold
