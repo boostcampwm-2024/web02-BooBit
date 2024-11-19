@@ -67,7 +67,7 @@ export class BalanceService implements OrderService, AccountService {
     return await this.balanceRepository.makeBuyOrder(orderRequest);
   }
 
-  @GrpcMethod('OrderService', 'MakeBuyOrder')
+  @GrpcMethod('OrderService', 'MakeSellOrder')
   async makeSellOrder(orderRequest: OrderRequestDto): Promise<OrderResponseDto> {
     return await this.balanceRepository.makeSellOrder(orderRequest);
   }

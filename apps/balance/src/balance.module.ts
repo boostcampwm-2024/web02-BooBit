@@ -15,8 +15,8 @@ export class BalanceModule {
   static grpcOptions = {
     transport: Transport.GRPC,
     options: {
-      packages: ['order', 'account'],
-      protoPath: 'libs/grpc/src/balance.proto',
+      package: ['order', 'account'],
+      protoPath: ['libs/grpc/src/order.proto', 'libs/grpc/src/account.proto'],
       url: '0.0.0.0:5001',
     },
   };
