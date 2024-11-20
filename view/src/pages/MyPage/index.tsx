@@ -12,6 +12,7 @@ import MyAssetList from '../../entities/MyAssetList';
 
 import CATEGORY from './consts/category';
 import useGetAssets from './model/useGetAssets';
+import MyTradeHistory from '../../entities/MyTradeHistory';
 
 const Home = () => {
   const [selectedCateIdx, setSelectedCateIdx] = useState(0);
@@ -53,6 +54,11 @@ const Home = () => {
                 currencyCode={assetList.assets[selectedAssetIdx].currencyCode}
                 amount={assetList.assets[selectedAssetIdx].amount}
               ></MyAssetInfo>
+            </div>
+          )}
+          {selectedCateIdx === 2 && (
+            <div>
+              <MyTradeHistory />
             </div>
           )}
         </MainviewLayout>
