@@ -6,7 +6,6 @@ import { BALANCE_EXCEPTIONS } from './exception/balance.exceptions';
 import { AssetDto } from './dto/asset.dto';
 import { CreateTransactionDto } from './dto/create.transaction.dto';
 import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
-import { GrpcMethod } from '@nestjs/microservices';
 import { OrderResponseDto } from '@app/grpc/dto/order.response.dto';
 import { AccountService } from '@app/grpc/account.interface';
 import { AccountCreateResponseDto } from '@app/grpc/dto/account.create.response.dto';
@@ -16,7 +15,6 @@ import { AccountCreateRequestDto } from '@app/grpc/dto/account.create.request.dt
 export class BalanceService implements OrderService, AccountService {
   constructor(private balanceRepository: BalanceRepository) {}
 
-  @GrpcMethod('AccountService', 'CreateAccount')
   async createAccount(accountRequest: AccountCreateRequestDto): Promise<AccountCreateResponseDto> {
     try {
       await this.balanceRepository.createEmptyAccount(BigInt(accountRequest.userId));
@@ -62,12 +60,11 @@ export class BalanceService implements OrderService, AccountService {
         ),
     );
   }
-  @GrpcMethod('OrderService', 'MakeBuyOrder')
+
   async makeBuyOrder(orderRequest: OrderRequestDto): Promise<OrderResponseDto> {
     return await this.balanceRepository.makeBuyOrder(orderRequest);
   }
 
-  @GrpcMethod('OrderService', 'MakeSellOrder')
   async makeSellOrder(orderRequest: OrderRequestDto): Promise<OrderResponseDto> {
     return await this.balanceRepository.makeSellOrder(orderRequest);
   }
