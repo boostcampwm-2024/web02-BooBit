@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: transaction-db
-          image: mongo:6.0
+          image: mongo:8.0
           resources:
             requests:
               cpu: '500m'
@@ -28,12 +28,15 @@ spec:
             - containerPort: 27017
           env:
             - name: MONGO_INITDB_ROOT_USERNAME
-              value: $(DB_USER)
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DB_USER
             - name: MONGO_INITDB_ROOT_PASSWORD
-              value: $(DB_PASSWORD)
-          envFrom:
-            - secretRef:
-                name: db-credentials
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DB_PASSWORD
           volumeMounts:
             - name: transaction-db-storage
               mountPath: /data/db
