@@ -20,7 +20,7 @@ const useSignup = (
     },
     onError: (error: unknown) => {
       if (error instanceof Error) {
-        if (error.message === '400') onErrorCallback('total', true, errorMessages[400]);
+        if (error.message === '400') onErrorCallback('total', true, errorMessages[400].general);
         else if (error.message === '409') onErrorCallback('email', true, errorMessages[409]);
         else onErrorCallback('total', true, errorMessages.default.signup);
       } else {

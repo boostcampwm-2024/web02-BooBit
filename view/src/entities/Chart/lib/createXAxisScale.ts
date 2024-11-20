@@ -19,21 +19,21 @@ export const createXAxisScale = (
     .map((d) => {
       const date = d.date;
       switch (scaleType) {
-        case '1s':
+        case '1sec':
           return date.getSeconds() % 12 === 0 ? date.toISOString() : null;
-        case '1m':
+        case '1min':
           return date.getMinutes() % 12 === 0 ? date.toISOString() : null;
-        case '10m':
+        case '10min':
           return date.getHours() % 2 === 0 && date.getMinutes() === 0 ? date.toISOString() : null;
-        case '30m':
+        case '30min':
           return date.getHours() % 6 === 0 && date.getMinutes() === 0 ? date.toISOString() : null;
-        case '1h':
+        case '1hour':
           return date.getHours() % 12 === 0 ? date.toISOString() : null;
-        case '1d':
+        case '1day':
           return date.getDate() === 1 || date.getDate() === 16 ? date.toISOString() : null;
-        case '1w':
+        case '1week':
           return date.getDate() === 1 ? date.toISOString() : null;
-        case '1M':
+        case '1month':
           return date.getMonth() === 1 ? date.toISOString() : null;
         default:
           return null;
@@ -46,25 +46,25 @@ export const createXAxisScale = (
     if (!d) return '';
     const date = new Date(d);
     switch (scaleType) {
-      case '1s':
+      case '1sec':
         return d3.timeFormat('%H:%M:%S')(date);
-      case '1m':
-      case '10m':
+      case '1min':
+      case '10min':
         return d3.timeFormat('%H:%M')(date);
-      case '30m':
-      case '1h': {
+      case '30min':
+      case '1hour': {
         const hour = date.getHours();
         return hour === 0 ? d3.timeFormat('%m/%d')(date) : d3.timeFormat('%H:%M')(date);
       }
-      case '1d': {
+      case '1day': {
         const day = date.getDate();
         return day === 1 ? d3.timeFormat('%b')(date) : '16';
       }
-      case '1w': {
+      case '1week': {
         const month = date.getMonth();
         return month === 0 ? d3.timeFormat('%Y')(date) : d3.timeFormat('%b')(date);
       }
-      case '1M':
+      case '1month':
         return d3.timeFormat('%Y')(date);
       default:
         return '';

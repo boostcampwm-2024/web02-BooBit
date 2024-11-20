@@ -8,18 +8,21 @@ import { TransactionOrderService } from './transaction.order.service';
 import { SessionModule } from '@app/session';
 import { WsModule } from '@app/ws/ws.module';
 import { CandleGateway } from './transaction.candle.gateway';
+import { CommonModule } from '@app/common';
+
 @Module({
   imports: [
     PrismaModule,
     SessionModule,
     WsModule,
+    CommonModule,
     ClientsModule.register([
       {
         name: 'ORDER_PACKAGE',
         transport: Transport.GRPC,
         options: {
           package: 'order',
-          protoPath: 'libs/grpc/src/order.proto',
+          protoPath: 'libs/grpc/proto/order.proto',
           url: 'localhost:5001',
         },
       },

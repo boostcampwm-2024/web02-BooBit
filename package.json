@@ -16,13 +16,15 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e:balance": "jest --config ./apps/balance/test/jest-e2e.json",
-    "generate:balance": "npx prisma generate --schema apps/balance/prisma/schema.prisma",
-    "start:prod:balance": "npx prisma migrate deploy && node dist/apps/balance/main",
     "generate:auth": "npx prisma generate --schema apps/auth/prisma/schema.prisma",
+    "generate:balance": "npx prisma generate --schema apps/balance/prisma/schema.prisma",
+    "generate:transaction": "npx prisma generate --schema apps/transaction/prisma/schema.prisma",
     "start:prod:auth": "npx prisma migrate deploy && node dist/apps/auth/main",
+    "start:prod:balance": "npx prisma migrate deploy && node dist/apps/balance/main",
+    "start:prod:transaction": "node dist/apps/transaction/main",
     "dev:auth": "concurrently -s all \"npx prisma generate --schema apps/auth/prisma/schema.prisma\" \"npx prisma migrate deploy --schema apps/auth/prisma/schema.prisma\" \"nest start auth --watch --debug\"",
-    "dev:balance": "concurrently -s all \"npx prisma generate --schema apps/balance/prisma/schema.prisma\" \"npx prisma migrate deploy --schema apps/balance/prisma/schema.prisma\" \"nest start balance --watch --debug\""
+    "dev:balance": "concurrently -s all \"npx prisma generate --schema apps/balance/prisma/schema.prisma\" \"npx prisma migrate deploy --schema apps/balance/prisma/schema.prisma\" \"nest start balance --watch --debug\"",
+    "dev:transaction": "concurrently -s all \"npx prisma generate --schema apps/transaction/prisma/schema.prisma\" \"nest start transaction --watch --debug\""
   },
   "lint-staged": {
     "*.ts": [

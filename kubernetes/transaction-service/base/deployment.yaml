@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-service
+  labels:
+    app: transaction-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transaction-service
+  template:
+    metadata:
+      labels:
+        app: transaction-service
+    spec:
+      containers:
+        - name: transaction-service
+          image: boobit-ncr.kr.ncr.ntruss.com/transaction-service:latest #todo
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: '500m'
+              memory: '1Gi'
+            limits:
+              cpu: '500m'
+              memory: '1Gi'
+          env:
+            - name: DATABASE_URL
+              value: 'mongodb://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):27017/$(DB_SCHEMA)'
+          envFrom:
+            - configMapRef:
+                name: transaction-service-config
+            - secretRef:
+                name: db-credentials

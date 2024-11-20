@@ -20,7 +20,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
     if (!svgRef.current) return;
 
     const margin = { top: 20, right: 90, bottom: 50, left: 40 };
-    const width = 1076 - margin.left - margin.right;
+    const width = 1066 - margin.left - margin.right;
     const height = 460 - margin.top - margin.bottom;
     const volumeHeight = 80;
     const svg = d3.select(svgRef.current);

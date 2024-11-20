@@ -1,11 +1,29 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  Inject,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import * as bcrypt from 'bcrypt';
 import { SignUpDto } from './dto/signup.dto';
+import { ClientGrpc } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
+import { AccountService } from '@app/grpc/account.interface';
+import { AccountCreateResponseDto } from '@app/grpc/dto/account.create.response.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject('ACCOUNT_PACKAGE') private client: ClientGrpc,
+  ) {}
+
+  private accountService;
+
+  onModuleInit() {
+    this.accountService = this.client.getService<AccountService>('AccountService');
+  }
 
   async signup(signUpDto: SignUpDto) {
     const { email, password, name } = signUpDto;
@@ -32,6 +50,14 @@ export class AuthService {
         name: true,
       },
     });
+
+    const accountCreateResult: AccountCreateResponseDto = await firstValueFrom(
+      this.accountService.createAccount({ userId: user.userId.toString() }),
+    );
+
+    if (accountCreateResult.status !== 'SUCCESS') {
+      throw new InternalServerErrorException('Failed to create account');
+    }
 
     return user;
   }

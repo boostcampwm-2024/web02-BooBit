@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { BalanceModule } from './balance.module';
 import { PrismaService } from '@app/prisma';
 import cors from '@app/common/cors';
-import { Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(BalanceModule);
@@ -12,14 +11,7 @@ async function bootstrap() {
   app.enableCors(cors);
   await app.listen(3000, '0.0.0.0');
 
-  const grpcApp = await NestFactory.createMicroservice(BalanceModule, {
-    transport: Transport.GRPC,
-    options: {
-      package: 'order',
-      protoPath: 'libs/grpc/src/order.proto',
-      url: '0.0.0.0:5001',
-    },
-  });
+  const grpcApp = await NestFactory.createMicroservice(BalanceModule, BalanceModule.grpcOptions);
   await grpcApp.listen();
 }
 bootstrap();

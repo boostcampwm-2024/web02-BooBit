@@ -15,11 +15,16 @@ spec:
         app: balance-db
         type: database
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: boobit-w-617b
       containers:
         - name: balance-db
           image: mysql:8.0.22
+          resources:
+            requests:
+              cpu: '500m'
+              memory: '1Gi'
+            limits:
+              cpu: '500m'
+              memory: '1Gi'
           args:
             - --character-set-server=utf8mb4
             - --collation-server=utf8mb4_unicode_ci
@@ -28,25 +33,16 @@ spec:
               name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-credentials
-                  key: MYSQL_ROOT_PASSWORD
+              value: $(DB_ROOT_PASSWORD)
             - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-credentials
-                  key: MYSQL_USER
+              value: $(DB_USER)
             - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-credentials
-                  key: MYSQL_PASSWORD
+              value: $(DB_PASSWORD)
             - name: MYSQL_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-credentials
-                  key: MYSQL_DATABASE
+              value: $(DB_SCHEMA)
+          envFrom:
+            - secretRef:
+                name: db-credentials
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql

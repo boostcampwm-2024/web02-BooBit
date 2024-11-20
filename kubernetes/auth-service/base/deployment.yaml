@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  labels:
+    app: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - name: auth-service
+          image: boobit-ncr.kr.ncr.ntruss.com/auth-service:latest #todo
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: '500m'
+              memory: '1Gi'
+            limits:
+              cpu: '500m'
+              memory: '1Gi'
+          env:
+            - name: DATABASE_URL
+              value: 'mysql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):3306/$(DB_SCHEMA)'
+          envFrom:
+            - configMapRef:
+                name: auth-service-config
+            - secretRef:
+                name: db-credentials

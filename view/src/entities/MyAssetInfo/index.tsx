@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import BoxContainer from './UI/BoxContainer';
 import Title from './UI/Title';
-import Tab from './UI/Tab';
+import Tab from '../../shared/UI/Tab';
 import TransactionForm from './UI/TransactionForm';
 import assetHistory from './consts/historyMockData';
 import TransactionLogItem from './UI/TransactionLogItem';
+
 import useDeposit from './model/useDeposit';
 import { AssetType } from './consts/AssetType';
 import useWithdraw from './model/useWithdraw';
+
+import CATEGORY from './consts/category';
 
 const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
   const [selectedCate, setSelectedCate] = useState('내역');
@@ -46,7 +49,11 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
   return (
     <BoxContainer>
       <Title currency_code={currencyCode} amount={amount} />
-      <Tab selectedCate={selectedCate} setSelectedCate={setSelectedCate} />
+      <Tab
+        selectedCate={selectedCate}
+        setSelectedCate={setSelectedCate}
+        categories={CATEGORY}
+      />
       {selectedCate === '내역' && (
         <ul className="w-[100%] h-[17rem] px-[3vw] overflow-y-auto">
           {assetHistory.transactions.map((log) => (

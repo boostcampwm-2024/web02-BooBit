@@ -2,12 +2,11 @@ services:
   # Service 컨테이너
   #Auth 서비스
   auth:
-    container_name: auth-server
+    container_name: auth-service
+    image: auth-service:latest
     build:
       context: .
       dockerfile: ./apps/auth/DockerFile
-      args:
-        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${AUTH_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
     ports:
       - '${AUTH_HOST_SERVICE_PORT}:3000'
     environment:
@@ -21,12 +20,11 @@ services:
 
   # Balance 서비스
   balance:
-    container_name: balance-server
+    container_name: balance-service
+    image: balance-service:latest
     build:
       context: .
       dockerfile: ./apps/balance/DockerFile
-      args:
-        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${BALANCE_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
     ports:
       - '${BALANCE_HOST_SERVICE_PORT}:3000'
     environment:
@@ -35,6 +33,24 @@ services:
       SESSION_SECRET: ${SESSION_SECRET}
     depends_on:
       balance-db:
+        condition: service_healthy
+    restart: always
+
+  # Transaction 서비스
+  transaction:
+    container_name: transaction-service
+    image: transaction-service:latest
+    build:
+      context: .
+      dockerfile: ./apps/transaction/DockerFile
+    ports:
+      - '${TRANSACTION_HOST_SERVICE_PORT}:3000'
+    environment:
+      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}
+      REDIS_URL: 'redis://${SESSION_DB}:${REDIS_PORT}'
+      SESSION_SECRET: ${SESSION_SECRET}
+    depends_on:
+      transaction-db:
         condition: service_healthy
     restart: always
 
@@ -103,17 +119,23 @@ services:
       retries: 5
 
   # Mongo DB
-  mongo-db:
+  transaction-db:
     image: mongo:8.0
-    container_name: mongo-db
+    container_name: transaction-db
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MYSQL_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - '27017:27017'
+      - '${TRANSACTION_HOST_DB_PORT}:27017'
     volumes:
-      - mongo-db:/data/db
+      - transaction-db:/data/db
+      - ./docker_init/mongo_init.js:/docker-entrypoint-initdb.d/init.js
+    healthcheck:
+      test: mongosh --eval 'db.runCommand("ping").ok' --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # MongoDB 관리를 위한 Web UI (선택사항)
   mongo-express:
@@ -125,12 +147,12 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MYSQL_USER}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MYSQL_PASSWORD}
-      ME_CONFIG_MONGODB_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@mongo-db:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@transaction-db:27017/
     depends_on:
-      - mongo-db
+      - transaction-db
 
 volumes:
   redis-db:
   auth-db:
   balance-db:
-  mongo-db:
+  transaction-db:
