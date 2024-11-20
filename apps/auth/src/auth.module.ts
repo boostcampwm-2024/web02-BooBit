@@ -12,13 +12,14 @@ import { CommonModule } from '@app/common';
   imports: [
     PrismaModule,
     SessionModule,
+    CommonModule,
     ClientsModule.register([
       {
         name: 'ACCOUNT_PACKAGE',
         transport: Transport.GRPC,
         options: {
           package: 'account',
-          protoPath: 'libs/grpc/src/account.proto',
+          protoPath: 'libs/grpc/proto/account.proto',
           url: 'localhost:5001',
         },
       },
