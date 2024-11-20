@@ -7,8 +7,6 @@ services:
     build:
       context: .
       dockerfile: ./apps/auth/DockerFile
-      args:
-        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${AUTH_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
     ports:
       - '${AUTH_HOST_SERVICE_PORT}:3000'
     environment:
@@ -27,8 +25,6 @@ services:
     build:
       context: .
       dockerfile: ./apps/balance/DockerFile
-      args:
-        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${BALANCE_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
     ports:
       - '${BALANCE_HOST_SERVICE_PORT}:3000'
     environment:
@@ -40,19 +36,17 @@ services:
         condition: service_healthy
     restart: always
 
-  # Balance 서비스
+  # Transaction 서비스
   transaction:
     container_name: transaction-service
     image: transaction-service:latest
     build:
       context: .
       dockerfile: ./apps/transaction/DockerFile
-      args:
-        DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
     ports:
       - '${TRANSACTION_HOST_SERVICE_PORT}:3000'
     environment:
-      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
+      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}
       REDIS_URL: 'redis://${SESSION_DB}:${REDIS_PORT}'
       SESSION_SECRET: ${SESSION_SECRET}
     depends_on:
@@ -136,6 +130,7 @@ services:
       - '${TRANSACTION_HOST_DB_PORT}:27017'
     volumes:
       - transaction-db:/data/db
+      - ./docker_init/mongo_init.js:/docker-entrypoint-initdb.d/init.js
     healthcheck:
       test: mongosh --eval 'db.runCommand("ping").ok' --quiet
       interval: 10s
