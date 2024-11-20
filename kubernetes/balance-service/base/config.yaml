@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: balance-service-config
+data:
+  DB_HOST: 'balance-db'
+  REDIS_URL: 'redis://session-db:6379'
+  #GRPC관련설정 추가필요

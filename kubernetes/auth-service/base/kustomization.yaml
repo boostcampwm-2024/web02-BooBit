@@ -1,0 +1,12 @@
+# base/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - config.yaml
+  - deployment.yaml
+  - service.yaml
+
+commonLabels:
+  app: auth-service
+  environment: production

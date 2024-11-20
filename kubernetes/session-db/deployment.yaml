@@ -1,0 +1,40 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: session-db
+spec:
+  selector:
+    matchLabels:
+      app: session-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: session-db
+    spec:
+      containers:
+        - name: session-db
+          image: redis:7.2-alpine
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: session-db
+spec:
+  type: ClusterIP
+  selector:
+    app: session-db
+  ports:
+    - port: 6379
+      targetPort: 6379

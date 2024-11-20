@@ -13,20 +13,20 @@ spec:
         app: boobit-nginx
     spec:
       containers:
-      - name: boobit-nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 30000
-          name: auth-db
-        - containerPort: 31000
-          name: balance-db
-        - containerPort: 32123
-          name: redis
-        volumeMounts:
-        - name: nginx-config
-          mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
+        - name: boobit-nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 30000
+              name: auth-db
+            - containerPort: 31000
+              name: balance-db
+            - containerPort: 32123
+              name: session-db
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
       volumes:
-      - name: nginx-config
-        configMap:
-          name: nginx-config
+        - name: nginx-config
+          configMap:
+            name: nginx-config

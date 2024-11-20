@@ -16,7 +16,12 @@ export class TransactionController {
   @UseGuards(AuthenticatedGuard)
   async buyLimitOrder(@Request() req, @Body() buyLimitRequest: OrderLimitRequestDto) {
     const userId = req.user.userId;
-    const orderRequest = new OrderRequestDto(userId, buyLimitRequest);
+    const orderRequest = new OrderRequestDto(
+      userId,
+      buyLimitRequest.coinCode,
+      buyLimitRequest.amount,
+      buyLimitRequest.price,
+    );
     const response = await this.transactionOrderService.makeBuyOrder(orderRequest);
     return await this.transactionService.registerBuyOrder(orderRequest, response);
   }
@@ -25,7 +30,13 @@ export class TransactionController {
   @UseGuards(AuthenticatedGuard)
   async sellLimitOrder(@Request() req, @Body() sellLimitRequest: OrderLimitRequestDto) {
     const userId = req.user.userId;
-    const orderRequest = new OrderRequestDto(userId, sellLimitRequest);
+    const orderRequest = new OrderRequestDto(
+      userId,
+      sellLimitRequest.coinCode,
+      sellLimitRequest.amount,
+      sellLimitRequest.price,
+    );
+
     const response = await this.transactionOrderService.makeSellOrder(orderRequest);
     return await this.transactionService.registerSellOrder(orderRequest, response);
   }
