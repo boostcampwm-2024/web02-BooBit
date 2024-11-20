@@ -4,16 +4,16 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy only necessary files for this service
-COPY nest-cli.json ./
-COPY package*.json ./
-COPY tsconfig*.json ./
-COPY apps/transaction ./apps/transaction
-COPY libs ./libs
+COPY microservice/nest-cli.json ./
+COPY microservice/package*.json ./
+COPY microservice/tsconfig*.json ./
+COPY microservice/apps/balance ./apps/balance
+COPY microservice/libs ./libs
 
 # Install and build
 RUN npm ci
-RUN npm run generate:transaction
-RUN npm run build transaction
+RUN npm run generate:balance
+RUN npm run build balance
 
 # Production stage
 FROM node:20-alpine
@@ -21,12 +21,12 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy package files and install dependencies
-COPY package*.json ./
+COPY microservice/package*.json ./
 RUN npm ci --only=production
 
 # Copy built assets and Prisma generated files
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/apps/transaction/prisma ./prisma
+COPY --from=builder /app/apps/balance/prisma ./prisma
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/libs/grpc/proto ./libs/grpc/proto
 
@@ -34,6 +34,6 @@ COPY --from=builder /app/libs/grpc/proto ./libs/grpc/proto
 EXPOSE 3000
 
 # Run application
-CMD ["npm", "run", "start:prod:transaction"]
-#CMD ["node", "dist/apps/transaction/main"]
+CMD ["npm", "run", "start:prod:balance"]
+#CMD ["node", "dist/apps/balance/main"]
 
