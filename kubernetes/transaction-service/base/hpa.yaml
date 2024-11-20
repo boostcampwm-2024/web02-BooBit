@@ -1,0 +1,32 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: transaction-service
+spec:
+  scaleTargetRef: # 어떤 리소스를 스케일링할지 지정
+    apiVersion: apps/v1
+    kind: Deployment
+    name: transaction-service # Deployment 이름과 일치해야 함
+
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60 # 스케일 업 결정 전 대기 시간
+      policies:
+        - type: Percent
+          value: 50 # 한 번에 50%까지만 증가
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300 # 스케일 다운 결정 전 대기 시간
+      policies:
+        - type: Percent
+          value: 25 # 한 번에 25%까지만 감소
+          periodSeconds: 60

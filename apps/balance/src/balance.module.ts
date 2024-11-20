@@ -5,9 +5,10 @@ import { PrismaModule } from '@app/prisma';
 import { BalanceRepository } from './balance.repository';
 import { SessionModule } from '@app/session';
 import { Transport } from '@nestjs/microservices';
+import { CommonModule } from '@app/common';
 
 @Module({
-  imports: [PrismaModule, SessionModule],
+  imports: [PrismaModule, SessionModule, CommonModule],
   controllers: [BalanceController],
   providers: [BalanceService, BalanceRepository],
 })

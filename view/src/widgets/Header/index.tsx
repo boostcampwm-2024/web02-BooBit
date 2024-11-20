@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import Logo from './UI/Logo';
+
 import { useAuth } from '../../shared/store/auth/authContext';
 import useSignout from './model/useSignout';
 
@@ -7,7 +8,8 @@ const Header = () => {
   const { state } = useAuth();
   const { mutate } = useSignout();
 
-  const handleLogout = () => {
+  const handleLogout = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.preventDefault();
     mutate();
   };
 

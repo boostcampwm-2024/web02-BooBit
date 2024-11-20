@@ -25,7 +25,6 @@ export class BalanceController implements OrderService, AccountService {
     console.log('deposit');
     const userId = req.user.userId;
     await this.balanceService.deposit(userId, createTransactionDto);
-    return;
   }
 
   @Post('/withdraw')
@@ -33,8 +32,7 @@ export class BalanceController implements OrderService, AccountService {
   @UseGuards(AuthenticatedGuard)
   async withdraw(@Body() createTransactionDto: CreateTransactionDto, @Request() req) {
     const userId = req.user.userId;
-    const assets = await this.balanceService.withdraw(userId, createTransactionDto);
-    return { assets };
+    await this.balanceService.withdraw(userId, createTransactionDto);
   }
   @GrpcMethod('OrderService', 'MakeBuyOrder')
   async makeBuyOrder(orderRequest) {

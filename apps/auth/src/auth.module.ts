@@ -6,6 +6,7 @@ import { PrismaModule } from '@app/prisma';
 import { LocalAuthGuard } from './passport/local.auth.guard';
 import { SessionModule } from '@app/session';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CommonModule } from '@app/common';
 
 @Module({
   imports: [
