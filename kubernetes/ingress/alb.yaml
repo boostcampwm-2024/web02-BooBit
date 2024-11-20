@@ -11,13 +11,6 @@ spec:
   rules:
     - http:
         paths:
-          - path: /*
-            pathType: Prefix
-            backend:
-              service:
-                name: static-server
-                port:
-                  number: 80
           - path: /api/auth
             pathType: Prefix
             backend:
@@ -37,5 +30,12 @@ spec:
             backend:
               service:
                 name: transaction-service
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: static-server
                 port:
                   number: 80
