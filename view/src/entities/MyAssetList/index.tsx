@@ -15,11 +15,7 @@ const MyAssetList = ({ assetList, setSelectedAssetIdx }: AssetListProps) => {
       <ul className="h-[10rem] overflow-y-auto">
         {assetList.map((a, i) => {
           return (
-            <AssetItem
-              key={a.currencyCode}
-              asset={a}
-              handleClick={() => setSelectedAssetIdx(i)}
-            />
+            <AssetItem key={a.currencyCode} asset={a} handleClick={() => setSelectedAssetIdx(i)} />
           );
         })}
       </ul>
