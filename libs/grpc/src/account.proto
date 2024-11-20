@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package account;
+
+service AccountService {
+  rpc CreateAccount(AccountCreateRequest) returns (AccountCreateResponse);
+}
+
+message AccountCreateRequest {
+  string userId = 1;
+}
+
+message AccountCreateResponse {
+  string status = 1;
+} 
