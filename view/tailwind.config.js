@@ -11,6 +11,7 @@ module.exports = {
         'display-bold-16': ['1rem', { lineHeight: 'auto', fontWeight: '700' }], // 16px Bold
         'display-bold-14': ['0.875rem', { lineHeight: 'auto', fontWeight: '700' }], // 14px Bold
         'display-bold-12': ['0.75rem', { lineHeight: 'auto', fontWeight: '700' }], // 12px Bold
+        'available-medium-18': ['1.125rem', { lineHeight: '22px', fontWeight: '500' }], // 18px Medium
         'available-medium-16': ['1rem', { lineHeight: '22px', fontWeight: '500' }], // 16px Medium
         'available-medium-14': ['0.875rem', { lineHeight: 'auto', fontWeight: '500' }], // 14px Medium
         'available-medium-12': ['0.75rem', { lineHeight: 'auto', fontWeight: '500' }], // 12px Medium
