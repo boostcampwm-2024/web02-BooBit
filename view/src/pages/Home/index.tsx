@@ -3,14 +3,15 @@ import Chart from '../../entities/Chart';
 import OrderBook from '../../entities/OrderBook';
 import Header from '../../widgets/Header';
 import Layout from '../../widgets/Layout';
-import TimeScaleSelector from './UI/TimeScaleSelector';
-
 import OrderPanel from '../../entities/OrderPanel';
-import d1candleData from './consts/d1candleData';
+import TradeRecords from '../../entities/TradeRecords';
+import TimeScaleSelector from './UI/TimeScaleSelector';
 import Title from './UI/Title';
 
+import d1candleData from './consts/d1candleData';
 import currentPriceMockData from './consts/currentPriceMockData';
 import orderBookMockData from './consts/orderBookMockData';
+import tradeHistoryMockData from './consts/tradeHistoryMockData';
 
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 import useWebSocket from '../../shared/model/useWebSocket';
@@ -75,6 +76,8 @@ const Home = () => {
           />
           <OrderPanel tradePrice={orderPrice} setTradePrice={setOrderPrice} />
         </div>
+
+        <TradeRecords tradeRecords={tradeHistoryMockData} />
       </Layout>
     </div>
   );
