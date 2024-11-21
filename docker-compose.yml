@@ -86,7 +86,7 @@ services:
 
   # Auth DB
   auth-db:
-    image: mysql:8.0.22
+    image: mysql:8.0
     container_name: auth-db
     ports:
       - "${AUTH_HOST_DB_PORT}:${MYSQL_PORT}"
@@ -109,7 +109,7 @@ services:
 
   # Balance DB
   balance-db:
-    image: mysql:8.0.22
+    image: mysql:8.0
     container_name: balance-db
     ports:
       - "${BALANCE_HOST_DB_PORT}:${MYSQL_PORT}"
