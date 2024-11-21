@@ -6,19 +6,14 @@ import SubviewLayout from './UI/SubviewLayout';
 import CategoryItem from './UI/CategoryItem';
 import Title from './UI/Title';
 import MyInfo from '../../entities/MyInfo';
-import MyAssetInfo from '../../entities/MyAssetInfo';
-import MyAssetList from '../../entities/MyAssetList';
 
 import CATEGORY from './consts/category';
-import useGetAssets from './model/useGetAssets';
 import MyTradeHistory from '../../entities/MyTradeHistory';
 import MyOpenOrders from '../../entities/MyOpenOrders';
+import CashTransaction from '../../widgets/CashTransaction';
 
 const Home = () => {
   const [selectedCateIdx, setSelectedCateIdx] = useState(0);
-  const [selectedAssetIdx, setSelectedAssetIdx] = useState(0);
-
-  const { data: assetList } = useGetAssets();
 
   const moveCategory = (categoryIdx: number) => {
     setSelectedCateIdx(categoryIdx);
@@ -41,18 +36,7 @@ const Home = () => {
         <MainviewLayout>
           <Title content={CATEGORY[selectedCateIdx]} />
           {selectedCateIdx === 0 && <MyInfo />}
-          {selectedCateIdx === 1 && assetList && (
-            <div>
-              <MyAssetList
-                assetList={assetList.assets}
-                setSelectedAssetIdx={setSelectedAssetIdx}
-              ></MyAssetList>
-              <MyAssetInfo
-                currencyCode={assetList.assets[selectedAssetIdx].currencyCode}
-                amount={assetList.assets[selectedAssetIdx].amount}
-              ></MyAssetInfo>
-            </div>
-          )}
+          {selectedCateIdx === 1 && <CashTransaction />}
           {selectedCateIdx === 2 && (
             <div>
               <MyTradeHistory />
