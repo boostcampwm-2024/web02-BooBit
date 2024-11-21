@@ -13,7 +13,7 @@ interface OrderBookProps {
 
 const OrderBook: React.FC<OrderBookProps> = ({ priceChangeRate, setOrderPrice, orderBook }) => {
   return (
-    <div className="w-[31rem] h-[24rem] relative border-[1px] bg-surface-default border-border-default">
+    <div className="w-[26vw] h-[24rem] relative border-[1px] bg-surface-default border-border-default">
       <div className="w-full text-positive absolute bottom-[212px]">
         {orderBook.sell &&
           orderBook.sell.map((o) => {

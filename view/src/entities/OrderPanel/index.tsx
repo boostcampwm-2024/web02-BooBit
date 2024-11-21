@@ -79,7 +79,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
   };
 
   return (
-    <div className="w-[35rem] h-[24rem] border-[1px] bg-surface-default border-border-default">
+    <div className="w-[29vw] h-[24rem] border-[1px] bg-surface-default border-border-default">
       <Tab
         selectedCate={selectedOrder}
         setSelectedCate={setSelectedOrder}
@@ -112,12 +112,12 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
         <div className="w-[100%] flex mt-3 text-display-bold-18 justify-between">
           <Button
             label={authState.isAuthenticated ? '초기화' : '회원가입'}
-            styles={`basis-44 bg-surface-hover-light`}
+            styles={`w-[30%] bg-surface-hover-light`}
             onClick={handleSubClick}
           />
           <Button
             label={authState.isAuthenticated ? selectedOrder : '로그인'}
-            styles={`basis-72 ${getButtonStyle()}`}
+            styles={`w-[68%] ${getButtonStyle()}`}
             onClick={handleMainClick}
           ></Button>
         </div>
