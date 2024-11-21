@@ -1,0 +1,40 @@
+# Build stage
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy only necessary files for this service
+COPY microservice/nest-cli.json ./
+COPY microservice/package*.json ./
+COPY microservice/tsconfig*.json ./
+COPY microservice/apps/auth ./apps/auth
+COPY microservice/libs ./libs
+
+# Install and build
+RUN npm ci
+RUN npm run generate:auth
+RUN npm run build auth
+
+# Production stage
+FROM node:20-alpine
+
+
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY microservice/package*.json ./
+RUN npm ci --only=production
+
+# Copy built assets and Prisma generated files
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/apps/auth/prisma ./prisma
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/libs/grpc/proto ./libs/grpc/proto
+
+# Expose port
+EXPOSE 3000
+
+# Run application
+CMD ["npm", "run", "start:prod:auth"]
+#CMD ["node", "dist/apps/auth/main"]
+
