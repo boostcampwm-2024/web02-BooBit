@@ -130,7 +130,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Mongo DB
+  # Transaction DB
   transaction-db:
     image: mongo:8.0
     container_name: transaction-db
@@ -140,6 +140,17 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "${TRANSACTION_HOST_DB_PORT}:27017"
+    command:
+      - sh
+      - -c
+      - |
+        mongod --replSet rs0 --bind_ip_all &
+        until mongosh --quiet --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+          echo "Waiting for MongoDB to start..."
+          sleep 1
+        done
+        mongosh --host transaction-db:27017 --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'transaction-db:27017'}]})"
+        tail -f /dev/null
     volumes:
       - transaction-db:/data/db
       - ./docker_init/mongo_init.js:/docker-entrypoint-initdb.d/init.js
@@ -148,7 +159,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
 volumes:
   redis-db:
   auth-db:
