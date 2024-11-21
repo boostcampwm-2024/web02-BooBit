@@ -28,7 +28,7 @@ const InputField: React.FC<InputFieldProps> = ({
   return (
     <form className="w-[100%] mb-[1rem]">
       <input
-        className={`w-[100%] h-[3.5rem] px-[2rem]   ${isError ? 'border-[2px] border-negative' : 'border-[1px] border-border-default'} rounded-[5px] text-available-medium-16 text-text-light bg-surface-default`}
+        className={`w-[100%] h-[6.5vh] px-[2rem]   ${isError ? 'border-[2px] border-negative' : 'border-[1px] border-border-default'} rounded-[5px] text-available-medium-16 text-text-light bg-surface-default`}
         type={type}
         name={name}
         placeholder={placeholder}
@@ -36,11 +36,7 @@ const InputField: React.FC<InputFieldProps> = ({
         onChange={onChange}
         onKeyDown={handleKeyDown}
       />
-      {isError ? (
-        <label className="text-negative  text-available-medium-14">{errorMessage}</label>
-      ) : (
-        ''
-      )}
+      {isError && <label className="text-negative  text-available-medium-14">{errorMessage}</label>}
     </form>
   );
 };
