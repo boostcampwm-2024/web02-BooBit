@@ -43,9 +43,9 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
     if (data) {
       login();
       if (selectedOrder === '매수') {
-        setMyAsset(data[0] ? data[0].amount : 0);
-      } else {
         setMyAsset(data[1] ? data[1].amount : 0);
+      } else {
+        setMyAsset(data[0] ? data[0].amount : 0);
       }
     }
   }, [data, selectedOrder]);
