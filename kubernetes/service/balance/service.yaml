@@ -10,4 +10,9 @@ spec:
       port: 80
       targetPort: 3000
       nodePort: 31080
+      name: http
+    - protocol: TCP
+      port: 50051
+      targetPort: 50051
+      name: grpc
   type: NodePort

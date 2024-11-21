@@ -1,12 +1,4 @@
 -- CreateTable
-CREATE TABLE `currency` (
-    `currency_code` VARCHAR(20) NOT NULL,
-    `name` VARCHAR(50) NOT NULL,
-
-    PRIMARY KEY (`currency_code`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `asset` (
     `asset_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT NOT NULL,
@@ -30,4 +22,19 @@ CREATE TABLE `deposit_withdrawal` (
 
     INDEX `deposit_withdrawal_user_id_idx`(`user_id`),
     PRIMARY KEY (`tx_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `order_history` (
+    `history_id` BIGINT NOT NULL AUTO_INCREMENT,
+    `order_type` VARCHAR(10) NOT NULL,
+    `user_id` BIGINT NOT NULL,
+    `coin_code` VARCHAR(20) NOT NULL,
+    `price` DECIMAL(24, 8) NOT NULL,
+    `quantity` DECIMAL(24, 8) NOT NULL,
+    `status` VARCHAR(20) NOT NULL,
+    `created_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    INDEX `order_history_user_id_idx`(`user_id`),
+    PRIMARY KEY (`history_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
