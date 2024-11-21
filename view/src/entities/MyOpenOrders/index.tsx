@@ -18,7 +18,9 @@ const MyOpenOrders = () => {
       <table className="w-full h-[18rem] mb-12 border-[1px] bg-surface-default border-border-default text-text-light">
         <TableRow height="h-[2rem]" styles="bg-surface-hover-light pr-[10px]">
           {columnData.map((c) => (
-            <TableCell width={c.width}>{c.content}</TableCell>
+            <TableCell key={c.content} width={c.width}>
+              {c.content}
+            </TableCell>
           ))}
         </TableRow>
         <tbody className="block h-[16rem] overflow-y-auto">
