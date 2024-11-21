@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import getAssetsApi from '../api/getAssetsApi';
+import getAssetsApi from '../../../widgets/CashTransaction/api/getAssetsApi';
 
 const useGetAssets = () => {
   return useQuery({
