@@ -1,4 +1,4 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
+import { BASE_URLS } from '../consts/baseUrl';
 
 const getAssetsApi = async () => {
   const response = await fetch(`${BASE_URLS.BALANCE}/api/users/assets`, {

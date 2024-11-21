@@ -9,7 +9,7 @@ import CATEGORY from './const/orderCategory';
 import { useAuth } from '../../shared/store/auth/authContext';
 import { useAuthActions } from '../../shared/store/auth/authActions';
 import useOrderAmount from './model/useOrderAmount';
-import useGetAssets from './model/useGetAssets';
+import useGetAssets from '../../shared/model/useGetAssets';
 import usePostBuy from './model/usePostBuy';
 
 interface OrderPanelProps {
