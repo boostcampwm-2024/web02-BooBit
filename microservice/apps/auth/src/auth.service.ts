@@ -56,6 +56,9 @@ export class AuthService {
     );
 
     if (accountCreateResult.status !== 'SUCCESS') {
+      await this.prisma.user.delete({
+        where: { userId: user.userId },
+      });
       throw new InternalServerErrorException('Failed to create account');
     }
 
