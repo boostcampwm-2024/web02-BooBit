@@ -11,6 +11,7 @@ import { useAuthActions } from '../../shared/store/auth/authActions';
 import useOrderAmount from './model/useOrderAmount';
 import useGetAssets from '../../shared/model/useGetAssets';
 import usePostBuy from './model/usePostBuy';
+import { useToast } from '../../shared/store/ToastContext';
 
 interface OrderPanelProps {
   tradePrice: string;
@@ -18,13 +19,6 @@ interface OrderPanelProps {
 }
 
 const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) => {
-  const { state: authState } = useAuth();
-  const navigate = useNavigate();
-  const [myAsset, setMyAsset] = useState(0);
-  const [selectedOrder, setSelectedOrder] = useState('매수');
-  const [coinCode, setCoinCode] = useState('KRW');
-  const { data } = useGetAssets();
-  const { login } = useAuthActions();
   const {
     amount,
     setAmount,
@@ -35,6 +29,14 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
     reset,
   } = useOrderAmount({ tradePrice });
   const { mutate: orderBuy } = usePostBuy();
+  const { addToast } = useToast();
+  const { state: authState } = useAuth();
+  const navigate = useNavigate();
+  const [myAsset, setMyAsset] = useState(0);
+  const [selectedOrder, setSelectedOrder] = useState('매수');
+  const [coinCode, setCoinCode] = useState('KRW');
+  const { data } = useGetAssets();
+  const { login } = useAuthActions();
 
   useEffect(() => {
     setCoinCode(selectedOrder === '매수' ? 'KRW' : 'BTC');
@@ -65,8 +67,18 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
       return;
     }
 
-    const requestParam = { coinCode: selectedOrder, amount: Number(amount), price: Number(price) };
-    if (selectedOrder === '매수') orderBuy(requestParam);
+    const requestParam = {
+      coinCode: selectedOrder,
+      amount: Number(amount.replace(/,/g, '')),
+      price: Number(price.replace(/,/g, '')),
+    };
+    if (selectedOrder === '매수') {
+      if (myAsset < requestParam.price) {
+        addToast('주문 금액이 보유 금액을 초과했습니다.', 'error');
+        return;
+      }
+      orderBuy(requestParam);
+    }
 
     reset();
   };
@@ -88,7 +100,9 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
       />
       <div className="pt-8 px-10">
         <SectionBlock title="주문 가능">
-          <div className="text-display-bold-16 mr-2">{authState.isAuthenticated ? myAsset : 0}</div>
+          <div className="text-display-bold-16 mr-2">
+            {authState.isAuthenticated ? myAsset.toLocaleString() : 0}
+          </div>
           <div className="available-medium-12 text-text-dark">{coinCode}</div>
         </SectionBlock>
         <SectionBlock title={`${selectedOrder} 가격`} subtitle="KRW">
