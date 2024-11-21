@@ -18,7 +18,7 @@ export class BalanceModule {
     options: {
       package: ['order', 'account'],
       protoPath: ['libs/grpc/proto/order.proto', 'libs/grpc/proto/account.proto'],
-      url: '0.0.0.0:5001',
+      url: '0.0.0.0:50051',
     },
   };
 }

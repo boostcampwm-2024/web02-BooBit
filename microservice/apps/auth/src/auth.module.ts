@@ -7,21 +7,26 @@ import { LocalAuthGuard } from './passport/local.auth.guard';
 import { SessionModule } from '@app/session';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CommonModule } from '@app/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     PrismaModule,
     SessionModule,
     CommonModule,
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'ACCOUNT_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'account',
-          protoPath: 'libs/grpc/proto/account.proto',
-          url: 'localhost:5001',
-        },
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'account',
+            protoPath: 'libs/grpc/proto/account.proto',
+            url: `${configService.get('BALANCE_GRPC_URL')}`,
+          },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],
