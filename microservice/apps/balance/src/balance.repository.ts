@@ -16,6 +16,20 @@ export enum TransactionType {
 export class BalanceRepository {
   constructor(private prisma: PrismaService) {}
 
+  async getPending(userId: bigint) {
+    return await this.prisma.orderHistory.findMany({
+      where: { userId, status: OrderStatus.PENDING },
+      select: {
+        historyId: true,
+        orderType: true,
+        coinCode: true,
+        price: true,
+        quantity: true,
+        createdAt: true,
+      },
+    });
+  }
+
   async createEmptyAccount(userId: bigint) {
     await this.prisma.asset.createMany({
       data: [

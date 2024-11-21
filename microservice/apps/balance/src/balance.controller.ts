@@ -10,6 +10,13 @@ import { AccountService } from '@app/grpc/account.interface';
 export class BalanceController implements OrderService, AccountService {
   constructor(private readonly balanceService: BalanceService) {}
 
+  @Get('/pending')
+  @UseGuards(AuthenticatedGuard)
+  async getPending(@Request() req) {
+    const userId = req.user.userId;
+    return await this.balanceService.getPending(userId);
+  }
+
   @Get('/assets')
   @UseGuards(AuthenticatedGuard)
   async getAssets(@Request() req) {

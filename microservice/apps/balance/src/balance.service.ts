@@ -15,6 +15,16 @@ import { AccountCreateRequestDto } from '@app/grpc/dto/account.create.request.dt
 export class BalanceService implements OrderService, AccountService {
   constructor(private balanceRepository: BalanceRepository) {}
 
+  async getPending(userId: bigint) {
+    const pending = await this.balanceRepository.getPending(userId);
+    return pending.map((item) => ({
+      ...item,
+      historyId: Number(item.historyId),
+      createdAt: item.createdAt.toLocaleString('sv'),
+      unfilledAmount: item.quantity,
+    }));
+  }
+
   async createAccount(accountRequest: AccountCreateRequestDto): Promise<AccountCreateResponseDto> {
     try {
       await this.balanceRepository.createEmptyAccount(BigInt(accountRequest.userId));
