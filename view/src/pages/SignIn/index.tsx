@@ -23,7 +23,7 @@ const SignIn = () => {
 
   return (
     <AuthLayout>
-      <img src={logo} alt="logo" className="w-[11rem] mb-[2rem]" />
+      <img src={logo} alt="logo" className="w-[9vw] mb-[2rem]" />
       <InputField
         type="text"
         placeholder="이메일"
@@ -42,13 +42,15 @@ const SignIn = () => {
         isError={error.isError}
         errorMessage={error.errorMessage}
       />
-      <SubmitButton height="h-[4rem]" content="로그인" onClick={handleSumbit} />
-      <button
-        className="ml-[52%] mb-[5rem] text-available-medium-16 text-text-dark hover:underline"
-        onClick={moveToSignup}
-      >
-        아직 계정이 없다면? 회원가입하기
-      </button>
+      <SubmitButton height="h-[7vh]" content="로그인" onClick={handleSumbit} />
+      <div className="w-full text-end mb-[5rem] ">
+        <button
+          className="text-available-medium-16 text-text-dark hover:underline"
+          onClick={moveToSignup}
+        >
+          아직 계정이 없다면? 회원가입하기
+        </button>
+      </div>
     </AuthLayout>
   );
 };

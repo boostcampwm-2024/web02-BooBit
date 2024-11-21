@@ -22,7 +22,7 @@ const InputNumber: React.FC<InputNumberProps> = ({ amount, setAmount, updateRela
   return (
     <input
       type="text"
-      className="w-[100%] h-[2.75rem] px-[1rem] rounded border-[1px] border-border-default text-right bg-surface-default"
+      className="w-[14vw] h-[2.5rem] px-[1rem] rounded border-[1px] border-border-default text-right bg-surface-default"
       value={amount}
       onChange={handleChange}
     />

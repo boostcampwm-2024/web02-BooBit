@@ -1,12 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import getAssetsApi from '../../../widgets/CashTransaction/api/getAssetsApi';
+import getAssetsApi from '../api/getAssetsApi';
 
 const useGetAssets = () => {
   return useQuery({
-    queryKey: ['asset', 'order'],
+    queryKey: ['assets'],
     queryFn: getAssetsApi,
     select: (data) => data.assets,
-    staleTime: 1000 * 60 * 5,
   });
 };
 

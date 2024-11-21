@@ -1,9 +1,8 @@
+import { BASE_URLS } from '../../../shared/consts/baseUrl';
 import { RequestDataType } from '../model/RequestDataType';
 
-const BASE_URLS = 'http://172.31.99.241:3000';
-
 const postBuyApi = async (requestData: RequestDataType) => {
-  const response = await fetch(`${BASE_URLS}/api/orders/limit/buy`, {
+  const response = await fetch(`${BASE_URLS.TRANSACTION}/api/orders/limit/buy`, {
     method: 'POST',
     credentials: 'include',
     headers: {

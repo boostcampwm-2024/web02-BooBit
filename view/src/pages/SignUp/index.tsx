@@ -28,7 +28,7 @@ const SignUp = () => {
 
   return (
     <AuthLayout>
-      <img src={logo} alt="logo" className="w-[10rem] mb-[2rem]" />
+      <img src={logo} alt="logo" className="w-[8vw] mb-[2rem]" />
       <LabeledInput
         label="이메일"
         type="text"
@@ -76,7 +76,7 @@ const SignUp = () => {
           {formValidation.total.message}
         </div>
       )}
-      <SubmitButton height="h-[4rem]" content="가입하기" onClick={handleSumbit} />
+      <SubmitButton height="h-[8vh]" content="가입하기" onClick={handleSumbit} />
     </AuthLayout>
   );
 };
