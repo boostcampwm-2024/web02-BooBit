@@ -20,6 +20,7 @@ services:
       - "${AUTH_HOST_SERVICE_PORT}:3000"
     environment:
       DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${AUTH_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
+      BALANCE_GRPC_URL: balance:50051
       REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
       SESSION_SECRET: ${SESSION_SECRET}
     depends_on:
@@ -36,6 +37,7 @@ services:
       dockerfile: ./microservice/apps/balance/DockerFile
     ports:
       - "${BALANCE_HOST_SERVICE_PORT}:3000"
+      - "50051:50051"
     environment:
       DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${BALANCE_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
       REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
@@ -56,6 +58,7 @@ services:
       - "${TRANSACTION_HOST_SERVICE_PORT}:3000"
     environment:
       DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}
+      BALANCE_GRPC_URL: balance:50051
       REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
       SESSION_SECRET: ${SESSION_SECRET}
     depends_on:

@@ -8,6 +8,7 @@ import { TransactionOrderService } from './transaction.order.service';
 import { SessionModule } from '@app/session';
 import { WsModule } from '@app/ws/ws.module';
 import { CandleGateway } from './gateway/transaction.candle.gateway';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommonModule } from '@app/common';
 
 @Module({
@@ -16,15 +17,19 @@ import { CommonModule } from '@app/common';
     SessionModule,
     WsModule,
     CommonModule,
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'ORDER_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'order',
-          protoPath: 'libs/grpc/proto/order.proto',
-          url: 'localhost:5001',
-        },
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'order',
+            protoPath: 'libs/grpc/proto/order.proto',
+            url: `${configService.get('BALANCE_GRPC_URL')}`,
+          },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],
