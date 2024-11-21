@@ -6,12 +6,15 @@ import { PrismaModule } from '@app/prisma';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TransactionOrderService } from './transaction.order.service';
 import { SessionModule } from '@app/session';
+import { WsModule } from '@app/ws/ws.module';
+import { CandleGateway } from './gateway/transaction.candle.gateway';
 import { CommonModule } from '@app/common';
 
 @Module({
   imports: [
     PrismaModule,
     SessionModule,
+    WsModule,
     CommonModule,
     ClientsModule.register([
       {
@@ -26,6 +29,6 @@ import { CommonModule } from '@app/common';
     ]),
   ],
   controllers: [TransactionController],
-  providers: [TransactionService, TransactionRepository, TransactionOrderService],
+  providers: [TransactionService, TransactionRepository, TransactionOrderService, CandleGateway],
 })
 export class TransactionModule {}

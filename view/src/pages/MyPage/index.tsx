@@ -3,15 +3,16 @@ import Header from '../../widgets/Header';
 import Layout from '../../widgets/Layout';
 import MainviewLayout from './UI/MainviewLayout';
 import SubviewLayout from './UI/SubviewLayout';
-import VerticalDivider from './UI/VerticalDivider';
 import CategoryItem from './UI/CategoryItem';
 import Title from './UI/Title';
-
+import MyInfo from '../../entities/MyInfo';
+import MyAssetInfo from '../../entities/MyAssetInfo';
 import MyAssetList from '../../entities/MyAssetList';
 
 import CATEGORY from './consts/category';
-import MyAssetInfo from '../../entities/MyAssetInfo';
 import useGetAssets from './model/useGetAssets';
+import MyTradeHistory from '../../entities/MyTradeHistory';
+import MyOpenOrders from '../../entities/MyOpenOrders';
 
 const Home = () => {
   const [selectedCateIdx, setSelectedCateIdx] = useState(0);
@@ -37,11 +38,9 @@ const Home = () => {
             />
           ))}
         </SubviewLayout>
-
-        <VerticalDivider />
-
         <MainviewLayout>
           <Title content={CATEGORY[selectedCateIdx]} />
+          {selectedCateIdx === 0 && <MyInfo />}
           {selectedCateIdx === 1 && assetList && (
             <div>
               <MyAssetList
@@ -52,6 +51,12 @@ const Home = () => {
                 currencyCode={assetList.assets[selectedAssetIdx].currencyCode}
                 amount={assetList.assets[selectedAssetIdx].amount}
               ></MyAssetInfo>
+            </div>
+          )}
+          {selectedCateIdx === 2 && (
+            <div>
+              <MyTradeHistory />
+              <MyOpenOrders />
             </div>
           )}
         </MainviewLayout>

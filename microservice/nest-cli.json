@@ -68,8 +68,19 @@
       "sourceRoot": "libs/grpc/src",
       "compilerOptions": {
         "tsConfigPath": "libs/grpc/tsconfig.lib.json",
-        "assets": ["**/*.proto"],
+        "assets": [
+          "**/*.proto"
+        ],
         "watchAssets": true
+      }
+    },
+    "ws": {
+      "type": "library",
+      "root": "libs/ws",
+      "entryFile": "index",
+      "sourceRoot": "libs/ws/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/ws/tsconfig.lib.json"
       }
     }
   }
