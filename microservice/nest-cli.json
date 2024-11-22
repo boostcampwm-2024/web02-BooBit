@@ -89,6 +89,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/bull/tsconfig.lib.json"
       }
+    },
+    "trade": {
+      "type": "application",
+      "root": "apps/trade",
+      "entryFile": "main",
+      "sourceRoot": "apps/trade/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/trade/tsconfig.app.json"
+      }
     }
   }
 }

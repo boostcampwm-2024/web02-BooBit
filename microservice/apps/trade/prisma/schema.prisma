@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model buyOrder {
+  historyId      String   @id @map("_id")
+  userId         String   @map("user_id")
+  coinCode       String   @map("coin_code")
+  price          String
+  originalQuote  String   @map("original_quote")
+  remainingQuote String   @map("remaining_quote")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([price, createdAt])
+  @@map("buy_order")
+}
+
+model sellOrder {
+  historyId     String   @id @map("_id")
+  userId        String   @map("user_id")
+  coinCode      String   @map("coin_code")
+  price         String
+  originalQuote String   @map("original_quote")
+  remainingBase String   @map("remaining_base")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([price, createdAt])
+  @@map("sell_order")
+}
+
+model trade {
+  tradeId     String   @id @default(cuid()) @map("_id")
+  buyOrderId  String   @map("buy_order_id")
+  sellOrderId String   @map("sell_order_id")
+  coinCode    String   @map("coin_code")
+  price       String
+  quantity    String
+  tradedAt    DateTime @default(now()) @map("traded_at")
+}
