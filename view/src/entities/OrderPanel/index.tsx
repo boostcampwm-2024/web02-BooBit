@@ -12,6 +12,7 @@ import useOrderAmount from './model/useOrderAmount';
 import useGetAssets from '../../shared/model/useGetAssets';
 import usePostBuy from './model/usePostBuy';
 import { useToast } from '../../shared/store/ToastContext';
+import usePostSell from './model/usePostSell';
 
 interface OrderPanelProps {
   tradePrice: string;
@@ -29,6 +30,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
     reset,
   } = useOrderAmount({ tradePrice });
   const { mutate: orderBuy } = usePostBuy();
+  const { mutate: orderSell } = usePostSell();
   const { addToast } = useToast();
   const { state: authState } = useAuth();
   const navigate = useNavigate();
@@ -68,7 +70,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
     }
 
     const requestParam = {
-      coinCode: selectedOrder,
+      coinCode: 'BTC',
       amount: Number(amount.replace(/,/g, '')),
       price: Number(price.replace(/,/g, '')),
     };
@@ -78,6 +80,12 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
         return;
       }
       orderBuy(requestParam);
+    } else {
+      if (myAsset < requestParam.amount) {
+        addToast('주문 수량이 보유 수량을 초과했습니다.', 'error');
+        return;
+      }
+      orderSell(requestParam);
     }
 
     reset();
