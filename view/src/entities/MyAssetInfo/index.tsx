@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import BoxContainer from './UI/BoxContainer';
 import Title from './UI/Title';
 import Tab from '../../shared/UI/Tab';
@@ -46,23 +46,30 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
     setWithdrawError(false);
   }, [selectedCate]);
 
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const bottomRef = useCallback((node: HTMLDivElement | null) => {
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        alert('출력');
+      }
+    });
+
+    if (node) observerRef.current.observe(node);
+  }, []);
+
   return (
     <BoxContainer>
       <Title currency_code={currencyCode} amount={amount} />
-      <Tab
-        selectedCate={selectedCate}
-        setSelectedCate={setSelectedCate}
-        categories={CATEGORY}
-      />
+      <Tab selectedCate={selectedCate} setSelectedCate={setSelectedCate} categories={CATEGORY} />
       {selectedCate === '내역' && (
         <ul className="w-[100%] h-[17rem] px-[3vw] overflow-y-auto">
           {assetHistory.transactions.map((log) => (
-            <TransactionLogItem
-              key={log.timestamp}
-              log={log}
-              currency_code={currencyCode}
-            />
+            <TransactionLogItem key={log.timestamp} log={log} currency_code={currencyCode} />
           ))}
+          <div ref={bottomRef} className="h-4"></div>
         </ul>
       )}
       {selectedCate === '입금' && (
