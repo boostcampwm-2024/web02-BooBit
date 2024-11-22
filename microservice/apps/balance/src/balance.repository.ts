@@ -8,6 +8,10 @@ import { CurrencyCode } from '@app/common';
 import { OrderStatus } from '@app/common/enums/order-status.enum';
 import { OrderType } from '@app/common/enums/order-type.enum';
 import { GetTransactionsDto } from './dto/get.transactions.request.dto';
+import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
+import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
+import { TradeBuyerRequestDto } from '@app/grpc/dto/trade.buyer.request.dto';
+import { TradeSellerRequestDto } from '@app/grpc/dto/trade.seller.request.dto';
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
   WITHDRAWAL = 'WITHDRAWAL',
@@ -284,5 +288,117 @@ export class BalanceRepository {
       },
     });
     return orderHistory.historyId;
+  }
+
+  async settleTransaction(tradeRequest: TradeRequestDto) {
+    const { buyerRequest, sellerRequest, historyRequests } = tradeRequest;
+    return await this.prisma.$transaction(async (prisma) => {
+      await this.updateBuyerAsset(prisma, buyerRequest);
+      await this.updateSellerAsset(prisma, sellerRequest);
+      for (const historyRequest of historyRequests) {
+        await this.updateOrderHistoryStatus(
+          prisma,
+          historyRequest.historyId,
+          historyRequest.status,
+        );
+      }
+      return new TradeResponseDto('SUCCESS');
+    });
+  }
+
+  async updateBuyerAsset(prisma, buyerRequest: TradeBuyerRequestDto) {
+    const { userId, paymentAmount, coinCode, receivedCoins, refund } = buyerRequest;
+    await this.decreaseBuyerCurrencyBalance(
+      prisma,
+      userId,
+      CurrencyCode.KRW,
+      paymentAmount,
+      refund,
+    );
+    await this.increaseBuyerCoinBalance(prisma, userId, coinCode, receivedCoins);
+  }
+
+  async decreaseBuyerCurrencyBalance(prisma, userId, currencyCode, payment, refund) {
+    return await prisma.asset.update({
+      where: {
+        userId_currencyCode: {
+          userId: userId,
+          currencyCode: currencyCode,
+        },
+      },
+      data: {
+        availableBalance: {
+          increment: refund,
+        },
+        lockedBalance: {
+          decrement: payment,
+        },
+      },
+    });
+  }
+
+  async increaseBuyerCoinBalance(prisma, userId, coinCode, receiveCoins) {
+    return await prisma.asset.update({
+      where: {
+        userId_currencyCode: {
+          userId: userId,
+          currencyCode: coinCode,
+        },
+      },
+      data: {
+        availableBalance: {
+          increment: receiveCoins,
+        },
+      },
+    });
+  }
+
+  async updateSellerAsset(prisma, sellerRequest: TradeSellerRequestDto) {
+    const { userId, coinCode, receivedAmount, soldCoins } = sellerRequest;
+    await this.increaseSellerCurrencyBalance(prisma, userId, CurrencyCode.KRW, receivedAmount);
+    await this.decreaseSellerCoinBalance(prisma, userId, coinCode, soldCoins);
+  }
+
+  async increaseSellerCurrencyBalance(prisma, userId, currencyCode, payment) {
+    return await prisma.asset.update({
+      where: {
+        userId_currencyCode: {
+          userId: userId,
+          currencyCode: currencyCode,
+        },
+      },
+      data: {
+        lockedBalance: {
+          increment: payment,
+        },
+      },
+    });
+  }
+
+  async decreaseSellerCoinBalance(prisma, userId, coinCode, soldCoins) {
+    return await prisma.asset.update({
+      where: {
+        userId_currencyCode: {
+          userId: userId,
+          currencyCode: coinCode,
+        },
+      },
+      data: {
+        availableBalance: {
+          decrement: soldCoins,
+        },
+      },
+    });
+  }
+
+  async updateOrderHistoryStatus(prisma, historyId: string, status: OrderStatus) {
+    return await prisma.OrderHistory.update({
+      where: {
+        historyId: BigInt(historyId),
+      },
+      data: {
+        status: status,
+      },
+    });
   }
 }
