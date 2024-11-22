@@ -20,6 +20,8 @@ spec:
               name: auth-db
             - containerPort: 31000
               name: balance-db
+            - containerPort: 32000
+              name: transaction-db
             - containerPort: 32123
               name: session-db
           volumeMounts:

@@ -31,6 +31,6 @@ spec:
               value: "mysql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):3306/$(DB_SCHEMA)"
           envFrom:
             - configMapRef:
-                name: auth-service-config
+                name: balance-service-config
             - secretRef:
                 name: db-credentials
