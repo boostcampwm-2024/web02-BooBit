@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package trade;
+
+service TradeService {
+  rpc SettleTransaction(TradeRequest) returns (TradeResponse);
+}
+
+message TradeRequest {
+  BuyerRequest buyerRequest = 1;
+  SellerRequest sellerRequest = 2;
+  HistoryListRequest historyRequests = 3;
+}
+
+message BuyerRequest {
+  string userId = 1;
+  string coinCode = 2;
+  double paymentAmount = 3;
+  double receivedCoins = 4;
+  double refund = 5;
+}
+
+message SellerRequest {
+  string userId = 1;
+  string coinCode = 2;
+  double receivedAmount = 3;
+  double soldCoins = 4;
+}
+
+message HistoryRequest {
+  string historyId = 1;
+  string status = 2;
+}
+
+message HistoryListRequest {
+  repeated HistoryRequest history = 1;
+}
+
+message TradeResponse {
+  string status = 1;
+}
