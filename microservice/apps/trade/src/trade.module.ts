@@ -4,9 +4,13 @@ import { BullMQModule } from '@app/bull';
 import { TradeProcessor } from './trade.processor';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TradeRepository } from './trade.repository';
+import { TradeBalanceService } from './trade.balance.service';
+import { PrismaModule } from '@app/prisma';
 
 @Module({
   imports: [
+    PrismaModule,
     BullMQModule,
     ClientsModule.registerAsync([
       {
@@ -24,6 +28,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       },
     ]),
   ],
-  providers: [TradeService, TradeProcessor],
+  providers: [TradeService, TradeProcessor, TradeBalanceService, TradeRepository],
 })
 export class TradeModule {}
