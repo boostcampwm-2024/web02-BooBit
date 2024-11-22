@@ -27,7 +27,9 @@
       "@app/grpc": ["libs/grpc/src"],
       "@app/grpc/*": ["libs/grpc/src/*"],
       "@app/ws": ["libs/ws/src"],
-      "@app/ws/*": ["libs/ws/src/*"]
+      "@app/ws/*": ["libs/ws/src/*"],
+      "@app/bull": ["libs/bull/src"],
+      "@app/bull/*": ["libs/bull/src/*"]
     }
   }
 }

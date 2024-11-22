@@ -68,9 +68,7 @@
       "sourceRoot": "libs/grpc/src",
       "compilerOptions": {
         "tsConfigPath": "libs/grpc/tsconfig.lib.json",
-        "assets": [
-          "**/*.proto"
-        ],
+        "assets": ["**/*.proto"],
         "watchAssets": true
       }
     },
@@ -81,6 +79,15 @@
       "sourceRoot": "libs/ws/src",
       "compilerOptions": {
         "tsConfigPath": "libs/ws/tsconfig.lib.json"
+      }
+    },
+    "bull": {
+      "type": "library",
+      "root": "libs/bull",
+      "entryFile": "index",
+      "sourceRoot": "libs/bull/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/bull/tsconfig.lib.json"
       }
     }
   }
