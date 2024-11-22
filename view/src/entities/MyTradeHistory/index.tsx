@@ -17,13 +17,16 @@ const MyTradeHistory = () => {
     <div className="text-text-light text-available-medium-14">
       <div className="text-available-medium-18 mb-[0.5rem]">거래내역</div>
       <table className="w-full h-[22rem] mb-4 border-[1px] bg-surface-default border-border-default text-text-light">
-        <TableRow height="h-[2rem]" styles="bg-surface-hover-light pr-[10px]">
-          {columnData.map((c) => (
-            <TableCell key={c.content} width={c.width}>
-              {c.content}
-            </TableCell>
-          ))}
-        </TableRow>
+        <thead>
+          <TableRow height="h-[2rem]" styles="bg-surface-hover-light pr-[10px]">
+            {columnData.map((c) => (
+              <TableCell key={c.content} width={c.width}>
+                {c.content}
+              </TableCell>
+            ))}
+          </TableRow>
+        </thead>
+
         <tbody className="block h-[20rem] overflow-y-auto">
           {tradeHistory.map((t) => (
             <TableRow
