@@ -57,12 +57,16 @@ services:
     ports:
       - "${TRANSACTION_HOST_SERVICE_PORT}:3000"
     environment:
-      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}
+      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017,${TRANSACTION_DB}-secondary1:27017,${TRANSACTION_DB}-secondary2:27017/${MYSQL_DATABASE}?replicaSet=rs0
       BALANCE_GRPC_URL: balance:50051
       REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
       SESSION_SECRET: ${SESSION_SECRET}
     depends_on:
       transaction-db:
+        condition: service_healthy
+      transaction-db-secondary1:
+        condition: service_healthy
+      transaction-db-secondary2:
         condition: service_healthy
     restart: always
 
@@ -86,7 +90,7 @@ services:
 
   # Auth DB
   auth-db:
-    image: mysql:8.0.22
+    image: mysql:8.0
     container_name: auth-db
     ports:
       - "${AUTH_HOST_DB_PORT}:${MYSQL_PORT}"
@@ -109,7 +113,7 @@ services:
 
   # Balance DB
   balance-db:
-    image: mysql:8.0.22
+    image: mysql:8.0
     container_name: balance-db
     ports:
       - "${BALANCE_HOST_DB_PORT}:${MYSQL_PORT}"
@@ -140,27 +144,79 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "${TRANSACTION_HOST_DB_PORT}:27017"
+    command: ["sh", "/init_mongodb.sh"]
+    volumes:
+      - transaction-db:/data/db
+      - ./docker_init/mongo_init.js:/mongo_init.js
+      - ./docker_init/init_mongodb.sh:/init_mongodb.sh
+    healthcheck:
+      test: >
+        mongosh boobit --eval '
+          if (db.getUsers().users.length > 0) {
+            exit(0);
+          } else {
+            exit(1);
+          }
+        ' --quiet || exit 1
+      interval: 3s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  transaction-db-secondary1:
+    image: mongo:8.0
+    container_name: transaction-db-secondary1
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MYSQL_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${TRANSACTION_HOST_DB_PORT_SECONDARY1}:27017"
     command:
       - sh
       - -c
       - |
-        mongod --replSet rs0 --bind_ip_all &
-        until mongosh --quiet --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
-          echo "Waiting for MongoDB to start..."
-          sleep 1
-        done
-        mongosh --host transaction-db:27017 --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'transaction-db:27017'}]})"
-        tail -f /dev/null
+        sleep 5
+        mongod --replSet rs0 --bind_ip_all
     volumes:
-      - transaction-db:/data/db
-      - ./docker_init/mongo_init.js:/docker-entrypoint-initdb.d/init.js
+      - transaction-db-secondary1:/data/db
     healthcheck:
       test: mongosh --eval 'db.runCommand("ping").ok' --quiet
       interval: 10s
       timeout: 5s
       retries: 5
+    depends_on:
+      - transaction-db
+
+  transaction-db-secondary2:
+    image: mongo:8.0
+    container_name: transaction-db-secondary2
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MYSQL_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${TRANSACTION_HOST_DB_PORT_SECONDARY2}:27017"
+    command:
+      - sh
+      - -c
+      - |
+        sleep 5
+        mongod --replSet rs0 --bind_ip_all
+    volumes:
+      - transaction-db-secondary2:/data/db
+    healthcheck:
+      test: mongosh --eval 'db.runCommand("ping").ok' --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - transaction-db
+
 volumes:
   redis-db:
   auth-db:
   balance-db:
   transaction-db:
+  transaction-db-secondary1:
+  transaction-db-secondary2:
