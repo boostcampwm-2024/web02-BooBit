@@ -5,7 +5,6 @@ import { OrderLimitRequestDto } from './dto/order.limit.request.dto';
 import { TransactionOrderService } from './transaction.order.service';
 import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
 import { OrderType } from '@app/common/enums/order-type.enum';
-import { TradeRequestDto } from './dto/trade.request.dto';
 import { TransactionQueueService } from './transaction.queue.service';
 
 @Controller('api/orders')
@@ -28,9 +27,8 @@ export class TransactionController {
     );
     const response = await this.transactionOrderService.makeBuyOrder(orderRequest);
 
-    const tradeRequest = new TradeRequestDto(orderRequest, response);
-    await this.transactionService.registerBuyOrder(tradeRequest);
-    return await this.transactionQueueService.addQueue(OrderType.BUY, tradeRequest);
+    await this.transactionService.registerBuyOrder(orderRequest, response);
+    return await this.transactionQueueService.addQueue(OrderType.BUY, response.historyId);
   }
 
   @Post('/limit/sell')
@@ -45,8 +43,7 @@ export class TransactionController {
     );
     const response = await this.transactionOrderService.makeSellOrder(orderRequest);
 
-    const tradeRequest = new TradeRequestDto(orderRequest, response);
-    await this.transactionService.registerSellOrder(tradeRequest);
-    return await this.transactionQueueService.addQueue(OrderType.SELL, tradeRequest);
+    await this.transactionService.registerSellOrder(orderRequest, response);
+    return await this.transactionQueueService.addQueue(OrderType.SELL, response.historyId);
   }
 }

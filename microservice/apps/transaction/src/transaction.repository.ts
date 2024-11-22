@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
+import { formatFixedPoint } from '@app/common/utils/number.format.util';
 
 @Injectable()
 export class TransactionRepository {
@@ -12,7 +13,7 @@ export class TransactionRepository {
         historyId: historyId,
         userId: orderRequest.userId,
         coinCode: orderRequest.coinCode,
-        price: String(orderRequest.price),
+        price: formatFixedPoint(orderRequest.price),
         originalQuote: String(orderRequest.amount),
         remainingQuote: String(orderRequest.amount),
       },
@@ -25,7 +26,7 @@ export class TransactionRepository {
         historyId: historyId,
         userId: orderRequest.userId,
         coinCode: orderRequest.coinCode,
-        price: String(orderRequest.price),
+        price: formatFixedPoint(orderRequest.price),
         originalQuote: String(orderRequest.amount),
         remainingBase: String(orderRequest.amount),
       },
