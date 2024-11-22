@@ -32,9 +32,9 @@ export class TradeService {
     await this.processTrade(OrderType.SELL, historyId, sellOrder, sellOrder.remainingBase);
   }
 
-  async processTrade(type: OrderType, historyId: string, current, amount: number) {
+  async processTrade(type: OrderType, historyId: string, current, amount: string) {
     const { coinCode, price } = current;
-    let remain = amount;
+    let remain = Number(amount);
     let offset = 0;
 
     const getOrders = this.getOrderFetcher(type);
