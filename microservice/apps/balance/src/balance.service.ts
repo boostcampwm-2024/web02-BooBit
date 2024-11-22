@@ -10,10 +10,30 @@ import { OrderResponseDto } from '@app/grpc/dto/order.response.dto';
 import { AccountService } from '@app/grpc/account.interface';
 import { AccountCreateResponseDto } from '@app/grpc/dto/account.create.response.dto';
 import { AccountCreateRequestDto } from '@app/grpc/dto/account.create.request.dto';
+import { GetTransactionsDto } from './dto/get.transactions.request.dto';
 
 @Injectable()
 export class BalanceService implements OrderService, AccountService {
   constructor(private balanceRepository: BalanceRepository) {}
+
+  async getTransactions(userId: bigint, getTransactionsDto: GetTransactionsDto) {
+    const { items, nextId } = await this.balanceRepository.getBankHistory(
+      userId,
+      getTransactionsDto,
+    );
+
+    const transactions = items.map((tx) => ({
+      tx_type: tx.txType.toLowerCase(),
+      amount: tx.amount.toNumber(),
+      currency_code: tx.currencyCode,
+      timestamp: tx.createdAt.toISOString(),
+    }));
+
+    return {
+      nextId,
+      transactions,
+    };
+  }
 
   async getPending(userId: bigint) {
     const pending = await this.balanceRepository.getPending(userId);

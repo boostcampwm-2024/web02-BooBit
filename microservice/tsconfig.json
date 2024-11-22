@@ -18,36 +18,16 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/common": [
-        "libs/common/src"
-      ],
-      "@app/common/*": [
-        "libs/common/src/*"
-      ],
-      "@app/prisma": [
-        "libs/prisma/src"
-      ],
-      "@app/prisma/*": [
-        "libs/prisma/src/*"
-      ],
-      "@app/session": [
-        "libs/session/src"
-      ],
-      "@app/session/*": [
-        "libs/session/src/*"
-      ],
-      "@app/grpc": [
-        "libs/grpc/src"
-      ],
-      "@app/grpc/*": [
-        "libs/grpc/src/*"
-      ],
-      "@app/ws": [
-        "libs/ws/src"
-      ],
-      "@app/ws/*": [
-        "libs/ws/src/*"
-      ]
+      "@app/common": ["libs/common/src"],
+      "@app/common/*": ["libs/common/src/*"],
+      "@app/prisma": ["libs/prisma/src"],
+      "@app/prisma/*": ["libs/prisma/src/*"],
+      "@app/session": ["libs/session/src"],
+      "@app/session/*": ["libs/session/src/*"],
+      "@app/grpc": ["libs/grpc/src"],
+      "@app/grpc/*": ["libs/grpc/src/*"],
+      "@app/ws": ["libs/ws/src"],
+      "@app/ws/*": ["libs/ws/src/*"]
     }
   }
 }

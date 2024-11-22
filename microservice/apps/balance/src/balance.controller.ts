@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards, Request, HttpCode } from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import { CreateTransactionDto } from './dto/create.transaction.dto';
+import { GetTransactionsDto } from './dto/get.transactions.request.dto';
 import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
 import { GrpcMethod } from '@nestjs/microservices';
 import { OrderService } from '@app/grpc/order.interface';
@@ -41,6 +42,14 @@ export class BalanceController implements OrderService, AccountService {
     const userId = req.user.userId;
     await this.balanceService.withdraw(userId, createTransactionDto);
   }
+
+  @Get('/transactions')
+  @UseGuards(AuthenticatedGuard)
+  async getTransactions(@Body() getTransactionsDto: GetTransactionsDto, @Request() req) {
+    const userId = req.user.userId;
+    return await this.balanceService.getTransactions(userId, getTransactionsDto);
+  }
+
   @GrpcMethod('OrderService', 'MakeBuyOrder')
   async makeBuyOrder(orderRequest) {
     return await this.balanceService.makeBuyOrder(orderRequest);

@@ -7,6 +7,7 @@ import { GrpcOrderStatusCode } from '@app/common/enums/grpc-status.enum';
 import { CurrencyCode } from '@app/common';
 import { OrderStatus } from '@app/common/enums/order-status.enum';
 import { OrderType } from '@app/common/enums/order-type.enum';
+import { GetTransactionsDto } from './dto/get.transactions.request.dto';
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
   WITHDRAWAL = 'WITHDRAWAL',
@@ -15,6 +16,46 @@ export enum TransactionType {
 @Injectable()
 export class BalanceRepository {
   constructor(private prisma: PrismaService) {}
+
+  async getBankHistory(userId: bigint, getTransactionsDto: GetTransactionsDto) {
+    const { currencyCode, id } = getTransactionsDto;
+    const take = 31; // 다음 페이지 존재 여부를 확인하기 위해 31개를 조회
+
+    const where = {
+      userId,
+      currencyCode,
+      ...(id && {
+        txId: {
+          lt: BigInt(id),
+        },
+      }),
+    };
+
+    const transactions = await this.prisma.depositWithdrawal.findMany({
+      where,
+      take,
+      orderBy: {
+        txId: 'desc', // 최신 거래내역부터 조회
+      },
+      select: {
+        txId: true,
+        txType: true,
+        currencyCode: true,
+        amount: true,
+        createdAt: true,
+      },
+    });
+
+    // 31개를 조회했다면, 마지막 항목은 다음 페이지의 시작점이 됨
+    const hasNextPage = transactions.length > 30;
+    const items = transactions.slice(0, 30); // 실제로는 30개만 반환
+    const nextId = hasNextPage ? Number(transactions[30].txId) : null;
+
+    return {
+      items,
+      nextId,
+    };
+  }
 
   async getPending(userId: bigint) {
     return await this.prisma.orderHistory.findMany({
