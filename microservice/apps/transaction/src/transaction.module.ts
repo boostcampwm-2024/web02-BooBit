@@ -10,6 +10,7 @@ import { WsModule } from '@app/ws/ws.module';
 import { CandleGateway } from './gateway/transaction.candle.gateway';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommonModule } from '@app/common';
+import { BullMQModule } from '@app/bull';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CommonModule } from '@app/common';
         }),
         inject: [ConfigService],
       },
+      BullMQModule,
     ]),
   ],
   controllers: [TransactionController],
