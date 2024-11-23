@@ -1,20 +1,43 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: transaction-db-config
+  name: transaction-db-init
+  labels:
+    app: transaction-db
 data:
-  init.js: |
-    db = db.getSiblingDB('boobit');
-    db.createUser({
-      user: process.env.MONGO_INITDB_ROOT_USERNAME,
-      pwd: process.env.MONGO_INITDB_ROOT_PASSWORD,
-      roles: [
-        { role: "dbAdmin", db: "boobit" },
-        { role: "readWrite", db: "boobit" }
-      ]
-    });
-  mongod.conf: |
-    storage:
-      dbPath: /data/db
-    net:
-      bindIp: 0.0.0.0
+  init.sh: |
+    #!/bin/bash
+    # Wait for all pods to be ready
+    until mongosh --host transaction-db-0.transaction-db-service:27017 --eval "print(\"waiting for connection\")" > /dev/null 2>&1
+    do
+      echo "Waiting for transaction-db-0..."
+      sleep 2
+    done
+    until mongosh --host transaction-db-1.transaction-db-service:27017 --eval "print(\"waiting for connection\")" > /dev/null 2>&1
+    do
+      echo "Waiting for transaction-db-1..."
+      sleep 2
+    done
+    until mongosh --host transaction-db-2.transaction-db-service:27017 --eval "print(\"waiting for connection\")" > /dev/null 2>&1
+    do
+      echo "Waiting for transaction-db-2..."
+      sleep 2
+    done
+
+    # Check if already initialized
+    INIT_STATUS=$(mongosh --host transaction-db-0.transaction-db-service:27017 --eval "rs.status()" | grep "not initialized")
+    if [ ! -z "$INIT_STATUS" ]; then
+      echo "Initializing replica set..."
+      mongosh --host transaction-db-0.transaction-db-service:27017 --eval '
+        rs.initiate({
+          _id: "rs0",
+          members: [
+            {_id: 0, host: "transaction-db-0.transaction-db-service:27017"},
+            {_id: 1, host: "transaction-db-1.transaction-db-service:27017"},
+            {_id: 2, host: "transaction-db-2.transaction-db-service:27017"}
+          ]
+        })
+      '
+    else
+      echo "Replica set already initialized"
+    fi
