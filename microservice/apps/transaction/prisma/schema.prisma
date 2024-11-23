@@ -150,3 +150,15 @@ model candle01Month {
   @@index([startTime(sort: Desc)])
   @@map("candle_01_month")
 }
+
+model trade {
+  tradeId     String   @id @default(cuid()) @map("_id")
+  buyOrderId  String   @map("buy_order_id")
+  sellOrderId String   @map("sell_order_id")
+  coinCode    String   @map("coin_code")
+  price       String
+  quantity    String
+  tradedAt    DateTime @default(now()) @map("traded_at")
+
+  @@index([tradedAt(sort: Desc)])
+}
