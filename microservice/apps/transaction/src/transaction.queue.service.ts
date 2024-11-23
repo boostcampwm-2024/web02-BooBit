@@ -7,6 +7,6 @@ export class TransactionQueueService {
   constructor(@InjectQueue('trade') private queue: Queue) {}
 
   async addQueue(name: string, historyId: string) {
-    await this.queue.add(name, { jobId: historyId });
+    await this.queue.add(name, { historyId: historyId }, { jobId: `${name}-${historyId}` });
   }
 }
