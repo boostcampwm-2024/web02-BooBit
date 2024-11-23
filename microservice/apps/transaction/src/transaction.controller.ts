@@ -4,12 +4,15 @@ import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
 import { OrderLimitRequestDto } from './dto/order.limit.request.dto';
 import { TransactionOrderService } from './transaction.order.service';
 import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
+import { OrderType } from '@app/common/enums/order-type.enum';
+import { TransactionQueueService } from './transaction.queue.service';
 
 @Controller('api/orders')
 export class TransactionController {
   constructor(
     private readonly transactionService: TransactionService,
     private readonly transactionOrderService: TransactionOrderService,
+    private readonly transactionQueueService: TransactionQueueService,
   ) {}
 
   @Post('/limit/buy')
@@ -23,7 +26,9 @@ export class TransactionController {
       buyLimitRequest.price,
     );
     const response = await this.transactionOrderService.makeBuyOrder(orderRequest);
-    return await this.transactionService.registerBuyOrder(orderRequest, response);
+
+    await this.transactionService.registerBuyOrder(orderRequest, response);
+    return await this.transactionQueueService.addQueue(OrderType.BUY, response.historyId);
   }
 
   @Post('/limit/sell')
@@ -36,8 +41,9 @@ export class TransactionController {
       sellLimitRequest.amount,
       sellLimitRequest.price,
     );
-
     const response = await this.transactionOrderService.makeSellOrder(orderRequest);
-    return await this.transactionService.registerSellOrder(orderRequest, response);
+
+    await this.transactionService.registerSellOrder(orderRequest, response);
+    return await this.transactionQueueService.addQueue(OrderType.SELL, response.historyId);
   }
 }
