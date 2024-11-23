@@ -1,0 +1,40 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trade-redis
+spec:
+  selector:
+    matchLabels:
+      app: trade-redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: trade-redis
+    spec:
+      containers:
+        - name: trade-redis
+          image: redis:7.2-alpine
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+---
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: trade-redis
+spec:
+  type: ClusterIP
+  selector:
+    app: trade-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
