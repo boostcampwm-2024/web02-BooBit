@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  UseGuards,
-  Request,
-  HttpCode,
-  Param,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Request, HttpCode, Query } from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import { CreateTransactionDto } from './dto/create.transaction.dto';
 import { GetTransactionsDto } from './dto/get.transactions.request.dto';
@@ -16,6 +6,8 @@ import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
 import { GrpcMethod } from '@nestjs/microservices';
 import { OrderService } from '@app/grpc/order.interface';
 import { AccountService } from '@app/grpc/account.interface';
+import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
+import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
 
 @Controller('api/users')
 export class BalanceController implements OrderService, AccountService {
@@ -73,5 +65,10 @@ export class BalanceController implements OrderService, AccountService {
   @GrpcMethod('AccountService', 'CreateAccount')
   async createAccount(accountRequest) {
     return await this.balanceService.createAccount(accountRequest);
+  }
+
+  @GrpcMethod('TradeService', 'SettleTransaction')
+  async settleTransaction(tradeRequest: TradeRequestDto): Promise<TradeResponseDto> {
+    return await this.balanceService.settleTransaction(tradeRequest);
   }
 }

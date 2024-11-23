@@ -11,6 +11,7 @@ import { AccountService } from '@app/grpc/account.interface';
 import { AccountCreateResponseDto } from '@app/grpc/dto/account.create.response.dto';
 import { AccountCreateRequestDto } from '@app/grpc/dto/account.create.request.dto';
 import { GetTransactionsDto } from './dto/get.transactions.request.dto';
+import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 
 @Injectable()
 export class BalanceService implements OrderService, AccountService {
@@ -97,5 +98,9 @@ export class BalanceService implements OrderService, AccountService {
 
   async makeSellOrder(orderRequest: OrderRequestDto): Promise<OrderResponseDto> {
     return await this.balanceRepository.makeSellOrder(orderRequest);
+  }
+
+  async settleTransaction(tradeRequest: TradeRequestDto) {
+    return await this.balanceRepository.settleTransaction(tradeRequest);
   }
 }

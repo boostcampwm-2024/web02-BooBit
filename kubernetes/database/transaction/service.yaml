@@ -6,8 +6,8 @@ metadata:
     app: transaction-db
 spec:
   type: ClusterIP
+  selector:
+    app: transaction-db
   ports:
     - port: 27017
       targetPort: 27017
-  selector:
-    app: transaction-db

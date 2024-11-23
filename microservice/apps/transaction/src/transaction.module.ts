@@ -11,6 +11,8 @@ import { CandleGateway } from './gateway/transaction.candle.gateway';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommonModule } from '@app/common';
 import { CandleService } from './gateway/transaction.candle.service';
+import { BullMQModule } from '@app/bull';
+import { TransactionQueueService } from './transaction.queue.service';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { CandleService } from './gateway/transaction.candle.service';
     SessionModule,
     WsModule,
     CommonModule,
+    BullMQModule,
     ClientsModule.registerAsync([
       {
         name: 'ORDER_PACKAGE',
@@ -41,6 +44,7 @@ import { CandleService } from './gateway/transaction.candle.service';
     TransactionOrderService,
     CandleGateway,
     CandleService,
+    TransactionQueueService,
   ],
 })
 export class TransactionModule {}
