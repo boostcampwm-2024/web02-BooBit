@@ -49,9 +49,18 @@ export class TradeService {
         const { quantity, tradeHistory } = this.calculateTrade(type, order, remain, historyId);
         remain -= quantity;
 
-        const seller = await this.settleTransaction(type, current, order, quantity, tradeHistory);
+        const tradePrice = Number(order.price);
+        await this.settleTransaction(type, current, order, tradePrice, quantity, tradeHistory);
 
-        await this.updateOrderAndTradeLog(type, historyId, tradeHistory[0], seller, remain);
+        await this.updateOrderAndTradeLog(
+          type,
+          historyId,
+          tradeHistory[0],
+          coinCode,
+          tradePrice,
+          quantity,
+          remain,
+        );
       }
 
       offset += BATCH_SIZE;
@@ -60,8 +69,10 @@ export class TradeService {
 
   getOrderFetcher(type: OrderType) {
     return type === OrderType.BUY
-      ? this.tradeRepository.findSellOrders
-      : this.tradeRepository.findBuyOrders;
+      ? (coinCode: string, price: string, offset: number, batchSize: number) =>
+          this.tradeRepository.findSellOrders(coinCode, price, offset, batchSize)
+      : (coinCode: string, price: string, offset: number, batchSize: number) =>
+          this.tradeRepository.findBuyOrders(coinCode, price, offset, batchSize);
   }
 
   calculateTrade(type: OrderType, order, remain: number, historyId: string) {
@@ -95,8 +106,7 @@ export class TradeService {
     return { quantity, tradeHistory };
   }
 
-  async settleTransaction(type, current, order, quantity, tradeHistory) {
-    const tradePrice = Number(order.price);
+  async settleTransaction(type, current, order, tradePrice, quantity, tradeHistory) {
     const buyer = new TradeBuyerRequestDto(
       type === OrderType.BUY ? current.userId : order.userId,
       current.coinCode,
@@ -112,17 +122,23 @@ export class TradeService {
     );
     const tradeRequest = new TradeRequestDto(buyer, seller, tradeHistory);
     await this.tradeBalanceService.settleTransaction(tradeRequest);
-
-    return seller;
   }
 
-  async updateOrderAndTradeLog(type, historyId, tradeHistory, seller, remain) {
+  async updateOrderAndTradeLog(
+    type,
+    historyId,
+    tradeHistory,
+    coinCode,
+    tradePrice,
+    quantity,
+    remain,
+  ) {
     const trade = {
       buyOrderId: type === OrderType.BUY ? historyId : tradeHistory.historyId,
       sellOrderId: type === OrderType.BUY ? tradeHistory.historyId : historyId,
-      coinCode: seller.coinCode,
-      price: formatFixedPoint(seller.price),
-      quantity: String(seller.quantity),
+      coinCode: coinCode,
+      price: formatFixedPoint(tradePrice),
+      quantity: String(quantity),
     };
 
     if (type === OrderType.BUY) {
