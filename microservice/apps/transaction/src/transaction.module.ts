@@ -10,6 +10,7 @@ import { WsModule } from '@app/ws/ws.module';
 import { CandleGateway } from './gateway/transaction.candle.gateway';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommonModule } from '@app/common';
+import { CandleService } from './gateway/transaction.candle.service';
 
 @Module({
   imports: [
@@ -34,6 +35,12 @@ import { CommonModule } from '@app/common';
     ]),
   ],
   controllers: [TransactionController],
-  providers: [TransactionService, TransactionRepository, TransactionOrderService, CandleGateway],
+  providers: [
+    TransactionService,
+    TransactionRepository,
+    TransactionOrderService,
+    CandleGateway,
+    CandleService,
+  ],
 })
 export class TransactionModule {}
