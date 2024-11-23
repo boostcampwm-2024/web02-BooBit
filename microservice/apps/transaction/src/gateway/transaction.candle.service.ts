@@ -3,6 +3,7 @@ import { TimeScale } from '@app/common/enums/chart-timescale.enum';
 import { TransactionRepository } from '../transaction.repository';
 import { TradeDataDto } from '@app/ws/dto/trade.data.dto';
 import { CandleDataDto } from '@app/ws/dto/candle.data.dto';
+import { TradeGradient } from '@app/common/enums/trade.gradient.enum';
 @Injectable()
 export class CandleService {
   constructor(private transactionRepository: TransactionRepository) {}
@@ -28,7 +29,10 @@ export class CandleService {
       price: parseFloat(trade.price),
       amount: parseFloat(trade.quantity),
       tradePrice: parseFloat(trade.price) * parseFloat(trade.quantity),
-      gradient: trade.price > trades[trades.length - 1]?.price ? 'POSITIVE' : 'NEGATIVE',
+      gradient:
+        trade.price > trades[trades.length - 1]?.price
+          ? TradeGradient.POSITIVE
+          : TradeGradient.NEGATIVE,
     }));
   }
 }
