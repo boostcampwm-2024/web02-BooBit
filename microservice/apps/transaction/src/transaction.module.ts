@@ -10,6 +10,7 @@ import { WsModule } from '@app/ws/ws.module';
 import { CandleGateway } from './gateway/transaction.candle.gateway';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommonModule } from '@app/common';
+import { CandleService } from './gateway/transaction.candle.service';
 import { BullMQModule } from '@app/bull';
 import { TransactionQueueService } from './transaction.queue.service';
 
@@ -42,6 +43,7 @@ import { TransactionQueueService } from './transaction.queue.service';
     TransactionRepository,
     TransactionOrderService,
     CandleGateway,
+    CandleService,
     TransactionQueueService,
   ],
 })

@@ -33,6 +33,126 @@ model sellOrder {
   @@map("sell_order")
 }
 
+model candle01Sec {
+  candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  coinCode   String   @map("coin_code")
+  startTime  DateTime @map("start_time")
+  openPrice  String   @map("open_price")
+  highPrice  String   @map("high_price")
+  lowPrice   String   @map("low_price")
+  closePrice String   @map("close_price")
+  volume     String
+
+  @@unique([coinCode, startTime])
+  @@index([startTime(sort: Desc)])
+  @@map("candle_01_sec")
+}
+
+model candle01Min {
+  candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  coinCode   String   @map("coin_code")
+  startTime  DateTime @map("start_time")
+  openPrice  String   @map("open_price")
+  highPrice  String   @map("high_price")
+  lowPrice   String   @map("low_price")
+  closePrice String   @map("close_price")
+  volume     String
+
+  @@unique([coinCode, startTime])
+  @@index([startTime(sort: Desc)])
+  @@map("candle_01_min")
+}
+
+model candle10Min {
+  candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  coinCode   String   @map("coin_code")
+  startTime  DateTime @map("start_time")
+  openPrice  String   @map("open_price")
+  highPrice  String   @map("high_price")
+  lowPrice   String   @map("low_price")
+  closePrice String   @map("close_price")
+  volume     String
+
+  @@unique([coinCode, startTime])
+  @@index([startTime(sort: Desc)])
+  @@map("candle_10_min")
+}
+
+model candle30Min {
+    candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  coinCode   String   @map("coin_code")
+  startTime  DateTime @map("start_time")
+  openPrice  String   @map("open_price")
+  highPrice  String   @map("high_price")
+  lowPrice   String   @map("low_price")
+  closePrice String   @map("close_price")
+  volume     String
+
+  @@unique([coinCode, startTime])
+  @@index([startTime(sort: Desc)])
+  @@map("candle_30_min")
+}
+
+model candle01Hour {
+  candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  coinCode   String   @map("coin_code")
+  startTime  DateTime @map("start_time")
+  openPrice  String   @map("open_price")
+  highPrice  String   @map("high_price")
+  lowPrice   String   @map("low_price")
+  closePrice String   @map("close_price")
+  volume     String
+
+  @@unique([coinCode, startTime])
+  @@index([startTime(sort: Desc)])
+  @@map("candle_01_hour")
+}
+
+model candle01Day {
+  candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  coinCode   String   @map("coin_code")
+  startTime  DateTime @map("start_time")
+  openPrice  String   @map("open_price")
+  highPrice  String   @map("high_price")
+  lowPrice   String   @map("low_price")
+  closePrice String   @map("close_price")
+  volume     String
+
+  @@unique([coinCode, startTime])
+  @@index([startTime(sort: Desc)])
+  @@map("candle_01_day")
+}
+
+model candle01Week {
+  candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  coinCode   String   @map("coin_code")
+  startTime  DateTime @map("start_time")
+  openPrice  String   @map("open_price")
+  highPrice  String   @map("high_price")
+  lowPrice   String   @map("low_price")
+  closePrice String   @map("close_price")
+  volume     String
+
+  @@unique([coinCode, startTime])
+  @@index([startTime(sort: Desc)])
+  @@map("candle_01_week")
+}
+
+model candle01Month {
+  candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  coinCode   String   @map("coin_code")
+  startTime  DateTime @map("start_time")
+  openPrice  String   @map("open_price")
+  highPrice  String   @map("high_price")
+  lowPrice   String   @map("low_price")
+  closePrice String   @map("close_price")
+  volume     String
+
+  @@unique([coinCode, startTime])
+  @@index([startTime(sort: Desc)])
+  @@map("candle_01_month")
+}
+
 model trade {
   tradeId     String   @id @default(cuid()) @map("_id")
   buyOrderId  String   @map("buy_order_id")
@@ -41,4 +161,6 @@ model trade {
   price       String
   quantity    String
   tradedAt    DateTime @default(now()) @map("traded_at")
+
+  @@index([tradedAt(sort: Desc)])
 }
