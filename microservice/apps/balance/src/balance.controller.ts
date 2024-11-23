@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, UseGuards, Request, HttpCode } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Request,
+  HttpCode,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import { CreateTransactionDto } from './dto/create.transaction.dto';
 import { GetTransactionsDto } from './dto/get.transactions.request.dto';
@@ -45,7 +55,7 @@ export class BalanceController implements OrderService, AccountService {
 
   @Get('/transactions')
   @UseGuards(AuthenticatedGuard)
-  async getTransactions(@Body() getTransactionsDto: GetTransactionsDto, @Request() req) {
+  async getTransactions(@Query() getTransactionsDto: GetTransactionsDto, @Request() req) {
     const userId = req.user.userId;
     return await this.balanceService.getTransactions(userId, getTransactionsDto);
   }

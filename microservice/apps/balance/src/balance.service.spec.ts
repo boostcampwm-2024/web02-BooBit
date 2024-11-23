@@ -5,6 +5,7 @@ import { CurrencyCode } from '@app/common';
 import { Decimal } from '@prisma/client/runtime/library';
 import { BalanceException } from './exception/balance.exception';
 import { AssetDto } from './dto/asset.dto';
+import { GetTransactionsDto } from './dto/get.transactions.request.dto';
 
 describe('BalanceService', () => {
   let service: BalanceService;
@@ -14,6 +15,7 @@ describe('BalanceService', () => {
     deposit: jest.fn(),
     withdraw: jest.fn(),
     getAssets: jest.fn(),
+    getBankHistory: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -104,6 +106,134 @@ describe('BalanceService', () => {
 
       expect(repository.getAssets).toHaveBeenCalledWith(userId);
       expect(result).toEqual(expectedAssets);
+    });
+  });
+  describe('getTransactions', () => {
+    const userId = BigInt(1);
+    const dto: GetTransactionsDto = {
+      currencyCode: 'BTC',
+      id: null,
+    };
+
+    const mockRepositoryResponse = {
+      items: [
+        {
+          txId: BigInt(1000),
+          txType: 'DEPOSIT',
+          currencyCode: 'BTC',
+          amount: new Decimal(1.5),
+          createdAt: new Date('2024-01-20T09:30:00.000Z'),
+        },
+        {
+          txId: BigInt(999),
+          txType: 'WITHDRAWAL',
+          currencyCode: 'BTC',
+          amount: new Decimal(0.5),
+          createdAt: new Date('2024-01-20T08:30:00.000Z'),
+        },
+      ],
+      nextId: 998,
+    };
+
+    const expectedResponse = {
+      nextId: 998,
+      transactions: [
+        {
+          tx_type: 'deposit',
+          amount: 1.5,
+          currency_code: 'BTC',
+          timestamp: '2024-01-20T09:30:00.000Z',
+        },
+        {
+          tx_type: 'withdrawal',
+          amount: 0.5,
+          currency_code: 'BTC',
+          timestamp: '2024-01-20T08:30:00.000Z',
+        },
+      ],
+    };
+
+    it('거래내역을 정상적으로 변환하여 반환해야 한다', async () => {
+      // Given
+      mockBalanceRepository.getBankHistory.mockResolvedValue(mockRepositoryResponse);
+
+      // When
+      const result = await service.getTransactions(userId, dto);
+
+      // Then
+      expect(result).toEqual(expectedResponse);
+      expect(repository.getBankHistory).toHaveBeenCalledWith(userId, dto);
+    });
+
+    it('거래내역이 없을 경우 빈 배열을 반환해야 한다', async () => {
+      // Given
+      mockBalanceRepository.getBankHistory.mockResolvedValue({
+        items: [],
+        nextId: null,
+      });
+
+      // When
+      const result = await service.getTransactions(userId, dto);
+
+      // Then
+      expect(result).toEqual({
+        nextId: null,
+        transactions: [],
+      });
+    });
+
+    it('거래내역의 타입과 시간 형식을 올바르게 변환해야 한다', async () => {
+      // Given
+      const singleTxResponse = {
+        items: [
+          {
+            txId: BigInt(1000),
+            txType: 'DEPOSIT',
+            currencyCode: 'BTC',
+            amount: new Decimal(1.5),
+            createdAt: new Date('2024-01-20T09:30:00.000Z'),
+          },
+        ],
+        nextId: null,
+      };
+
+      mockBalanceRepository.getBankHistory.mockResolvedValue(singleTxResponse);
+
+      // When
+      const result = await service.getTransactions(userId, dto);
+
+      // Then
+      expect(result.transactions[0]).toEqual({
+        tx_type: 'deposit',
+        amount: 1.5,
+        currency_code: 'BTC',
+        timestamp: '2024-01-20T09:30:00.000Z',
+      });
+    });
+
+    it('Decimal 타입의 금액을 number 타입으로 정확하게 변환해야 한다', async () => {
+      // Given
+      const preciseAmountTx = {
+        items: [
+          {
+            txId: BigInt(1000),
+            txType: 'DEPOSIT',
+            currencyCode: 'BTC',
+            amount: new Decimal('1.12345678'),
+            createdAt: new Date('2024-01-20T09:30:00.000Z'),
+          },
+        ],
+        nextId: null,
+      };
+
+      mockBalanceRepository.getBankHistory.mockResolvedValue(preciseAmountTx);
+
+      // When
+      const result = await service.getTransactions(userId, dto);
+
+      // Then
+      expect(typeof result.transactions[0].amount).toBe('number');
+      expect(result.transactions[0].amount).toBe(1.12345678);
     });
   });
 });
