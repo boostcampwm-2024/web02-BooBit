@@ -1,5 +1,5 @@
 import { BASE_URLS } from '../../../shared/consts/baseUrl';
-import { AssetType } from '../consts/AssetType';
+import { AssetType } from '../model/AssetType';
 
 const withdrawApi = async ({ currencyCode, amount }: AssetType) => {
   const response = await fetch(`${BASE_URLS.BALANCE}/api/users/withdraw`, {

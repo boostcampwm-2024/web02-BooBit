@@ -1,9 +1,7 @@
+import { TransactionType } from '../model/TransactionType';
+
 interface TransactionLogItemProps {
-  log: {
-    timestamp: string;
-    amount: number;
-    tx_type: string;
-  };
+  log: TransactionType;
   currency_code: string;
 }
 
@@ -15,9 +13,9 @@ const TransactionLogItem: React.FC<TransactionLogItemProps> = ({ log, currency_c
     >
       <div>
         <div
-          className={`${log.tx_type === 'withdraw' ? 'text-negative' : 'text-positive'} text-available-medium-16`}
+          className={`${log.tx_type === 'withdrawal' ? 'text-negative' : 'text-positive'} text-available-medium-16`}
         >
-          {log.tx_type === 'withdraw' ? '출금' : '입금'} 완료
+          {log.tx_type === 'withdrawal' ? '출금' : '입금'} 완료
         </div>
         <div className="text-text-dark text-available-medium-14">
           {new Date(log.timestamp).toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
