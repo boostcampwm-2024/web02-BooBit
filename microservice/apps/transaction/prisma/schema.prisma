@@ -146,5 +146,7 @@ model candle01Month {
   closePrice String   @map("close_price")
   volume     String
 
+  @@unique([coinCode, startTime])
+  @@index([startTime(sort: Desc)])
   @@map("candle_01_month")
 }
