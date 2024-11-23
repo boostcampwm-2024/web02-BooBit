@@ -17,11 +17,11 @@ export class TradeProcessor extends WorkerHost {
 
     switch (job.name) {
       case OrderType.BUY:
-        await this.tradeService.tradeBuyOrder(job.id);
+        await this.tradeService.tradeBuyOrder(job.data.historyId);
         break;
 
       case OrderType.SELL:
-        await this.tradeService.tradeSellOrder(job.id);
+        await this.tradeService.tradeSellOrder(job.data.historyId);
         break;
 
       default:
