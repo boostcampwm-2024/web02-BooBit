@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 import { WsBaseDto } from './ws.base.dto';
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
 
-export class SubscribeResponseDto extends WsBaseDto {
+export class ChartResponseDto extends WsBaseDto {
   @IsEnum(TimeScale)
   timeScale: TimeScale;
 
