@@ -8,8 +8,8 @@ export class TransactionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async getLatestCandles(timeScale: TimeScale, count: number) {
-    const tableName = this.getTableName(timeScale);
-    const candles = await this.prisma[tableName].findMany({
+    const modelName = this.getTableName(timeScale);
+    const candles = await this.prisma[modelName].findMany({
       take: count,
       orderBy: {
         startTime: 'desc',
