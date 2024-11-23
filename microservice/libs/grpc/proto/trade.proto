@@ -9,7 +9,7 @@ service TradeService {
 message TradeRequest {
   BuyerRequest buyerRequest = 1;
   SellerRequest sellerRequest = 2;
-  HistoryListRequest historyRequests = 3;
+  repeated HistoryRequest historyRequests = 3;
 }
 
 message BuyerRequest {
@@ -30,10 +30,6 @@ message SellerRequest {
 message HistoryRequest {
   string historyId = 1;
   string status = 2;
-}
-
-message HistoryListRequest {
-  repeated HistoryRequest history = 1;
 }
 
 message TradeResponse {
