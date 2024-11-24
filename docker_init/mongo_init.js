@@ -8,6 +8,7 @@ try {
       { role: "readWrite", db: "boobit" },
     ],
   });
+
   quit(0);
 } catch (error) {
   quit(1);
