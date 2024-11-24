@@ -14,7 +14,7 @@ const useWebSocket = (url: string) => {
       // WebSocket 연결 후 CANDLE_CHART_INIT 요청 보내기 (예: "1min" timeScale)
       const initMessage = {
         event: 'CANDLE_CHART_INIT',
-        timeScale: '1day', // 원하는 시간 단위로 변경 가능
+        timeScale: '1sec', // 원하는 시간 단위로 변경 가능
       };
       ws.send(JSON.stringify(initMessage));
     };
