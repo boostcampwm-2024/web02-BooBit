@@ -8,7 +8,6 @@ import TradeRecords from '../../entities/TradeRecords';
 import TimeScaleSelector from './UI/TimeScaleSelector';
 import Title from './UI/Title';
 
-import currentPriceMockData from './consts/currentPriceMockData';
 import orderBookMockData from './consts/orderBookMockData';
 
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
@@ -32,7 +31,7 @@ const Home = () => {
       case 'CANDLE_CHART_INIT': {
         const candlePrevData = message.data;
 
-        const transformedData = candlePrevData.map((item) => ({
+        const transformedData = candlePrevData.map((item: CandleData) => ({
           date: new Date(item.date),
           open: item.open,
           close: item.close,
@@ -67,7 +66,7 @@ const Home = () => {
     <div>
       <Header />
       <Layout paddingX="px-[22vw]" flex={false}>
-        <Title currentPrice={currentPriceMockData} />
+        <Title currentPrice={tradeRecords && tradeRecords[0].price} />
         <TimeScaleSelector
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
@@ -76,7 +75,7 @@ const Home = () => {
 
         <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
-            priceChangeRate={currentPriceMockData.priceChangeRate}
+            currentPrice={tradeRecords && tradeRecords[0].price}
             setOrderPrice={setOrderPrice}
             orderBook={orderBookMockData}
           />
