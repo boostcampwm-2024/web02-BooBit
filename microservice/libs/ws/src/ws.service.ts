@@ -32,4 +32,16 @@ export class WsService {
       }
     }
   }
+
+  broadcastToAll(data: any) {
+    const message = JSON.stringify(data);
+
+    for (const clients of this.timeScaleRoom.values()) {
+      for (const client of clients) {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(message);
+        }
+      }
+    }
+  }
 }
