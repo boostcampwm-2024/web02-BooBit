@@ -1,5 +1,5 @@
 import { CandleDataDto } from '@app/ws/dto/candle.data.dto';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IntervalRepository } from './interval.candle.repository';
 
 @Injectable()
@@ -7,7 +7,7 @@ export class IntervalMakeService {
   private readonly logger = new Logger(IntervalMakeService.name);
   private lastClose: number;
 
-  constructor(@Inject() private intervalRepository: IntervalRepository) {
+  constructor(private intervalRepository: IntervalRepository) {
     this.lastClose = 0;
   }
 

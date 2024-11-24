@@ -1,16 +1,14 @@
 import { CurrencyCode } from '@app/common';
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
+import { PrismaService } from '@app/prisma';
 import { CandleDataDto } from '@app/ws/dto/candle.data.dto';
-import { Logger } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Injectable, Logger } from '@nestjs/common';
 
+@Injectable()
 export class IntervalRepository {
-  private prisma: PrismaClient;
   private logger = new Logger(IntervalRepository.name);
 
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
-  }
+  constructor(private prisma: PrismaService) {}
 
   private getModelForInterval(interval: TimeScale) {
     const modelMap = {

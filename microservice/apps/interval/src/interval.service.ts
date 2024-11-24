@@ -1,14 +1,15 @@
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
 import { CandleDataDto } from '@app/ws/dto/candle.data.dto';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { IntervalMakeService } from './interval.make.service';
 
 @Injectable()
 export class IntervalService {
   private readonly logger = new Logger(IntervalService.name);
   private intervalData: Map<TimeScale, CandleDataDto> = new Map<TimeScale, CandleDataDto>();
 
-  constructor(@Inject('IntervalMakeService') private readonly intervalMakeService) {
+  constructor(private intervalMakeService: IntervalMakeService) {
     Object.entries(TimeScale).forEach(async ([, value]) => {
       this.intervalData.set(
         value,
@@ -21,7 +22,9 @@ export class IntervalService {
   @Cron(CronExpression.EVERY_SECOND, { timeZone: 'Asia/Seoul' })
   async everySecond() {
     try {
-      const secData = this.intervalMakeService.makeSecData(new Date().setMilliseconds(0));
+      const secData = await this.intervalMakeService.makeSecData(
+        new Date(new Date().setMilliseconds(0)),
+      );
       this.intervalData.forEach((value, key, map) => {
         map.set(key, this.intervalMakeService.candleAdd(value, secData));
       });
@@ -39,7 +42,8 @@ export class IntervalService {
   async everyMinute() {
     this.exec(() => {
       this.logger.debug(this.intervalData.get(TimeScale.MIN_01).toString());
-      this.intervallDataInit(TimeScale.MIN_01);
+      this.intervalData.get(TimeScale.MIN_01);
+      this.intervalDataInit(TimeScale.MIN_01);
     });
   }
 
@@ -73,7 +77,7 @@ export class IntervalService {
     }, 50);
   }
 
-  intervallDataInit(timescale: TimeScale) {
+  intervalDataInit(timescale: TimeScale) {
     this.intervalData[timescale] = new CandleDataDto({
       date: new Date(),
       open: 0,
