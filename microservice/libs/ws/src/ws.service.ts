@@ -32,4 +32,33 @@ export class WsService {
       }
     }
   }
+
+  broadcastToAll(data: any) {
+    const message = JSON.stringify(data);
+
+    for (const clients of this.timeScaleRoom.values()) {
+      for (const client of clients) {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(message);
+        }
+      }
+    }
+  }
+
+  moveClientToRoom(client: WebSocket, newTimeScale: string) {
+    for (const [timeScale, clients] of this.timeScaleRoom.entries()) {
+      if (clients.has(client)) {
+        clients.delete(client);
+        if (clients.size === 0) {
+          this.timeScaleRoom.delete(timeScale);
+        }
+        break;
+      }
+    }
+
+    if (!this.timeScaleRoom.has(newTimeScale)) {
+      this.timeScaleRoom.set(newTimeScale, new Set());
+    }
+    this.timeScaleRoom.get(newTimeScale)!.add(client);
+  }
 }

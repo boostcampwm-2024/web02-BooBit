@@ -5,7 +5,7 @@ import { TradeDataDto } from '@app/ws/dto/trade.data.dto';
 import { CandleDataDto } from '@app/ws/dto/candle.data.dto';
 import { TradeGradient } from '@app/common/enums/trade.gradient.enum';
 @Injectable()
-export class CandleService {
+export class TransactionWsService {
   constructor(private transactionRepository: TransactionRepository) {}
 
   async getLatestCandles(timeScale: TimeScale, count: number = 60): Promise<CandleDataDto[]> {

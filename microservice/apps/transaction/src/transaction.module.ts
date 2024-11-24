@@ -7,10 +7,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TransactionOrderService } from './transaction.order.service';
 import { SessionModule } from '@app/session';
 import { WsModule } from '@app/ws/ws.module';
-import { CandleGateway } from './gateway/transaction.candle.gateway';
+import { TransactionWsGateway } from './gateway/transaction.ws.gateway';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommonModule } from '@app/common';
-import { CandleService } from './gateway/transaction.candle.service';
+import { TransactionWsService } from './gateway/transaction.ws.service';
 import { BullMQModule } from '@app/bull';
 import { TransactionQueueService } from './transaction.queue.service';
 
@@ -42,8 +42,8 @@ import { TransactionQueueService } from './transaction.queue.service';
     TransactionService,
     TransactionRepository,
     TransactionOrderService,
-    CandleGateway,
-    CandleService,
+    TransactionWsGateway,
+    TransactionWsService,
     TransactionQueueService,
   ],
 })
