@@ -26,7 +26,7 @@ until mongosh --quiet --eval '
         ]
     })
 ' >/dev/null 2>&1; do
-    log_with_time "Waiting for replica set initialization..."
+    log_with_time "Waiting for replica set initialization..." 
     sleep 2
 done
 log_with_time "Replica set initialized"
