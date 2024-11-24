@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { WebSocketGateway } from '@nestjs/websockets';
 import { Redis } from 'ioredis';
 import { ConfigService } from '@nestjs/config';
@@ -23,8 +23,9 @@ import { WsError } from '@app/ws/ws.error';
   cors: cors,
 })
 @Injectable()
-export class TransactionWsGateway extends WsBaseGateway implements OnModuleInit {
-  private readonly redisSubscriber: Redis;
+export class TransactionWsGateway extends WsBaseGateway {
+  private redisSubscriber: Redis | null = null;
+  private reconnectInterval: NodeJS.Timer | null = null;
 
   constructor(
     private readonly transactionWsService: TransactionWsService,
@@ -33,27 +34,83 @@ export class TransactionWsGateway extends WsBaseGateway implements OnModuleInit 
     private readonly configService: ConfigService,
   ) {
     super(wsService, reflector);
-    this.redisSubscriber = new Redis(this.configService.get('REDIS_PUB_SUB_URL'));
+    this.connectRedis();
   }
 
-  async onModuleInit() {
-    // Redis 채널 구독
-    Object.values(RedisChannel).forEach((channel) => {
-      this.redisSubscriber.subscribe(channel);
-    });
-
-    // Redis 메시지 수신 처리
-    this.redisSubscriber.on('message', (channel, message) => {
-      try {
-        const data = JSON.parse(message);
-        this.handleRedisMessage(channel as RedisChannel, data);
-      } catch (error) {
-        console.error('Redis message parsing error:', error);
+  private connectRedis() {
+    try {
+      if (this.redisSubscriber) {
+        this.redisSubscriber.disconnect();
       }
-    });
+
+      this.redisSubscriber = new Redis(this.configService.get('REDIS_PUB_SUB_URL'), {
+        maxRetriesPerRequest: null,
+        retryStrategy: () => null,
+        enableReadyCheck: false,
+      });
+
+      this.redisSubscriber.on('error', (error) => {
+        console.error('Redis PubSub connection error:', error.message);
+        this.startReconnectInterval();
+      });
+
+      this.redisSubscriber.on('end', () => {
+        console.error('Redis connection ended');
+        this.startReconnectInterval();
+      });
+
+      this.redisSubscriber.on('ready', () => {
+        console.log('Redis connected successfully');
+        this.stopReconnectInterval();
+        this.subscribeToChannels();
+      });
+    } catch (error) {
+      console.error('Failed to initialize Redis connection:', error.message);
+      this.redisSubscriber = null;
+      this.startReconnectInterval();
+    }
+  }
+
+  private startReconnectInterval() {
+    if (!this.reconnectInterval) {
+      this.reconnectInterval = setInterval(() => {
+        console.log('Attempting to reconnect to Redis...');
+        this.connectRedis();
+      }, 5000);
+    }
+  }
+
+  private stopReconnectInterval() {
+    if (this.reconnectInterval) {
+      clearInterval(this.reconnectInterval as NodeJS.Timeout);
+      this.reconnectInterval = null;
+    }
+  }
+
+  private subscribeToChannels() {
+    if (!this.redisSubscriber) return;
+
+    try {
+      Object.values(RedisChannel).forEach((channel) => {
+        this.redisSubscriber?.subscribe(channel);
+      });
+
+      this.redisSubscriber.on('message', (channel, message) => {
+        try {
+          const data = JSON.parse(message);
+          this.handleRedisMessage(channel as RedisChannel, data);
+        } catch (error) {
+          console.error('Redis message parsing error:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Failed to subscribe to channels:', error);
+    }
   }
 
   private handleRedisMessage(channel: RedisChannel, data: any) {
+    if (!this.redisSubscriber) return;
+
     switch (channel) {
       case RedisChannel.CANDLE_CHART:
         this.wsService.broadcastToRoom(data.timeScale, data);
