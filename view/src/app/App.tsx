@@ -15,12 +15,15 @@ import errorMessages from '../shared/consts/errorMessages';
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuthActions();
+  const { login, logout } = useAuthActions();
   const { addToast } = useToast();
 
   const [queryClient] = useState(
     new QueryClient({
       queryCache: new QueryCache({
+        onSuccess: () => {
+          login();
+        },
         onError: (error) => {
           if (error instanceof Error) {
             if (error.message === '403') {

@@ -3,14 +3,13 @@ import BoxContainer from './UI/BoxContainer';
 import Title from './UI/Title';
 import Tab from '../../shared/UI/Tab';
 import TransactionForm from './UI/TransactionForm';
-import assetHistory from './consts/historyMockData';
-import TransactionLogItem from './UI/TransactionLogItem';
 
 import useDeposit from './model/useDeposit';
-import { AssetType } from './consts/AssetType';
+import { AssetType } from './model/AssetType';
 import useWithdraw from './model/useWithdraw';
 
 import CATEGORY from './consts/category';
+import TransactionLogs from './UI/TransactionLogs';
 
 const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
   const [selectedCate, setSelectedCate] = useState('내역');
@@ -49,22 +48,8 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
   return (
     <BoxContainer>
       <Title currency_code={currencyCode} amount={amount} />
-      <Tab
-        selectedCate={selectedCate}
-        setSelectedCate={setSelectedCate}
-        categories={CATEGORY}
-      />
-      {selectedCate === '내역' && (
-        <ul className="w-[100%] h-[17rem] px-[3vw] overflow-y-auto">
-          {assetHistory.transactions.map((log) => (
-            <TransactionLogItem
-              key={log.timestamp}
-              log={log}
-              currency_code={currencyCode}
-            />
-          ))}
-        </ul>
-      )}
+      <Tab selectedCate={selectedCate} setSelectedCate={setSelectedCate} categories={CATEGORY} />
+      {selectedCate === '내역' && <TransactionLogs currencyCode={currencyCode} />}
       {selectedCate === '입금' && (
         <TransactionForm
           type="입금"
