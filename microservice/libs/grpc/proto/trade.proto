@@ -45,7 +45,3 @@ message TradeCancelRequest {
   string remain = 5;
   string orderType = 6;
 }
-
-message TradeResponse {
-  string status = 1;
-}
