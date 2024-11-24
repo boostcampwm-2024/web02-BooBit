@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { TradeGrpcService } from '@app/grpc/trade.interface';
 import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
+import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 
 @Injectable()
 export class TradeBalanceService implements OnModuleInit, TradeGrpcService {
@@ -17,5 +18,9 @@ export class TradeBalanceService implements OnModuleInit, TradeGrpcService {
 
   settleTransaction(tradeRequest: TradeRequestDto): Promise<TradeResponseDto> {
     return firstValueFrom(this.tradeService.settleTransaction(tradeRequest));
+  }
+
+  cancelOrder(cancelRequest: TradeCancelRequestDto): Promise<TradeResponseDto> {
+    return firstValueFrom(this.tradeService.cancelOrder(cancelRequest));
   }
 }

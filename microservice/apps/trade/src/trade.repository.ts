@@ -150,4 +150,16 @@ export class TradeRepository {
   async createTrade(prisma, trade) {
     return await prisma.trade.create({ data: trade });
   }
+
+  async deleteBuyOrderByHistoryId(historyId) {
+    return await this.prisma.buyOrder.delete({
+      where: { historyId: BigInt(historyId) },
+    });
+  }
+
+  async deleteSellOrderByHistoryId(historyId) {
+    return await this.prisma.sellOrder.delete({
+      where: { historyId: BigInt(historyId) },
+    });
+  }
 }

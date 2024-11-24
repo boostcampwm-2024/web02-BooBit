@@ -8,6 +8,7 @@ import { TradeSellerRequestDto } from '@app/grpc/dto/trade.seller.request.dto';
 import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeBalanceService } from './trade.balance.service';
 import { formatFixedPoint } from '@app/common/utils/number.format.util';
+import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 
 const BATCH_SIZE = 30;
 
@@ -37,7 +38,7 @@ export class TradeService {
     let remain = Number(amount);
     let offset = 0;
 
-    const getOrders = this.getOrderFetcher(type);
+    const getOrders = this.getOrdersFetcher(type);
     while (remain > 0) {
       const orders = await getOrders(coinCode, price, offset, BATCH_SIZE);
 
@@ -67,7 +68,7 @@ export class TradeService {
     }
   }
 
-  getOrderFetcher(type: OrderType) {
+  getOrdersFetcher(type: OrderType) {
     return type === OrderType.BUY
       ? (coinCode: string, price: string, offset: number, batchSize: number) =>
           this.tradeRepository.findSellOrders(coinCode, price, offset, batchSize)
@@ -146,5 +147,37 @@ export class TradeService {
     } else {
       await this.tradeRepository.tradeSellOrder(tradeHistory, remain, historyId, trade);
     }
+  }
+
+  async cancelOrder(userId: bigint, historyId: string, orderType: OrderType) {
+    const getOrder = this.getOrderFetcher(orderType);
+    const order = await getOrder(historyId);
+
+    if (!order) return;
+
+    const deleteOrder = this.deleteOrderFetcher(orderType);
+    await deleteOrder(historyId);
+
+    const cancelRequest = new TradeCancelRequestDto(
+      String(userId),
+      historyId,
+      order.coinCode,
+      order.price,
+      orderType === OrderType.BUY ? order.remainingQuote : order.remainingBase,
+      orderType,
+    );
+    await this.tradeBalanceService.cancelOrder(cancelRequest);
+  }
+
+  getOrderFetcher(type: OrderType) {
+    return type === OrderType.BUY
+      ? (historyId: string) => this.tradeRepository.findBuyOrderByHistoryId(historyId)
+      : (historyId: string) => this.tradeRepository.findSellOrderByHistoryId(historyId);
+  }
+
+  deleteOrderFetcher(type: OrderType) {
+    return type === OrderType.BUY
+      ? (historyId: string) => this.tradeRepository.deleteBuyOrderByHistoryId(historyId)
+      : (historyId: string) => this.tradeRepository.deleteSellOrderByHistoryId(historyId);
   }
 }
