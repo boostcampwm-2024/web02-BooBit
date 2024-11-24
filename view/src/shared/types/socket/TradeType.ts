@@ -6,5 +6,5 @@ export interface TradeType {
     amount: number;
     tradePrice: number;
     gradient: 'POSITIVE' | 'NEGATIVE';
-  };
+  }[];
 }
