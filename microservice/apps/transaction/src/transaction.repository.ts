@@ -84,4 +84,26 @@ export class TransactionRepository {
 
     return tableMap[timeScale];
   }
+
+  async findBuyOrderByHistoryId(historyId: string) {
+    return await this.prisma.buyOrder.findUnique({
+      select: {
+        userId: true,
+      },
+      where: {
+        historyId: historyId,
+      },
+    });
+  }
+
+  async findSellOrderByHistoryId(historyId: string) {
+    return await this.prisma.sellOrder.findUnique({
+      select: {
+        userId: true,
+      },
+      where: {
+        historyId: historyId,
+      },
+    });
+  }
 }
