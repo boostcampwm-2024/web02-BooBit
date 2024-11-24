@@ -8,26 +8,26 @@ import TradeRecords from '../../entities/TradeRecords';
 import TimeScaleSelector from './UI/TimeScaleSelector';
 import Title from './UI/Title';
 
-import d1candleData from './consts/d1candleData';
 import currentPriceMockData from './consts/currentPriceMockData';
 import orderBookMockData from './consts/orderBookMockData';
-import tradeHistoryMockData from './consts/tradeHistoryMockData';
 
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 import useWebSocket from '../../shared/model/useWebSocket';
+import { RecordType } from '../../shared/types/RecordType';
+import { CandleData } from '../../entities/Chart/model/candleDataType';
 
 const Home = () => {
-  const [candleData, setCandleData] = useState(d1candleData);
-  const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1day');
+  const [candleData, setCandleData] = useState<CandleData[]>();
+  const [tradeRecords, setTradeRecords] = useState<RecordType[]>();
+  const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1sec');
 
-  const { message, sendMessage } = useWebSocket('ws://172.31.99.241:3000/ws');
+  const { message, sendMessage } = useWebSocket('ws://localhost:3200/ws');
   const [orderPrice, setOrderPrice] = useState<string>(
     orderBookMockData.buy[orderBookMockData.buy.length - 1].price.toLocaleString()
   );
 
   useEffect(() => {
     if (!message) return;
-
     switch (message.event) {
       case 'CANDLE_CHART_INIT': {
         const candlePrevData = message.data;
@@ -42,6 +42,12 @@ const Home = () => {
         }));
 
         setCandleData(transformedData);
+        break;
+      }
+      case 'TRADE': {
+        const tradePrevData = message.data;
+
+        setTradeRecords(tradePrevData);
         break;
       }
       default:
@@ -77,7 +83,7 @@ const Home = () => {
           <OrderPanel tradePrice={orderPrice} setTradePrice={setOrderPrice} />
         </div>
 
-        <TradeRecords tradeRecords={tradeHistoryMockData} />
+        <TradeRecords tradeRecords={tradeRecords} />
       </Layout>
     </div>
   );
