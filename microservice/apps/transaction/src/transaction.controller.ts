@@ -1,4 +1,4 @@
-import { Controller, Request, Post, UseGuards, Body } from '@nestjs/common';
+import { Controller, Request, Post, UseGuards, Body, Delete, Param, Query } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
 import { OrderLimitRequestDto } from './dto/order.limit.request.dto';
@@ -45,5 +45,17 @@ export class TransactionController {
 
     await this.transactionService.registerSellOrder(orderRequest, response);
     return await this.transactionQueueService.addQueue(OrderType.SELL, response.historyId);
+  }
+
+  @Delete('/:historyId')
+  @UseGuards(AuthenticatedGuard)
+  async cancelOrder(
+    @Request() req,
+    @Param('historyId') historyId: string,
+    @Query('orderType') orderType: OrderType,
+  ) {
+    const userId = req.user.userId;
+    await this.transactionService.validateOrderOwnership(userId, historyId, orderType);
+    return await this.transactionQueueService.addCancelQueue(userId, historyId, orderType);
   }
 }
