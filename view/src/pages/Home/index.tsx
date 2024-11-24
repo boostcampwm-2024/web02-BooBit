@@ -16,11 +16,12 @@ import { RecordType } from '../../shared/types/RecordType';
 import { CandleData } from '../../entities/Chart/model/candleDataType';
 
 const Home = () => {
+  const { message, sendMessage } = useWebSocket('ws://localhost:3200/ws');
   const [candleData, setCandleData] = useState<CandleData[]>();
   const [tradeRecords, setTradeRecords] = useState<RecordType[]>();
   const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1sec');
 
-  const { message, sendMessage } = useWebSocket('ws://localhost:3200/ws');
+  const hasIncreased = false;
   const [orderPrice, setOrderPrice] = useState<string>(
     orderBookMockData.buy[orderBookMockData.buy.length - 1].price.toLocaleString()
   );
@@ -66,7 +67,7 @@ const Home = () => {
     <div>
       <Header />
       <Layout paddingX="px-[22vw]" flex={false}>
-        <Title currentPrice={tradeRecords && tradeRecords[0].price} />
+        <Title currentPrice={tradeRecords && tradeRecords[0].price} hasIncreased={hasIncreased} />
         <TimeScaleSelector
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
@@ -76,6 +77,7 @@ const Home = () => {
         <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
             currentPrice={tradeRecords && tradeRecords[0].price}
+            hasIncreased={hasIncreased}
             setOrderPrice={setOrderPrice}
             orderBook={orderBookMockData}
           />
