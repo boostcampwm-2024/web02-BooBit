@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import Home from '../pages/Home';
 import MyPage from '../pages/MyPage';
@@ -32,17 +32,6 @@ const App = () => {
                 addToast(errorMessages[403], 'error');
                 navigate('signin');
               }
-            }
-          }
-        },
-      }),
-      mutationCache: new MutationCache({
-        onError: (error) => {
-          if (error instanceof Error) {
-            if (error.message === '403') {
-              addToast(errorMessages[403], 'error');
-              logout();
-              navigate('signin');
             }
           }
         },
