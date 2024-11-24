@@ -163,7 +163,9 @@ export class TradeService {
       historyId,
       order.coinCode,
       order.price,
-      orderType === OrderType.BUY ? order.remainingQuote : order.remainingBase,
+      orderType === OrderType.BUY
+        ? (order as { remainingQuote: string }).remainingQuote
+        : (order as { remainingBase: string }).remainingBase,
       orderType,
     );
     await this.tradeBalanceService.cancelOrder(cancelRequest);

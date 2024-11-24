@@ -153,13 +153,13 @@ export class TradeRepository {
 
   async deleteBuyOrderByHistoryId(historyId) {
     return await this.prisma.buyOrder.delete({
-      where: { historyId: BigInt(historyId) },
+      where: { historyId: historyId },
     });
   }
 
   async deleteSellOrderByHistoryId(historyId) {
     return await this.prisma.sellOrder.delete({
-      where: { historyId: BigInt(historyId) },
+      where: { historyId: historyId },
     });
   }
 }

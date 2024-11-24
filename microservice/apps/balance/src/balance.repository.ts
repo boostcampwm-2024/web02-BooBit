@@ -425,6 +425,8 @@ export class BalanceRepository {
           remainDecimal,
         );
       }
+
+      return new TradeResponseDto('SUCCESS');
     });
   }
 }
