@@ -21,16 +21,54 @@ export enum TransactionType {
 export class BalanceRepository {
   constructor(private prisma: PrismaService) {}
 
+  async getOrdersHistory(userId: bigint, id?: number) {
+    const take = 31;
+
+    const orders = await this.prisma.orderHistory.findMany({
+      where: {
+        userId,
+        status: { not: OrderStatus.PENDING },
+        ...(id && {
+          historyId: {
+            lte: BigInt(id),
+          },
+        }),
+      },
+      take,
+      orderBy: {
+        historyId: 'desc',
+      },
+      select: {
+        historyId: true,
+        orderType: true,
+        coinCode: true,
+        price: true,
+        quantity: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    const hasNextPage = orders.length > 30;
+    const items = orders.slice(0, 30);
+    const nextId = hasNextPage ? Number(orders[30].historyId) : null;
+
+    return {
+      items,
+      nextId,
+    };
+  }
+
   async getBankHistory(userId: bigint, getTransactionsDto: GetTransactionsDto) {
     const { currencyCode, id } = getTransactionsDto;
-    const take = 31; // 다음 페이지 존재 여부를 확인하기 위해 31개를 조회
+    const take = 31;
 
     const where = {
       userId,
       currencyCode,
       ...(id && {
         txId: {
-          lt: BigInt(id),
+          lte: BigInt(id),
         },
       }),
     };
@@ -39,7 +77,7 @@ export class BalanceRepository {
       where,
       take,
       orderBy: {
-        txId: 'desc', // 최신 거래내역부터 조회
+        txId: 'desc',
       },
       select: {
         txId: true,
@@ -64,6 +102,9 @@ export class BalanceRepository {
   async getPending(userId: bigint) {
     return await this.prisma.orderHistory.findMany({
       where: { userId, status: OrderStatus.PENDING },
+      orderBy: {
+        historyId: 'desc',
+      },
       select: {
         historyId: true,
         orderType: true,

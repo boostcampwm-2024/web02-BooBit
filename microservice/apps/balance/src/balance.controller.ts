@@ -20,6 +20,13 @@ export class BalanceController implements OrderService, AccountService {
     return await this.balanceService.getPending(userId);
   }
 
+  @Get('/orderHistory')
+  @UseGuards(AuthenticatedGuard)
+  async getOrdersHistory(@Request() req, @Query('id') lastId?: number) {
+    const userId = req.user.userId;
+    return await this.balanceService.getOrdersHistory(userId, lastId);
+  }
+
   @Get('/assets')
   @UseGuards(AuthenticatedGuard)
   async getAssets(@Request() req) {
