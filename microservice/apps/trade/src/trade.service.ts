@@ -98,7 +98,7 @@ export class TradeService {
     tradeHistory.push(
       new TradeHistoryRequestDto(
         historyId,
-        remain === 0 ? OrderStatus.FILLED : OrderStatus.PARTIALLY_FILLED,
+        remain === quantity ? OrderStatus.FILLED : OrderStatus.PARTIALLY_FILLED,
         remain - quantity,
       ),
     );
