@@ -23,11 +23,11 @@ export class IntervalRepository {
     };
     return modelMap[interval];
   }
-  async getLatestTrade(coinCode?: string) {
+  async getLatestTrade(coinCode: string) {
     try {
       const trade = await this.prisma.trade.findFirst({
         where: {
-          ...(coinCode && { coinCode }),
+          coinCode: coinCode
         },
         orderBy: {
           tradedAt: 'desc', // 날짜 기준 내림차순 정렬
@@ -41,7 +41,7 @@ export class IntervalRepository {
     }
   }
 
-  async getTradesByDateRange(startDate: Date, endDate: Date, coinCode?: string) {
+  async getTradesByDateRange(startDate: Date, endDate: Date, coinCode: string) {
     try {
       const trades = await this.prisma.trade.findMany({
         where: {
@@ -49,7 +49,7 @@ export class IntervalRepository {
             gte: startDate,
             lt: endDate,
           },
-          ...(coinCode && { coinCode }),
+          coinCode: coinCode,
         },
         orderBy: {
           tradedAt: 'desc',

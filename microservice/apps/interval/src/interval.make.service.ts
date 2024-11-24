@@ -1,6 +1,7 @@
 import { CandleDataDto } from '@app/ws/dto/candle.data.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { IntervalRepository } from './interval.candle.repository';
+import { CurrencyCode } from '@app/common';
 
 @Injectable()
 export class IntervalMakeService {
@@ -25,10 +26,12 @@ export class IntervalMakeService {
     const trades = await this.intervalRepository.getTradesByDateRange(
       new Date(date.setTime(date.getTime() - 1000)),
       date,
+      CurrencyCode.BTC,
     );
 
     if (trades.length === 0) {
-      this.lastClose = Number((await this.intervalRepository.getLatestTrade()).quantity);
+      const latestTrade = await this.intervalRepository.getLatestTrade(CurrencyCode.BTC);
+      this.lastClose = latestTrade ? Number(latestTrade.price) : 0;
       return new CandleDataDto({
         date,
         open: this.lastClose,
