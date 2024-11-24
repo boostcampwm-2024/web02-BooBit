@@ -20,14 +20,17 @@
     "generate:balance": "npx prisma generate --schema apps/balance/prisma/schema.prisma",
     "generate:transaction": "npx prisma generate --schema apps/transaction/prisma/schema.prisma",
     "generate:trade": "npx prisma generate --schema apps/trade/prisma/schema.prisma",
+    "generate:interval": "npx prisma generate --schema apps/interval/prisma/schema.prisma",
     "start:prod:auth": "npx prisma migrate deploy && node dist/apps/auth/main",
     "start:prod:balance": "npx prisma migrate deploy && node dist/apps/balance/main",
     "start:prod:transaction": "node dist/apps/transaction/main",
     "start:prod:trade": "node dist/apps/trade/main",
+    "start:prod:interval": "node dist/apps/interval/main",
     "dev:auth": "concurrently -s all \"npx prisma generate --schema apps/auth/prisma/schema.prisma\" \"npx prisma migrate deploy --schema apps/auth/prisma/schema.prisma\" \"nest start auth --watch --debug\"",
     "dev:balance": "concurrently -s all \"npx prisma generate --schema apps/balance/prisma/schema.prisma\" \"npx prisma migrate deploy --schema apps/balance/prisma/schema.prisma\" \"nest start balance --watch --debug\"",
     "dev:transaction": "concurrently -s all \"npx prisma generate --schema apps/transaction/prisma/schema.prisma\" \"nest start transaction --watch --debug\"",
-    "dev:trade": "concurrently -s all \"npx prisma generate --schema apps/trade/prisma/schema.prisma\" \"nest start trade --watch --debug\""
+    "dev:trade": "concurrently -s all \"npx prisma generate --schema apps/trade/prisma/schema.prisma\" \"nest start trade --watch --debug\"",
+    "dev:interval": "concurrently -s all \"npx prisma generate --schema apps/interval/prisma/schema.prisma\" \"nest start interval --watch --debug\""
   },
   "lint-staged": {
     "*.ts": [
@@ -45,6 +48,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/platform-ws": "^10.4.8",
+    "@nestjs/schedule": "^4.1.1",
     "@prisma/client": "^5.22.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.29.0",
