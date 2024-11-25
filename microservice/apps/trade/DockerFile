@@ -1,0 +1,39 @@
+# Build stage
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy only necessary files for this service
+COPY microservice/nest-cli.json ./
+COPY microservice/package*.json ./
+COPY microservice/tsconfig*.json ./
+COPY microservice/apps/trade ./apps/trade
+COPY microservice/libs ./libs
+
+# Install and build
+RUN npm ci
+RUN npm run generate:trade
+RUN npm run build trade
+
+# Production stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY microservice/package*.json ./
+RUN npm ci --only=production
+
+# Copy built assets and Prisma generated files
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/apps/trade/prisma ./prisma
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/libs/grpc/proto ./libs/grpc/proto
+
+# Expose port
+EXPOSE 3000
+
+# Run application
+CMD ["npm", "run", "start:prod:trade"]
+#CMD ["node", "dist/apps/trade/main"]
+
