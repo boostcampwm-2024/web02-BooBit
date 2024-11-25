@@ -1,4 +1,4 @@
-import { OrderType } from '../model/OrderType';
+import { OrderType } from '../../../shared/types/socket/OrderType';
 
 interface OrderItemProps {
   setOrderPrice: React.Dispatch<React.SetStateAction<string>>;

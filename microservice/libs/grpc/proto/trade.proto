@@ -4,12 +4,12 @@ package trade;
 
 service TradeService {
   rpc SettleTransaction(TradeRequest) returns (TradeResponse);
+  rpc CancelOrder(TradeCancelRequest) returns (TradeResponse);
 }
 
 message TradeRequest {
   BuyerRequest buyerRequest = 1;
   SellerRequest sellerRequest = 2;
-  repeated HistoryRequest historyRequests = 3;
 }
 
 message BuyerRequest {
@@ -27,11 +27,16 @@ message SellerRequest {
   double soldCoins = 4;
 }
 
-message HistoryRequest {
-  string historyId = 1;
-  string status = 2;
-}
-
 message TradeResponse {
   string status = 1;
+}
+
+message TradeCancelRequest {
+  string userId = 1;
+  string historyId = 2;
+  string coinCode = 3;
+  string price = 4;
+  string remain = 5;
+  string orderType = 6;
+  string orderStatus = 7;
 }

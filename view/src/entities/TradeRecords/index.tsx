@@ -1,16 +1,9 @@
+import { RecordType } from '../../shared/types/RecordType';
 import TradeRecordsRow from './UI/TradeRecordRow';
 import TradeRecordsCell from './UI/TradeRecordsCell';
 
-interface Record {
-  date: string;
-  price: number;
-  amount: number;
-  tradePrice: number;
-  gradient: string;
-}
-
 interface TradeRecordsProps {
-  tradeRecords: Record[];
+  tradeRecords: RecordType[] | undefined;
 }
 
 const TradeRecords: React.FC<TradeRecordsProps> = ({ tradeRecords }) => {
@@ -30,21 +23,27 @@ const TradeRecords: React.FC<TradeRecordsProps> = ({ tradeRecords }) => {
         </TradeRecordsRow>
       </thead>
       <tbody className="block max-h-[25rem] overflow-y-auto">
-        {tradeRecords.map((r) => (
-          <TradeRecordsRow key={r.amount + '.' + r.date} flex styles="even:bg-surface-hover-light">
-            <TradeRecordsCell start>
-              <span>{r.date.slice(0, 4)}</span>
-              <span className="text-text-dark">{r.date.slice(5)}</span>
-            </TradeRecordsCell>
-            <TradeRecordsCell>{r.price.toLocaleString()}</TradeRecordsCell>
-            <TradeRecordsCell
-              styles={r.gradient === 'POSITIVE' ? 'text-positive' : 'text-negative'}
+        {tradeRecords &&
+          tradeRecords.length !== 0 &&
+          tradeRecords.map((r) => (
+            <TradeRecordsRow
+              key={r.amount + '.' + r.date}
+              flex
+              styles="even:bg-surface-hover-light"
             >
-              {r.amount}
-            </TradeRecordsCell>
-            <TradeRecordsCell end>{r.tradePrice.toLocaleString()}</TradeRecordsCell>
-          </TradeRecordsRow>
-        ))}
+              <TradeRecordsCell start>
+                <span>{r.date.slice(5, 10).replace('-', '.')}</span>
+                <span className="ml-[0.5rem] text-text-dark">{r.date.slice(11, 19)}</span>
+              </TradeRecordsCell>
+              <TradeRecordsCell>{r.price.toLocaleString()}</TradeRecordsCell>
+              <TradeRecordsCell
+                styles={r.gradient === 'POSITIVE' ? 'text-positive' : 'text-negative'}
+              >
+                {r.amount}
+              </TradeRecordsCell>
+              <TradeRecordsCell end>{r.tradePrice.toLocaleString()}</TradeRecordsCell>
+            </TradeRecordsRow>
+          ))}
       </tbody>
     </table>
   );

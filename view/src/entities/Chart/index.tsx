@@ -8,7 +8,7 @@ import { createBarAxisScale } from './lib/createBarYAsixScale';
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 
 interface CandleChartProps {
-  data: CandleData[];
+  data?: CandleData[];
   scaleType: ChartTimeScaleType;
 }
 
@@ -17,7 +17,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
   const [marketValues, setMarketValues] = useState<CandleData>();
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    if (!data || data.length === 0 || !svgRef.current) return;
 
     const margin = { top: 20, right: 90, bottom: 50, left: 40 };
     const width = window.innerWidth * 0.56 - margin.left - margin.right;

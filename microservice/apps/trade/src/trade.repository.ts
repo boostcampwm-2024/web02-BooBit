@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { TradeHistoryRequestDto } from '@app/grpc/dto/trade.history.request.dto';
-import { OrderStatus } from '@app/common/enums/order-status.enum';
 
 @Injectable()
 export class TradeRepository {
@@ -10,6 +9,7 @@ export class TradeRepository {
   async findBuyOrderByHistoryId(historyId: string) {
     return await this.prisma.buyOrder.findUnique({
       select: {
+        historyId: true,
         userId: true,
         coinCode: true,
         price: true,
@@ -24,6 +24,7 @@ export class TradeRepository {
   async findSellOrderByHistoryId(historyId: string) {
     return await this.prisma.sellOrder.findUnique({
       select: {
+        historyId: true,
         userId: true,
         coinCode: true,
         price: true,
@@ -40,9 +41,9 @@ export class TradeRepository {
       select: {
         historyId: true,
         userId: true,
+        coinCode: true,
         price: true,
         remainingBase: true,
-        createdAt: true,
       },
       where: {
         price: { lte: price },
@@ -59,9 +60,9 @@ export class TradeRepository {
       select: {
         historyId: true,
         userId: true,
+        coinCode: true,
         price: true,
         remainingQuote: true,
-        createdAt: true,
       },
       where: {
         price: { gte: price },
@@ -73,12 +74,12 @@ export class TradeRepository {
     });
   }
 
-  async tradeBuyOrder(history: TradeHistoryRequestDto, remain: number, historyId: string, trade) {
+  async tradeBuyOrder(opposite: TradeHistoryRequestDto, remain: number, historyId: string, trade) {
     await this.prisma.$transaction(async (prisma) => {
-      if (history.status === OrderStatus.FILLED) {
-        await this.deleteSellOrder(prisma, history.historyId);
+      if (opposite.remain === 0) {
+        await this.deleteSellOrder(prisma, opposite.historyId);
       } else {
-        await this.updateSellOrderRemainingBase(prisma, history.historyId, history.remain);
+        await this.updateSellOrderRemainingBase(prisma, opposite.historyId, opposite.remain);
       }
 
       if (remain === 0) {
@@ -91,12 +92,12 @@ export class TradeRepository {
     });
   }
 
-  async tradeSellOrder(history: TradeHistoryRequestDto, remain: number, historyId: string, trade) {
+  async tradeSellOrder(opposite: TradeHistoryRequestDto, remain: number, historyId: string, trade) {
     await this.prisma.$transaction(async (prisma) => {
-      if (history.status === OrderStatus.FILLED) {
-        await this.deleteBuyOrder(prisma, history.historyId);
+      if (opposite.remain === 0) {
+        await this.deleteBuyOrder(prisma, opposite.historyId);
       } else {
-        await this.updateBuyOrderRemainingQuote(prisma, history.historyId, history.remain);
+        await this.updateBuyOrderRemainingQuote(prisma, opposite.historyId, opposite.remain);
       }
 
       if (remain === 0) {
@@ -149,5 +150,17 @@ export class TradeRepository {
 
   async createTrade(prisma, trade) {
     return await prisma.trade.create({ data: trade });
+  }
+
+  async deleteBuyOrderByHistoryId(historyId) {
+    return await this.prisma.buyOrder.delete({
+      where: { historyId: historyId },
+    });
+  }
+
+  async deleteSellOrderByHistoryId(historyId) {
+    return await this.prisma.sellOrder.delete({
+      where: { historyId: historyId },
+    });
   }
 }

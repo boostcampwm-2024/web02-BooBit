@@ -12,6 +12,9 @@ import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
 import { TradeBuyerRequestDto } from '@app/grpc/dto/trade.buyer.request.dto';
 import { TradeSellerRequestDto } from '@app/grpc/dto/trade.seller.request.dto';
+import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
+import { Decimal } from '@prisma/client/runtime/library';
+
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
   WITHDRAWAL = 'WITHDRAWAL',
@@ -21,16 +24,53 @@ export enum TransactionType {
 export class BalanceRepository {
   constructor(private prisma: PrismaService) {}
 
+  async getOrdersHistory(userId: bigint, id?: number) {
+    const take = 31;
+
+    const orders = await this.prisma.orderHistory.findMany({
+      where: {
+        userId,
+        ...(id && {
+          historyId: {
+            lte: BigInt(id),
+          },
+        }),
+      },
+      take,
+      orderBy: {
+        historyId: 'desc',
+      },
+      select: {
+        historyId: true,
+        orderType: true,
+        coinCode: true,
+        price: true,
+        quantity: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    const hasNextPage = orders.length > 30;
+    const items = orders.slice(0, 30);
+    const nextId = hasNextPage ? Number(orders[30].historyId) : null;
+
+    return {
+      items,
+      nextId,
+    };
+  }
+
   async getBankHistory(userId: bigint, getTransactionsDto: GetTransactionsDto) {
     const { currencyCode, id } = getTransactionsDto;
-    const take = 31; // 다음 페이지 존재 여부를 확인하기 위해 31개를 조회
+    const take = 31;
 
     const where = {
       userId,
       currencyCode,
       ...(id && {
         txId: {
-          lt: BigInt(id),
+          lte: BigInt(id),
         },
       }),
     };
@@ -39,7 +79,7 @@ export class BalanceRepository {
       where,
       take,
       orderBy: {
-        txId: 'desc', // 최신 거래내역부터 조회
+        txId: 'desc',
       },
       select: {
         txId: true,
@@ -59,20 +99,6 @@ export class BalanceRepository {
       items,
       nextId,
     };
-  }
-
-  async getPending(userId: bigint) {
-    return await this.prisma.orderHistory.findMany({
-      where: { userId, status: OrderStatus.PENDING },
-      select: {
-        historyId: true,
-        orderType: true,
-        coinCode: true,
-        price: true,
-        quantity: true,
-        createdAt: true,
-      },
-    });
   }
 
   async createEmptyAccount(userId: bigint) {
@@ -201,7 +227,7 @@ export class BalanceRepository {
           return new OrderResponseDto(GrpcOrderStatusCode.NO_BALANCE, 'NONE');
         }
 
-        await this.lockBalance(prisma, userId, orderPrice);
+        await this.lockBalance(prisma, userId, CurrencyCode.KRW, orderPrice);
         const historyId = await this.createOrderHistory(
           prisma,
           OrderType.BUY,
@@ -209,6 +235,7 @@ export class BalanceRepository {
           coinCode,
           price,
           amount,
+          OrderStatus.ORDERED,
         );
         return new OrderResponseDto(GrpcOrderStatusCode.SUCCESS, historyId);
       });
@@ -226,7 +253,7 @@ export class BalanceRepository {
           return new OrderResponseDto(GrpcOrderStatusCode.NO_BALANCE, 'NONE');
         }
 
-        await this.lockBalance(prisma, userId, amount);
+        await this.lockBalance(prisma, userId, coinCode, amount);
         const historyId = await this.createOrderHistory(
           prisma,
           OrderType.SELL,
@@ -234,6 +261,7 @@ export class BalanceRepository {
           coinCode,
           price,
           amount,
+          OrderStatus.ORDERED,
         );
         return new OrderResponseDto(GrpcOrderStatusCode.SUCCESS, historyId);
       });
@@ -247,19 +275,19 @@ export class BalanceRepository {
       select: { availableBalance: true },
       where: {
         userId_currencyCode: {
-          userId,
-          currencyCode,
+          userId: BigInt(userId),
+          currencyCode: currencyCode,
         },
       },
     });
   }
 
-  async lockBalance(prisma, userId, orderPrice) {
+  async lockBalance(prisma, userId, currencyCode, orderPrice) {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
-          userId,
-          currencyCode: CurrencyCode.KRW,
+          userId: BigInt(userId),
+          currencyCode: currencyCode,
         },
       },
       data: {
@@ -273,15 +301,15 @@ export class BalanceRepository {
     });
   }
 
-  async createOrderHistory(prisma, orderType, userId, coinCode, price, quantity) {
+  async createOrderHistory(prisma, orderType, userId, coinCode, price, quantity, status) {
     const orderHistory = await prisma.orderHistory.create({
       data: {
         orderType: orderType,
-        userId: userId,
+        userId: BigInt(userId),
         coinCode: coinCode,
         price: price,
-        status: OrderStatus.PENDING,
         quantity: quantity,
+        status: status,
       },
       select: {
         historyId: true,
@@ -291,17 +319,10 @@ export class BalanceRepository {
   }
 
   async settleTransaction(tradeRequest: TradeRequestDto) {
-    const { buyerRequest, sellerRequest, historyRequests } = tradeRequest;
+    const { buyerRequest, sellerRequest } = tradeRequest;
     return await this.prisma.$transaction(async (prisma) => {
       await this.updateBuyerAsset(prisma, buyerRequest);
       await this.updateSellerAsset(prisma, sellerRequest);
-      for (const historyRequest of historyRequests) {
-        await this.updateOrderHistoryStatus(
-          prisma,
-          historyRequest.historyId,
-          historyRequest.status,
-        );
-      }
       return new TradeResponseDto('SUCCESS');
     });
   }
@@ -322,7 +343,7 @@ export class BalanceRepository {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
-          userId: userId,
+          userId: BigInt(userId),
           currencyCode: currencyCode,
         },
       },
@@ -341,7 +362,7 @@ export class BalanceRepository {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
-          userId: userId,
+          userId: BigInt(userId),
           currencyCode: coinCode,
         },
       },
@@ -363,7 +384,7 @@ export class BalanceRepository {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
-          userId: userId,
+          userId: BigInt(userId),
           currencyCode: currencyCode,
         },
       },
@@ -379,7 +400,7 @@ export class BalanceRepository {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
-          userId: userId,
+          userId: BigInt(userId),
           currencyCode: coinCode,
         },
       },
@@ -391,14 +412,36 @@ export class BalanceRepository {
     });
   }
 
-  async updateOrderHistoryStatus(prisma, historyId: string, status: OrderStatus) {
-    return await prisma.OrderHistory.update({
-      where: {
-        historyId: BigInt(historyId),
-      },
-      data: {
-        status: status,
-      },
+  async cancelOrder(cancelRequest: TradeCancelRequestDto) {
+    return await this.prisma.$transaction(async (prisma) => {
+      const { userId, coinCode, orderType } = cancelRequest;
+      const priceDecimal = new Decimal(cancelRequest.price);
+      const remainDecimal = new Decimal(cancelRequest.remain);
+
+      await this.createOrderHistory(
+        prisma,
+        orderType,
+        userId,
+        coinCode,
+        priceDecimal,
+        remainDecimal,
+        OrderStatus.CANCELED,
+      );
+
+      if (orderType === OrderType.BUY) {
+        const refund = priceDecimal.mul(remainDecimal);
+        await this.decreaseBuyerCurrencyBalance(prisma, userId, CurrencyCode.KRW, refund, refund);
+      } else if (orderType === OrderType.SELL) {
+        await this.decreaseBuyerCurrencyBalance(
+          prisma,
+          userId,
+          coinCode,
+          remainDecimal,
+          remainDecimal,
+        );
+      }
+
+      return new TradeResponseDto('SUCCESS');
     });
   }
 }

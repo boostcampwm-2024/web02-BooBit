@@ -1,7 +1,7 @@
 import TableCell from '../../shared/UI/TableCell.tsx';
 import TableRow from '../../shared/UI/TableRow.tsx';
-import { useToast } from '../../shared/store/ToastContext.tsx';
 import { OrderType } from './model/OrderType.ts';
+import useDeleteOrder from './model/useDeleteOrder.ts';
 import useGetPending from './model/useGetPending.ts';
 
 const columnData = [
@@ -14,13 +14,17 @@ const columnData = [
 ];
 
 const MyOpenOrders = () => {
-  const { addToast } = useToast();
   const { data: openOrders } = useGetPending();
+  const { mutate: deleteOrder } = useDeleteOrder();
 
-  const handleRemoveOrder = (e: React.MouseEvent<HTMLElement, MouseEvent>, historyId: number) => {
+  const handleRemoveOrder = (
+    e: React.MouseEvent<HTMLElement, MouseEvent>,
+    historyId: number,
+    orderType: 'BUY' | 'SELL'
+  ) => {
     e.preventDefault();
 
-    addToast(historyId + ' 삭제', 'info');
+    deleteOrder({ historyId, orderType });
   };
 
   return (
@@ -61,7 +65,7 @@ const MyOpenOrders = () => {
                 <TableCell width={columnData[5].width}>
                   <button
                     className={`w-[5rem] h-[2rem] rounded bg-surface-hover-light`}
-                    onClick={(e) => handleRemoveOrder(e, t.historyId)}
+                    onClick={(e) => handleRemoveOrder(e, t.historyId, t.orderType)}
                   >
                     주문취소
                   </button>
