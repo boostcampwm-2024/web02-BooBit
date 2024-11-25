@@ -10,7 +10,6 @@ service TradeService {
 message TradeRequest {
   BuyerRequest buyerRequest = 1;
   SellerRequest sellerRequest = 2;
-  repeated HistoryRequest historyRequests = 3;
 }
 
 message BuyerRequest {
@@ -26,11 +25,6 @@ message SellerRequest {
   string coinCode = 2;
   double receivedAmount = 3;
   double soldCoins = 4;
-}
-
-message HistoryRequest {
-  string historyId = 1;
-  string status = 2;
 }
 
 message TradeResponse {
