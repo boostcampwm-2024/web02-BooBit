@@ -43,7 +43,7 @@ export class TransactionWsGateway extends WsBaseGateway {
         this.redisSubscriber.disconnect();
       }
 
-      this.redisSubscriber = new Redis(this.configService.get('REDIS_PUB_SUB_URL'), {
+      this.redisSubscriber = new Redis(this.configService.get('TRADE_REDIS_URL'), {
         maxRetriesPerRequest: null,
         retryStrategy: () => null,
         enableReadyCheck: false,

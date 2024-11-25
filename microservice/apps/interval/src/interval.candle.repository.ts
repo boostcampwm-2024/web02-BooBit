@@ -7,7 +7,9 @@ import { Injectable, Logger } from '@nestjs/common';
 @Injectable()
 export class IntervalRepository {
   private logger = new Logger(IntervalRepository.name);
-
+  private getSeoulDate(date: Date): Date {
+    return new Date(date.getTime() + 9 * 60 * 60 * 1000); // UTC+9
+  }
   constructor(private prisma: PrismaService) {}
 
   private getModelForInterval(interval: TimeScale) {
@@ -61,12 +63,13 @@ export class IntervalRepository {
 
   async saveCandle(interval: TimeScale, data: CandleDataDto) {
     const model = this.getModelForInterval(interval);
+    const seoulDate = this.getSeoulDate(data.date);
 
     try {
       return await model.create({
         data: {
           coinCode: CurrencyCode.BTC,
-          startTime: data.date,
+          startTime: seoulDate,
           openPrice: data.open.toString(),
           highPrice: data.high.toString(),
           lowPrice: data.low.toString(),
