@@ -48,7 +48,9 @@ const Home = () => {
       case 'TRADE': {
         const tradePrevData = message.data;
 
-        setTradeRecords(tradePrevData);
+        setTradeRecords((prevRecords) => {
+          return prevRecords ? [...tradePrevData, ...prevRecords] : [...tradePrevData];
+        });
         break;
       }
       default:
