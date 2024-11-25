@@ -24,22 +24,17 @@ export class TradeService {
     const buyOrder = await this.tradeRepository.findBuyOrderByHistoryId(historyId);
     if (!buyOrder) return;
 
-    await this.processTrade(OrderType.BUY, historyId, buyOrder, buyOrder.remainingQuote);
+    await this.processTrade(OrderType.BUY, buyOrder, buyOrder.remainingQuote);
   }
 
   async tradeSellOrder(historyId: string) {
     const sellOrder = await this.tradeRepository.findSellOrderByHistoryId(historyId);
     if (!sellOrder) return;
 
-    await this.processTrade(OrderType.SELL, historyId, sellOrder, sellOrder.remainingBase);
+    await this.processTrade(OrderType.SELL, sellOrder, sellOrder.remainingBase);
   }
 
-  async processTrade(
-    type: OrderType,
-    historyId: string,
-    current: BuyOrder | SellOrder,
-    amount: string,
-  ) {
+  async processTrade(type: OrderType, current: BuyOrder | SellOrder, amount: string) {
     const { coinCode, price } = current;
     let remain = Number(amount);
     let offset = 0;
@@ -61,7 +56,7 @@ export class TradeService {
 
         await this.updateOrderAndTradeLog(
           type,
-          historyId,
+          current,
           opposite,
           coinCode,
           tradePrice,
@@ -92,7 +87,11 @@ export class TradeService {
       quantity = remain;
     }
 
-    const opposite = new TradeHistoryRequestDto(order.historyId, availableAmount - quantity);
+    const opposite = new TradeHistoryRequestDto(
+      order.historyId,
+      order.userId,
+      availableAmount - quantity,
+    );
     return { quantity, opposite };
   }
 
@@ -132,7 +131,7 @@ export class TradeService {
 
   async updateOrderAndTradeLog(
     type: OrderType,
-    historyId: string,
+    current: BuyOrder | SellOrder,
     opposite: TradeHistoryRequestDto,
     coinCode: string,
     tradePrice: number,
@@ -140,17 +139,19 @@ export class TradeService {
     remain: number,
   ) {
     const trade = {
-      buyOrderId: type === OrderType.BUY ? historyId : opposite.historyId,
-      sellOrderId: type === OrderType.BUY ? opposite.historyId : historyId,
+      buyerId: type === OrderType.BUY ? current.userId : opposite.userId,
+      buyOrderId: type === OrderType.BUY ? current.historyId : opposite.historyId,
+      sellerId: type === OrderType.BUY ? opposite.userId : current.userId,
+      sellOrderId: type === OrderType.BUY ? opposite.historyId : current.historyId,
       coinCode: coinCode,
       price: formatFixedPoint(tradePrice),
       quantity: String(quantity),
     };
 
     if (type === OrderType.BUY) {
-      await this.tradeRepository.tradeBuyOrder(opposite, remain, historyId, trade);
+      await this.tradeRepository.tradeBuyOrder(opposite, remain, current.historyId, trade);
     } else {
-      await this.tradeRepository.tradeSellOrder(opposite, remain, historyId, trade);
+      await this.tradeRepository.tradeSellOrder(opposite, remain, current.historyId, trade);
     }
   }
 
