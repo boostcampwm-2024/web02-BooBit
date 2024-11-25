@@ -1,31 +1,29 @@
 import { useEffect, useState } from 'react';
 import Chart from '../../entities/Chart';
-import OrderBook from '../../entities/OrderBook';
 import Header from '../../widgets/Header';
 import Layout from '../../widgets/Layout';
 import OrderPanel from '../../entities/OrderPanel';
+import OrderBook from '../../entities/OrderBook';
 import TradeRecords from '../../entities/TradeRecords';
 import TimeScaleSelector from './UI/TimeScaleSelector';
 import Title from './UI/Title';
-
-import orderBookMockData from './consts/orderBookMockData';
 
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 import useWebSocket from '../../shared/model/useWebSocket';
 import { RecordType } from '../../shared/types/RecordType';
 import { CandleData } from '../../entities/Chart/model/candleDataType';
 import { CandleSocketType } from '../../shared/types/socket/CandleSocketType';
+import { OrderType } from '../../shared/types/socket/OrderType';
 
 const Home = () => {
   const { message, sendMessage } = useWebSocket('ws://localhost:3200/ws');
   const [candleData, setCandleData] = useState<CandleData[]>();
   const [tradeRecords, setTradeRecords] = useState<RecordType[]>();
+  const [orderBookData, setOrderBookData] = useState<{ buy: OrderType[]; sell: OrderType[] }>();
   const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1sec');
 
   const hasIncreased = false;
-  const [orderPrice, setOrderPrice] = useState<string>(
-    orderBookMockData.buy[orderBookMockData.buy.length - 1].price.toLocaleString()
-  );
+  const [orderPrice, setOrderPrice] = useState<string>('');
 
   useEffect(() => {
     if (!message) return;
@@ -48,7 +46,18 @@ const Home = () => {
       case 'TRADE': {
         const tradePrevData = message.data;
 
-        setTradeRecords(tradePrevData);
+        if (!tradeRecords && tradePrevData && tradePrevData.length > 0) {
+          setOrderPrice(tradePrevData[0].price.toLocaleString());
+        }
+        setTradeRecords((prevRecords) => {
+          return prevRecords ? [...tradePrevData, ...prevRecords] : [...tradePrevData];
+        });
+        break;
+      }
+      case 'BUY_AND_SELL': {
+        const nowOrderBookData = message.data;
+
+        setOrderBookData(nowOrderBookData);
         break;
       }
       default:
@@ -73,14 +82,18 @@ const Home = () => {
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
         />
-        <Chart data={candleData} scaleType={selectedTimeScale} />
+        {candleData ? (
+          <Chart data={candleData} scaleType={selectedTimeScale} />
+        ) : (
+          <div className="h-[460px] bg-surface-default"></div>
+        )}
 
         <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
             currentPrice={tradeRecords && tradeRecords[0].price}
             hasIncreased={hasIncreased}
             setOrderPrice={setOrderPrice}
-            orderBook={orderBookMockData}
+            orderBook={orderBookData}
           />
           <OrderPanel tradePrice={orderPrice} setTradePrice={setOrderPrice} />
         </div>
