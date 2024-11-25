@@ -10,6 +10,9 @@ import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
 import { OrderResponseDto } from '@app/grpc/dto/order.response.dto';
 import { GrpcOrderStatusCode } from '@app/common/enums/grpc-status.enum';
 import { OrderType } from '@app/common/enums/order-type.enum';
+import { PendingBuyOrder } from './dto/pending.buy.order.type';
+import { PendingSellOrder } from './dto/pending.sell.order.type';
+import { OrderPendingResponseDto } from './dto/order.pending.response.dto';
 
 @Injectable()
 export class TransactionService {
@@ -50,5 +53,41 @@ export class TransactionService {
     return type === OrderType.BUY
       ? (historyId: string) => this.transactionRepository.findBuyOrderByHistoryId(historyId)
       : (historyId: string) => this.transactionRepository.findSellOrderByHistoryId(historyId);
+  }
+
+  async getPending(userId: bigint) {
+    const buyOrders: PendingBuyOrder[] =
+      await this.transactionRepository.findBuyOrdersByUserId(userId);
+    const sellOrders: PendingSellOrder[] =
+      await this.transactionRepository.findSellOrdersByUserId(userId);
+    const buyOrderDtos = buyOrders.map(
+      (order) =>
+        new OrderPendingResponseDto(
+          order.historyId,
+          OrderType.BUY,
+          order.coinCode,
+          order.price,
+          order.originalQuote,
+          order.remainingQuote,
+          order.createdAt,
+        ),
+    );
+    const sellOrderDtos = sellOrders.map(
+      (order) =>
+        new OrderPendingResponseDto(
+          order.historyId,
+          OrderType.SELL,
+          order.coinCode,
+          order.price,
+          order.originalQuote,
+          order.remainingBase,
+          order.createdAt,
+        ),
+    );
+
+    const allOrders = [...buyOrderDtos, ...sellOrderDtos];
+    const sortedOrders = allOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    return sortedOrders;
   }
 }
