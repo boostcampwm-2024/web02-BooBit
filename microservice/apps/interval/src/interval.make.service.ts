@@ -24,7 +24,7 @@ export class IntervalMakeService {
   }
   async makeSecData(date: Date) {
     const trades = await this.intervalRepository.getTradesByDateRange(
-      new Date(date.setTime(date.getTime() - 1000)),
+      new Date(date.getTime() - 1000),
       date,
       CurrencyCode.BTC,
     );
