@@ -68,7 +68,9 @@
       "sourceRoot": "libs/grpc/src",
       "compilerOptions": {
         "tsConfigPath": "libs/grpc/tsconfig.lib.json",
-        "assets": ["**/*.proto"],
+        "assets": [
+          "**/*.proto"
+        ],
         "watchAssets": true
       }
     },
@@ -97,6 +99,15 @@
       "sourceRoot": "apps/trade/src",
       "compilerOptions": {
         "tsConfigPath": "apps/trade/tsconfig.app.json"
+      }
+    },
+    "interval": {
+      "type": "application",
+      "root": "apps/interval",
+      "entryFile": "main",
+      "sourceRoot": "apps/interval/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/interval/tsconfig.app.json"
       }
     }
   }

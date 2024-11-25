@@ -15,6 +15,7 @@ done
 sleep 10
 log_with_time "MongoDB is ready"
 
+
 log_with_time "Initializing replica set..."
 until mongosh --quiet --eval '
     rs.initiate({
