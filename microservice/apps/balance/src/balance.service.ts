@@ -18,6 +18,22 @@ import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 export class BalanceService implements OrderService, AccountService {
   constructor(private balanceRepository: BalanceRepository) {}
 
+  async getOrdersHistory(userId: bigint, lastId?: number) {
+    const { items, nextId } = await this.balanceRepository.getOrdersHistory(userId, lastId);
+    const orders = items.map((item) => ({
+      orderType: item.orderType,
+      coinCode: item.coinCode,
+      quantity: item.quantity,
+      price: item.price,
+      status: item.status,
+      timestamp: item.createdAt.toISOString(),
+    }));
+    return {
+      nextId,
+      orders,
+    };
+  }
+
   async getTransactions(userId: bigint, getTransactionsDto: GetTransactionsDto) {
     const { items, nextId } = await this.balanceRepository.getBankHistory(
       userId,

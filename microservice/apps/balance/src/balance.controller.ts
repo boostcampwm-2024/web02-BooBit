@@ -14,6 +14,13 @@ import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 export class BalanceController implements OrderService, AccountService {
   constructor(private readonly balanceService: BalanceService) {}
 
+  @Get('/orderHistory')
+  @UseGuards(AuthenticatedGuard)
+  async getOrdersHistory(@Request() req, @Query('id') lastId?: number) {
+    const userId = req.user.userId;
+    return await this.balanceService.getOrdersHistory(userId, lastId);
+  }
+
   @Get('/assets')
   @UseGuards(AuthenticatedGuard)
   async getAssets(@Request() req) {

@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transaction-service
+  name: trade-service
   labels:
-    app: transaction-service
+    app: trade-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: transaction-service
+      app: trade-service
   template:
     metadata:
       labels:
-        app: transaction-service
+        app: trade-service
     spec:
       containers:
-        - name: transaction-service
-          image: boobit-ncr.kr.ncr.ntruss.com/transaction-service:latest #todo
+        - name: trade-service
+          image: boobit-ncr.kr.ncr.ntruss.com/trade-service:latest #todo
           ports:
             - containerPort: 3000
           resources:
@@ -29,12 +29,8 @@ spec:
           env:
             - name: DATABASE_URL
               value: "mongodb://${DB_USER}:${DB_PASSWORD}@$(DB_HOST)-0.transaction-db-service:27017,$(DB_HOST)-1.transaction-db-service:27017,$(DB_HOST)-2.transaction-db-service:27017/${DB_SCHEMA}?replicaSet=rs0"
-            - name: BALANCE_GRPC_URL
-              value: "balance-service:50051"
-            - name: TRADE_REDIS_URL
-              value: "redis://trade-redis:6379"
           envFrom:
             - configMapRef:
-                name: transaction-service-config
+                name: trade-service-config
             - secretRef:
                 name: db-credentials
