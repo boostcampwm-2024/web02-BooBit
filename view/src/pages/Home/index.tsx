@@ -73,7 +73,11 @@ const Home = () => {
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
         />
-        <Chart data={candleData} scaleType={selectedTimeScale} />
+        {candleData ? (
+          <Chart data={candleData} scaleType={selectedTimeScale} />
+        ) : (
+          <div className="h-[460px] bg-surface-default"></div>
+        )}
 
         <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
