@@ -25,15 +25,7 @@ export class IntervalRepository {
   }
   async getLatestTrade(coinCode: string) {
     try {
-      const trade = await this.prisma.trade.findFirst({
-        where: {
-          coinCode: coinCode
-        },
-        orderBy: {
-          tradedAt: 'desc', // 날짜 기준 내림차순 정렬
-        },
-      });
-
+      const trade = await this.prisma.trade.findFirst({});
       return trade;
     } catch (error) {
       console.error('최근 거래 내역 조회 중 오류 발생:', error);
