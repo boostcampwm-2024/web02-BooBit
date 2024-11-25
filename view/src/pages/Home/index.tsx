@@ -8,20 +8,21 @@ import TradeRecords from '../../entities/TradeRecords';
 import TimeScaleSelector from './UI/TimeScaleSelector';
 import Title from './UI/Title';
 
-import currentPriceMockData from './consts/currentPriceMockData';
 import orderBookMockData from './consts/orderBookMockData';
 
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 import useWebSocket from '../../shared/model/useWebSocket';
 import { RecordType } from '../../shared/types/RecordType';
 import { CandleData } from '../../entities/Chart/model/candleDataType';
+import { CandleSocketType } from '../../shared/types/socket/CandleSocketType';
 
 const Home = () => {
+  const { message, sendMessage } = useWebSocket('ws://localhost:3200/ws');
   const [candleData, setCandleData] = useState<CandleData[]>();
   const [tradeRecords, setTradeRecords] = useState<RecordType[]>();
   const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1sec');
 
-  const { message, sendMessage } = useWebSocket('ws://localhost:3200/ws');
+  const hasIncreased = false;
   const [orderPrice, setOrderPrice] = useState<string>(
     orderBookMockData.buy[orderBookMockData.buy.length - 1].price.toLocaleString()
   );
@@ -32,7 +33,7 @@ const Home = () => {
       case 'CANDLE_CHART_INIT': {
         const candlePrevData = message.data;
 
-        const transformedData = candlePrevData.map((item) => ({
+        const transformedData = candlePrevData.map((item: CandleSocketType) => ({
           date: new Date(item.date),
           open: item.open,
           close: item.close,
@@ -67,7 +68,7 @@ const Home = () => {
     <div>
       <Header />
       <Layout paddingX="px-[22vw]" flex={false}>
-        <Title currentPrice={currentPriceMockData} />
+        <Title currentPrice={tradeRecords && tradeRecords[0].price} hasIncreased={hasIncreased} />
         <TimeScaleSelector
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
@@ -76,7 +77,8 @@ const Home = () => {
 
         <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
-            priceChangeRate={currentPriceMockData.priceChangeRate}
+            currentPrice={tradeRecords && tradeRecords[0].price}
+            hasIncreased={hasIncreased}
             setOrderPrice={setOrderPrice}
             orderBook={orderBookMockData}
           />
