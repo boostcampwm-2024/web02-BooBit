@@ -179,11 +179,11 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "${TRANSACTION_HOST_DB_PORT}:27017"
-    command: ["sh", "/init_mongodb.sh"]
+    command: ["sh", "/init_mongo.sh"]
     volumes:
       - transaction-db:/data/db
       - ./docker_init/mongo_init.js:/mongo_init.js
-      - ./docker_init/init_mongodb.sh:/init_mongodb.sh
+      - ./docker_init/init_mongo.sh:/init_mongo.sh
     healthcheck:
       test: >
         mongosh boobit --eval '
