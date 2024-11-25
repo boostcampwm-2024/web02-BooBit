@@ -22,9 +22,11 @@ export class IntervalService {
   @Cron(CronExpression.EVERY_SECOND, { timeZone: 'Asia/Seoul' })
   async everySecond() {
     try {
-      const secData = await this.intervalMakeService.makeSecData(
-        new Date(new Date().setMilliseconds(0)),
-      );
+      const date = new Date();
+      const seoulDate = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+      seoulDate.setMilliseconds(0);
+
+      const secData = await this.intervalMakeService.makeSecData(seoulDate);
       this.intervalData.forEach((value, key, map) => {
         map.set(key, this.intervalMakeService.candleAdd(value, secData));
       });
