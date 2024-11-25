@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: transaction-service-config
+  name: trade-service-config
 data:
   DB_HOST: "transaction-db"
   REDIS_URL: "redis://session-db:6379"
