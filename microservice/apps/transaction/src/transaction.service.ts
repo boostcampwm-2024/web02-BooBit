@@ -13,6 +13,7 @@ import { OrderType } from '@app/common/enums/order-type.enum';
 import { PendingBuyOrder } from './dto/pending.buy.order.type';
 import { PendingSellOrder } from './dto/pending.sell.order.type';
 import { OrderPendingResponseDto } from './dto/order.pending.response.dto';
+import { TradeGetResponseDto } from './dto/trade.get.response.dto';
 
 @Injectable()
 export class TransactionService {
@@ -89,5 +90,41 @@ export class TransactionService {
     const sortedOrders = allOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     return sortedOrders;
+  }
+
+  async getOrders(userId: string, lastId: string) {
+    const trades = await this.transactionRepository.getTradeOrders(userId, lastId);
+    const nextId = trades.length > 30 ? trades.pop().tradeId : null;
+    const orders: TradeGetResponseDto[] = [];
+
+    trades.forEach((trade) => {
+      if (trade.buyerId === userId) {
+        orders.push(
+          new TradeGetResponseDto(
+            trade.tradeId,
+            OrderType.BUY,
+            trade.coinCode,
+            trade.price,
+            trade.quantity,
+            trade.tradedAt,
+          ),
+        );
+      }
+
+      if (trade.sellerId === userId) {
+        orders.push(
+          new TradeGetResponseDto(
+            trade.tradeId,
+            OrderType.SELL,
+            trade.coinCode,
+            trade.price,
+            trade.quantity,
+            trade.tradedAt,
+          ),
+        );
+      }
+    });
+
+    return { nextId, orders };
   }
 }

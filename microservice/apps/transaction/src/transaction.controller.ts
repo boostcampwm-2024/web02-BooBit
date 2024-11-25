@@ -76,4 +76,11 @@ export class TransactionController {
     const userId = req.user.userId;
     return await this.transactionService.getPending(userId);
   }
+
+  @Get()
+  @UseGuards(AuthenticatedGuard)
+  async getOrders(@Request() req, @Query('id') id?: string) {
+    const userId = String(req.user.userId);
+    return await this.transactionService.getOrders(userId, id);
+  }
 }

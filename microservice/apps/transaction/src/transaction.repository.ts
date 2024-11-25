@@ -138,4 +138,28 @@ export class TransactionRepository {
       },
     });
   }
+
+  async getTradeOrders(userId: string, lastId?: string) {
+    return await this.prisma.trade.findMany({
+      select: {
+        tradeId: true,
+        buyerId: true,
+        buyOrderId: true,
+        sellerId: true,
+        sellOrderId: true,
+        coinCode: true,
+        price: true,
+        quantity: true,
+        tradedAt: true,
+      },
+      where: {
+        OR: [{ buyerId: userId }, { sellerId: userId }],
+        ...(lastId ? { tradeId: { gte: lastId } } : {}),
+      },
+      orderBy: {
+        tradedAt: 'desc',
+      },
+      take: 31,
+    });
+  }
 }
