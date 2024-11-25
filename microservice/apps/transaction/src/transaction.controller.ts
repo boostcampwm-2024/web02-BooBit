@@ -55,6 +55,7 @@ export class TransactionController {
     @Query('orderType') orderType: OrderType,
   ) {
     const userId = req.user.userId;
+    console.log(orderType);
     await this.transactionService.validateOrderOwnership(userId, historyId, orderType);
     return await this.transactionQueueService.addCancelQueue(userId, historyId, orderType);
   }

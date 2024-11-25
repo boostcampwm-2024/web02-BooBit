@@ -158,15 +158,18 @@ export class TradeService {
     const deleteOrder = this.deleteOrderFetcher(orderType);
     await deleteOrder(historyId);
 
+    const remain =
+      orderType === OrderType.BUY
+        ? (order as { remainingQuote: string }).remainingQuote
+        : (order as { remainingBase: string }).remainingBase;
     const cancelRequest = new TradeCancelRequestDto(
       String(userId),
       historyId,
       order.coinCode,
       order.price,
-      orderType === OrderType.BUY
-        ? (order as { remainingQuote: string }).remainingQuote
-        : (order as { remainingBase: string }).remainingBase,
+      remain,
       orderType,
+      order.remainingQuote === remain ? OrderStatus.CANCELED : OrderStatus.PARTIALLY_CANCELED,
     );
     await this.tradeBalanceService.cancelOrder(cancelRequest);
   }

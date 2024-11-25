@@ -38,7 +38,7 @@ export class TransactionService {
     const order = await getOrder(historyId);
 
     if (!order) {
-      throw new NotFoundException(`${historyId} 주문은 이미 처리되었습니다.`);
+      throw new NotFoundException(`${historyId} 주문은 이미 체결되었습니다.`);
     }
 
     if (order.userId !== userId) {

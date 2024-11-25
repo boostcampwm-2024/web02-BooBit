@@ -13,6 +13,7 @@ export class TradeRepository {
         userId: true,
         coinCode: true,
         price: true,
+        originalQuote: true,
         remainingQuote: true,
       },
       where: {
@@ -27,6 +28,7 @@ export class TradeRepository {
         userId: true,
         coinCode: true,
         price: true,
+        originalQuote: true,
         remainingBase: true,
       },
       where: {

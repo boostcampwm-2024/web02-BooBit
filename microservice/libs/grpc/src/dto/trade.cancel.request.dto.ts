@@ -5,6 +5,7 @@ export class TradeCancelRequestDto {
   price: string;
   remain: string;
   orderType: string;
+  orderStatus: string;
 
   constructor(
     userId: string,
@@ -13,6 +14,7 @@ export class TradeCancelRequestDto {
     price: string,
     remain: string,
     orderType: string,
+    orderStatus: string,
   ) {
     this.userId = userId;
     this.historyId = historyId;
@@ -20,5 +22,6 @@ export class TradeCancelRequestDto {
     this.price = price;
     this.remain = remain;
     this.orderType = orderType;
+    this.orderStatus = orderStatus;
   }
 }

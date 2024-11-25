@@ -44,4 +44,5 @@ message TradeCancelRequest {
   string price = 4;
   string remain = 5;
   string orderType = 6;
+  string orderStatus = 7;
 }

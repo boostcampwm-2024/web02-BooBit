@@ -204,7 +204,7 @@ export class BalanceRepository {
           return new OrderResponseDto(GrpcOrderStatusCode.NO_BALANCE, 'NONE');
         }
 
-        await this.lockBalance(prisma, userId, orderPrice);
+        await this.lockBalance(prisma, userId, CurrencyCode.KRW, orderPrice);
         const historyId = await this.createOrderHistory(
           prisma,
           OrderType.BUY,
@@ -229,7 +229,7 @@ export class BalanceRepository {
           return new OrderResponseDto(GrpcOrderStatusCode.NO_BALANCE, 'NONE');
         }
 
-        await this.lockBalance(prisma, userId, amount);
+        await this.lockBalance(prisma, userId, coinCode, amount);
         const historyId = await this.createOrderHistory(
           prisma,
           OrderType.SELL,
@@ -257,12 +257,12 @@ export class BalanceRepository {
     });
   }
 
-  async lockBalance(prisma, userId, orderPrice) {
+  async lockBalance(prisma, userId, currencyCode, orderPrice) {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
           userId: BigInt(userId),
-          currencyCode: CurrencyCode.KRW,
+          currencyCode: currencyCode,
         },
       },
       data: {
@@ -394,7 +394,7 @@ export class BalanceRepository {
     });
   }
 
-  async updateOrderHistoryStatus(prisma, historyId: string, status: OrderStatus) {
+  async updateOrderHistoryStatus(prisma, historyId: string, status: string) {
     return await prisma.OrderHistory.update({
       where: {
         historyId: BigInt(historyId),
@@ -407,11 +407,11 @@ export class BalanceRepository {
 
   async cancelOrder(cancelRequest: TradeCancelRequestDto) {
     return await this.prisma.$transaction(async (prisma) => {
-      const { userId, historyId, coinCode, orderType } = cancelRequest;
+      const { userId, historyId, coinCode, orderType, orderStatus } = cancelRequest;
       const priceDecimal = new Decimal(cancelRequest.price);
       const remainDecimal = new Decimal(cancelRequest.remain);
 
-      await this.updateOrderHistoryStatus(prisma, historyId, OrderStatus.PARTIALLY_CANCELED);
+      await this.updateOrderHistoryStatus(prisma, historyId, orderStatus);
 
       if (orderType === OrderType.BUY) {
         const refund = priceDecimal.mul(remainDecimal);
