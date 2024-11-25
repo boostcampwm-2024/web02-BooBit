@@ -124,7 +124,7 @@ export class TransactionRepository {
   }
 
   async findSellOrdersByUserId(userId: bigint) {
-    return await this.prisma.buyOrder.findMany({
+    return await this.prisma.sellOrder.findMany({
       select: {
         historyId: true,
         coinCode: true,
