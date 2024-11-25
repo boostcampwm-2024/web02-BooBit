@@ -86,25 +86,6 @@ services:
       REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
       TRADE_REDIS_URL: "redis://${TRADE_REDIS}:${REDIS_PORT}"
       SESSION_SECRET: ${SESSION_SECRET}
-  # Interval 서비스
-  interval:
-    container_name: interval-service
-    image: interval-service:latest
-    build:
-      context: .
-      dockerfile: ./microservice/apps/interval/DockerFile
-    ports:
-      - "${INTERVAL_HOST_SERVICE_PORT}:3000"
-    environment:
-      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017,${TRANSACTION_DB}-secondary1:27017,${TRANSACTION_DB}-secondary2:27017/${MYSQL_DATABASE}?replicaSet=rs0
-    depends_on:
-      transaction-db:
-        condition: service_healthy
-      transaction-db-secondary1:
-        condition: service_healthy
-      transaction-db-secondary2:
-        condition: service_healthy
-    restart: always
 
   # Interval 서비스
   interval:
@@ -127,7 +108,7 @@ services:
     restart: always
 
   # DB 컨테이너
-  # Redis
+  # trade Redis
   trade-redis:
     image: redis:7.2
     container_name: trade-redis
@@ -145,7 +126,7 @@ services:
       start_period: 30s
 
   # DB 컨테이너
-  # Redis
+  # session Redis
   session-db:
     image: redis:7.2
     container_name: session-db
