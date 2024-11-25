@@ -16,6 +16,7 @@ model buyOrder {
   remainingQuote String   @map("remaining_quote")
   createdAt      DateTime @default(now()) @map("created_at")
 
+  @@index(userId)
   @@index([price, createdAt])
   @@map("buy_order")
 }
@@ -29,6 +30,7 @@ model sellOrder {
   remainingBase String   @map("remaining_base")
   createdAt     DateTime @default(now()) @map("created_at")
 
+  @@index(userId)
   @@index([price, createdAt])
   @@map("sell_order")
 }
