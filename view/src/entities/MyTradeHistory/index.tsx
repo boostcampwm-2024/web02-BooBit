@@ -81,7 +81,7 @@ const MyTradeHistory = () => {
             )
           ) : (
             <tr className="w-full h-[19rem] flex justify-center items-center text-text-dark">
-              거래 내역이 없습니다.
+              <td>거래 내역이 없습니다.</td>
             </tr>
           )}
 

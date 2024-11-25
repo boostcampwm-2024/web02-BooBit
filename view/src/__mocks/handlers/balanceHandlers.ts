@@ -7,6 +7,8 @@ export const balanceHandlers = [
     const url = new URL(request.url);
     const productId = url.searchParams.get('id');
 
+    //  return new HttpResponse('Unauthorized', { status: 403 });
+
     const response = (nextId: number | null, orders: Array<object>) =>
       HttpResponse.json({ nextId, orders });
 
@@ -16,7 +18,7 @@ export const balanceHandlers = [
         coinCode: 'BTC',
         quantity: 0.0608,
         price: 30000,
-        status: 'FILLED',
+        status: 'ORDERED',
         timestamp: '2024-01-15T12:34:56Z',
       },
       {
@@ -24,7 +26,7 @@ export const balanceHandlers = [
         coinCode: 'ETH',
         quantity: 1.5,
         price: 2500,
-        status: 'PARTIALLY_FILLED',
+        status: 'ORDERED',
         timestamp: '2024-01-15T13:20:10Z',
       },
       {
@@ -40,7 +42,7 @@ export const balanceHandlers = [
         coinCode: 'DOGE',
         quantity: 5000,
         price: 0.07,
-        status: 'FILLED',
+        status: 'ORDERED',
         timestamp: '2024-01-15T15:05:22Z',
       },
       {
@@ -48,7 +50,7 @@ export const balanceHandlers = [
         coinCode: 'XRP',
         quantity: 300,
         price: 1.1,
-        status: 'PARTIALLY_CANCELED',
+        status: 'CANCELED',
         timestamp: '2024-01-15T16:45:33Z',
       },
       {
@@ -56,7 +58,7 @@ export const balanceHandlers = [
         coinCode: 'SOL',
         quantity: 20,
         price: 150,
-        status: 'PARTIALLY_FILLED',
+        status: 'ORDERED',
         timestamp: '2024-01-15T17:20:50Z',
       },
       {
@@ -64,7 +66,7 @@ export const balanceHandlers = [
         coinCode: 'LTC',
         quantity: 3,
         price: 70,
-        status: 'FILLED',
+        status: 'ORDERED',
         timestamp: '2024-01-15T18:05:11Z',
       },
       {
@@ -80,7 +82,7 @@ export const balanceHandlers = [
         coinCode: 'MATIC',
         quantity: 200,
         price: 0.8,
-        status: 'FILLED',
+        status: 'CANCELED',
         timestamp: '2024-01-15T20:15:44Z',
       },
       {
@@ -88,7 +90,7 @@ export const balanceHandlers = [
         coinCode: 'BNB',
         quantity: 5,
         price: 320,
-        status: 'FILLED',
+        status: 'CANCELED',
         timestamp: '2024-01-15T21:30:00Z',
       },
       // Add other orders here...

@@ -3,6 +3,6 @@ export interface OrderType {
   coinCode: string;
   quantity: string;
   price: string;
-  status: 'PARTIALLY_FILLED' | 'FILLED' | 'PARTIALLY_CANCELED' | 'CANCELED';
+  status: 'ORDERED' | 'CANCELED';
   timestamp: string;
 }
