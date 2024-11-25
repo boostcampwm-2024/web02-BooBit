@@ -14,6 +14,7 @@ import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 import useWebSocket from '../../shared/model/useWebSocket';
 import { RecordType } from '../../shared/types/RecordType';
 import { CandleData } from '../../entities/Chart/model/candleDataType';
+import { CandleSocketType } from '../../shared/types/socket/CandleSocketType';
 
 const Home = () => {
   const { message, sendMessage } = useWebSocket('ws://localhost:3200/ws');
@@ -32,7 +33,7 @@ const Home = () => {
       case 'CANDLE_CHART_INIT': {
         const candlePrevData = message.data;
 
-        const transformedData = candlePrevData.map((item: CandleData) => ({
+        const transformedData = candlePrevData.map((item: CandleSocketType) => ({
           date: new Date(item.date),
           open: item.open,
           close: item.close,
