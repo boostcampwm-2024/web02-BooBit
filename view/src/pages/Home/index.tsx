@@ -21,6 +21,7 @@ const Home = () => {
   const [tradeRecords, setTradeRecords] = useState<RecordType[]>();
   const [orderBookData, setOrderBookData] = useState<{ buy: OrderType[]; sell: OrderType[] }>();
   const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1sec');
+  const [currentPrice, setCurrentPrice] = useState(0);
 
   const hasIncreased = false;
   const [orderPrice, setOrderPrice] = useState<string>('');
@@ -48,6 +49,9 @@ const Home = () => {
 
         if (!tradeRecords && tradePrevData && tradePrevData.length > 0) {
           setOrderPrice(tradePrevData[0].price.toLocaleString());
+        }
+        if (tradePrevData && tradePrevData.length > 0) {
+          setCurrentPrice(tradePrevData[0].price);
         }
         setTradeRecords((prevRecords) => {
           return prevRecords ? [...tradePrevData, ...prevRecords] : [...tradePrevData];
@@ -77,7 +81,7 @@ const Home = () => {
     <div>
       <Header />
       <Layout paddingX="px-[22vw]" flex={false}>
-        <Title currentPrice={tradeRecords && tradeRecords[0].price} hasIncreased={hasIncreased} />
+        <Title currentPrice={currentPrice} hasIncreased={hasIncreased} />
         <TimeScaleSelector
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
@@ -90,7 +94,7 @@ const Home = () => {
 
         <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
-            currentPrice={tradeRecords && tradeRecords[0].price}
+            currentPrice={currentPrice}
             hasIncreased={hasIncreased}
             setOrderPrice={setOrderPrice}
             orderBook={orderBookData}
