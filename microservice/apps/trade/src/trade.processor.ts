@@ -24,6 +24,11 @@ export class TradeProcessor extends WorkerHost {
         await this.tradeService.tradeSellOrder(job.data.historyId);
         break;
 
+      case OrderType.CANCELED:
+        const { userId, historyId, orderType } = job.data;
+        await this.tradeService.cancelOrder(userId, historyId, orderType);
+        break;
+
       default:
         this.logger.error(`Unknown job type: ${job.name}`);
     }

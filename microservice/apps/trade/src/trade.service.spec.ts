@@ -3,12 +3,13 @@ import { TradeService } from './trade.service';
 import { TradeRepository } from './trade.repository';
 import { TradeBalanceService } from './trade.balance.service';
 import { OrderType } from '@app/common/enums/order-type.enum';
-import { OrderStatus } from '@app/common/enums/order-status.enum';
 import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeBuyerRequestDto } from '@app/grpc/dto/trade.buyer.request.dto';
 import { TradeSellerRequestDto } from '@app/grpc/dto/trade.seller.request.dto';
 import { TradeHistoryRequestDto } from '@app/grpc/dto/trade.history.request.dto';
 import { formatFixedPoint } from '@app/common/utils/number.format.util';
+import { BuyOrder } from './dto/trade.buy.order.type';
+import { SellOrder } from './dto/trade.sell.order.type';
 
 jest.mock('./trade.repository');
 jest.mock('./trade.balance.service');
@@ -36,7 +37,13 @@ describe('TradeService', () => {
 
   describe('tradeBuyOrder', () => {
     it('should process buy order if order exists', async () => {
-      const mockBuyOrder = { userId: '1', remainingQuote: '100', coinCode: 'BTC', price: '50000' };
+      const mockBuyOrder: BuyOrder = {
+        userId: '1',
+        remainingQuote: '100',
+        coinCode: 'BTC',
+        price: '50000',
+        historyId: '',
+      };
       tradeRepository.findBuyOrderByHistoryId.mockResolvedValue(mockBuyOrder);
       jest.spyOn(tradeService, 'processTrade').mockImplementation(jest.fn());
 
@@ -64,7 +71,13 @@ describe('TradeService', () => {
 
   describe('tradeSellOrder', () => {
     it('should process sell order if order exists', async () => {
-      const mockSellOrder = { userId: '1', remainingBase: '50', coinCode: 'ETH', price: '4000' };
+      const mockSellOrder: SellOrder = {
+        userId: '1',
+        remainingBase: '50',
+        coinCode: 'ETH',
+        price: '4000',
+        historyId: '',
+      };
       tradeRepository.findSellOrderByHistoryId.mockResolvedValue(mockSellOrder);
       jest.spyOn(tradeService, 'processTrade').mockImplementation(jest.fn());
 
@@ -92,14 +105,20 @@ describe('TradeService', () => {
 
   describe('processTrade', () => {
     it('should process trades with correct orders', async () => {
-      const mockOrder = { coinCode: 'BTC', price: '60000' };
-      const mockOrders = [
+      const mockOrder: BuyOrder = {
+        coinCode: 'BTC',
+        price: '60000',
+        historyId: '',
+        userId: '',
+        remainingQuote: '',
+      };
+      const mockOrders: SellOrder[] = [
         {
           historyId: '1',
           userId: '1',
           price: '50000',
-          createdAt: new Date(),
           remainingBase: '50',
+          coinCode: '',
         },
       ];
       tradeRepository.findSellOrders.mockResolvedValue(mockOrders);
@@ -117,33 +136,50 @@ describe('TradeService', () => {
 
   describe('calculateTrade', () => {
     it('should calculate trade with available amount less than remaining', () => {
-      const mockOrder = { remainingBase: '50', historyId: '1' };
-      const result = tradeService.calculateTrade(OrderType.BUY, mockOrder, 100, '2');
+      const mockOrder: SellOrder = {
+        remainingBase: '50',
+        historyId: '1',
+        userId: '',
+        coinCode: '',
+        price: '',
+      };
+      const result = tradeService.calculateTrade(OrderType.BUY, mockOrder, 100);
 
       expect(result.quantity).toBe(50);
-      expect(result.tradeHistory).toEqual([
-        { historyId: '1', status: OrderStatus.FILLED, remain: 0 },
-        { historyId: '2', status: OrderStatus.PARTIALLY_FILLED, remain: 50 },
-      ]);
+      expect(result.opposite).toEqual(new TradeHistoryRequestDto('1', 0));
     });
 
     it('should calculate trade with available amount greater than remaining', () => {
-      const mockOrder = { remainingBase: '150', historyId: '1' };
-      const result = tradeService.calculateTrade(OrderType.BUY, mockOrder, 100, '2');
+      const mockOrder: SellOrder = {
+        remainingBase: '150',
+        historyId: '1',
+        userId: '',
+        coinCode: '',
+        price: '',
+      };
+      const result = tradeService.calculateTrade(OrderType.BUY, mockOrder, 100);
 
       expect(result.quantity).toBe(100);
-      expect(result.tradeHistory).toEqual([
-        new TradeHistoryRequestDto('1', OrderStatus.PARTIALLY_FILLED, 50),
-        new TradeHistoryRequestDto('2', OrderStatus.FILLED, 0),
-      ]);
+      expect(result.opposite).toEqual(new TradeHistoryRequestDto('1', 50));
     });
   });
 
   describe('settleTransaction', () => {
     it('should settle transaction with correct buyer and seller details', async () => {
-      const mockBuyerOrder = { userId: '1', coinCode: 'BTC', price: '50000' };
-      const mockSellerOrder = { userId: '2', coinCode: 'BTC', price: '50000' };
-      const mockTradeHistory = [{ historyId: '1', status: OrderStatus.FILLED, remain: 0 }];
+      const mockBuyerOrder: BuyOrder = {
+        userId: '1',
+        coinCode: 'BTC',
+        price: '50000',
+        historyId: '',
+        remainingQuote: '',
+      };
+      const mockSellerOrder: SellOrder = {
+        userId: '2',
+        coinCode: 'BTC',
+        price: '50000',
+        historyId: '',
+        remainingBase: '',
+      };
 
       await tradeService.settleTransaction(
         OrderType.BUY,
@@ -151,14 +187,12 @@ describe('TradeService', () => {
         mockSellerOrder,
         50000,
         100,
-        mockTradeHistory,
       );
 
       expect(tradeBalanceService.settleTransaction).toHaveBeenCalledWith(
         new TradeRequestDto(
           new TradeBuyerRequestDto('1', 'BTC', 50000, 50000, 100),
           new TradeSellerRequestDto('2', 'BTC', 50000, 100),
-          [{ historyId: '1', status: OrderStatus.FILLED, remain: 0 }],
         ),
       );
     });
@@ -166,7 +200,10 @@ describe('TradeService', () => {
 
   describe('updateOrderAndTradeLog', () => {
     it('should call tradeBuyOrder for BUY type', async () => {
-      const mockTradeHistory = { historyId: '2' };
+      const mockTradeHistory: TradeHistoryRequestDto = {
+        historyId: '2',
+        remain: 0,
+      };
 
       await tradeService.updateOrderAndTradeLog(
         OrderType.BUY,
@@ -188,7 +225,10 @@ describe('TradeService', () => {
     });
 
     it('should call tradeSellOrder for SELL type', async () => {
-      const mockTradeHistory = { historyId: '3' };
+      const mockTradeHistory: TradeHistoryRequestDto = {
+        historyId: '3',
+        remain: 0,
+      };
 
       await tradeService.updateOrderAndTradeLog(
         OrderType.SELL,
@@ -207,6 +247,65 @@ describe('TradeService', () => {
         price: formatFixedPoint(4000),
         quantity: '50',
       });
+    });
+  });
+
+  describe('cancelOrder', () => {
+    it('should cancel order if order exists', async () => {
+      const userId = BigInt(1);
+      const historyId = '12345';
+      const orderType = OrderType.BUY;
+      const mockOrder: BuyOrder = {
+        historyId: '12345',
+        userId: 'user1',
+        coinCode: 'BTC',
+        price: '10000',
+        remainingQuote: '1000',
+      };
+
+      tradeService.getOrderFetcher = jest
+        .fn()
+        .mockReturnValueOnce(jest.fn().mockResolvedValueOnce(mockOrder));
+      tradeService.deleteOrderFetcher = jest
+        .fn()
+        .mockReturnValueOnce(jest.fn().mockResolvedValueOnce(undefined));
+      tradeService.getRemain = jest.fn().mockReturnValueOnce(1000);
+      tradeBalanceService.cancelOrder = jest.fn().mockResolvedValueOnce(undefined);
+
+      await tradeService.cancelOrder(userId, historyId, orderType);
+
+      expect(tradeService.getOrderFetcher).toHaveBeenCalledWith(orderType);
+      expect(tradeService.deleteOrderFetcher).toHaveBeenCalledWith(orderType);
+      expect(tradeService.getRemain).toHaveBeenCalledWith(mockOrder);
+      expect(tradeBalanceService.cancelOrder).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: '1',
+          coinCode: 'BTC',
+          price: '10000',
+          remain: 1000,
+          orderType,
+        }),
+      );
+    });
+
+    it('should not cancel order if order does not exist', async () => {
+      const userId = BigInt(1);
+      const historyId = '12345';
+      const orderType = OrderType.BUY;
+
+      tradeService.getOrderFetcher = jest
+        .fn()
+        .mockReturnValueOnce(jest.fn().mockResolvedValueOnce(null));
+      tradeService.deleteOrderFetcher = jest.fn();
+      tradeService.getRemain = jest.fn();
+      tradeBalanceService.cancelOrder = jest.fn();
+
+      await tradeService.cancelOrder(userId, historyId, orderType);
+
+      expect(tradeService.getOrderFetcher).toHaveBeenCalledWith(orderType);
+      expect(tradeService.deleteOrderFetcher).not.toHaveBeenCalled();
+      expect(tradeService.getRemain).not.toHaveBeenCalled();
+      expect(tradeBalanceService.cancelOrder).not.toHaveBeenCalled();
     });
   });
 });
