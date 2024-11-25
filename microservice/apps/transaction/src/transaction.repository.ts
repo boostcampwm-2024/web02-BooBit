@@ -84,4 +84,58 @@ export class TransactionRepository {
 
     return tableMap[timeScale];
   }
+
+  async findBuyOrderByHistoryId(historyId: string) {
+    return await this.prisma.buyOrder.findUnique({
+      select: {
+        userId: true,
+      },
+      where: {
+        historyId: historyId,
+      },
+    });
+  }
+
+  async findSellOrderByHistoryId(historyId: string) {
+    return await this.prisma.sellOrder.findUnique({
+      select: {
+        userId: true,
+      },
+      where: {
+        historyId: historyId,
+      },
+    });
+  }
+
+  async findBuyOrdersByUserId(userId: bigint) {
+    return await this.prisma.buyOrder.findMany({
+      select: {
+        historyId: true,
+        coinCode: true,
+        price: true,
+        originalQuote: true,
+        remainingQuote: true,
+        createdAt: true,
+      },
+      where: {
+        userId: String(userId),
+      },
+    });
+  }
+
+  async findSellOrdersByUserId(userId: bigint) {
+    return await this.prisma.sellOrder.findMany({
+      select: {
+        historyId: true,
+        coinCode: true,
+        price: true,
+        originalQuote: true,
+        remainingBase: true,
+        createdAt: true,
+      },
+      where: {
+        userId: String(userId),
+      },
+    });
+  }
 }

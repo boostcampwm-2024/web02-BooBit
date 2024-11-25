@@ -8,16 +8,17 @@ import { OrderService } from '@app/grpc/order.interface';
 import { AccountService } from '@app/grpc/account.interface';
 import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
+import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 
 @Controller('api/users')
 export class BalanceController implements OrderService, AccountService {
   constructor(private readonly balanceService: BalanceService) {}
 
-  @Get('/pending')
+  @Get('/orderHistory')
   @UseGuards(AuthenticatedGuard)
-  async getPending(@Request() req) {
+  async getOrdersHistory(@Request() req, @Query('id') lastId?: number) {
     const userId = req.user.userId;
-    return await this.balanceService.getPending(userId);
+    return await this.balanceService.getOrdersHistory(userId, lastId);
   }
 
   @Get('/assets')
@@ -70,5 +71,10 @@ export class BalanceController implements OrderService, AccountService {
   @GrpcMethod('TradeService', 'SettleTransaction')
   async settleTransaction(tradeRequest: TradeRequestDto): Promise<TradeResponseDto> {
     return await this.balanceService.settleTransaction(tradeRequest);
+  }
+
+  @GrpcMethod('TradeService', 'CancelOrder')
+  async cancelOrder(cancelRequest: TradeCancelRequestDto): Promise<TradeResponseDto> {
+    return await this.balanceService.cancelOrder(cancelRequest);
   }
 }

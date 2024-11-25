@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TradeRepository } from './trade.repository';
-import { OrderStatus } from '@app/common/enums/order-status.enum';
 import { OrderType } from '@app/common/enums/order-type.enum';
 import { TradeHistoryRequestDto } from '@app/grpc/dto/trade.history.request.dto';
 import { TradeBuyerRequestDto } from '@app/grpc/dto/trade.buyer.request.dto';
@@ -8,6 +7,9 @@ import { TradeSellerRequestDto } from '@app/grpc/dto/trade.seller.request.dto';
 import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeBalanceService } from './trade.balance.service';
 import { formatFixedPoint } from '@app/common/utils/number.format.util';
+import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
+import { BuyOrder } from './dto/trade.buy.order.type';
+import { SellOrder } from './dto/trade.sell.order.type';
 
 const BATCH_SIZE = 30;
 
@@ -32,12 +34,17 @@ export class TradeService {
     await this.processTrade(OrderType.SELL, historyId, sellOrder, sellOrder.remainingBase);
   }
 
-  async processTrade(type: OrderType, historyId: string, current, amount: string) {
+  async processTrade(
+    type: OrderType,
+    historyId: string,
+    current: BuyOrder | SellOrder,
+    amount: string,
+  ) {
     const { coinCode, price } = current;
     let remain = Number(amount);
     let offset = 0;
 
-    const getOrders = this.getOrderFetcher(type);
+    const getOrders = this.getOrdersFetcher(type);
     while (remain > 0) {
       const orders = await getOrders(coinCode, price, offset, BATCH_SIZE);
 
@@ -46,16 +53,16 @@ export class TradeService {
       for (const order of orders) {
         if (remain === 0) break;
 
-        const { quantity, tradeHistory } = this.calculateTrade(type, order, remain, historyId);
+        const { quantity, opposite } = this.calculateTrade(type, order, remain);
         remain -= quantity;
 
         const tradePrice = Number(order.price);
-        await this.settleTransaction(type, current, order, tradePrice, quantity, tradeHistory);
+        await this.settleTransaction(type, current, order, tradePrice, quantity);
 
         await this.updateOrderAndTradeLog(
           type,
           historyId,
-          tradeHistory[0],
+          opposite,
           coinCode,
           tradePrice,
           quantity,
@@ -67,7 +74,7 @@ export class TradeService {
     }
   }
 
-  getOrderFetcher(type: OrderType) {
+  getOrdersFetcher(type: OrderType) {
     return type === OrderType.BUY
       ? (coinCode: string, price: string, offset: number, batchSize: number) =>
           this.tradeRepository.findSellOrders(coinCode, price, offset, batchSize)
@@ -75,38 +82,37 @@ export class TradeService {
           this.tradeRepository.findBuyOrders(coinCode, price, offset, batchSize);
   }
 
-  calculateTrade(type: OrderType, order, remain: number, historyId: string) {
+  calculateTrade(type: OrderType, order: BuyOrder | SellOrder, remain: number) {
     let quantity: number;
-    const tradeHistory: TradeHistoryRequestDto[] = [];
-    const availableAmount =
-      type === OrderType.BUY ? Number(order.remainingBase) : Number(order.remainingQuote);
+    const availableAmount = Number(this.getRemain(order));
 
     if (availableAmount <= remain) {
       quantity = availableAmount;
-      tradeHistory.push(new TradeHistoryRequestDto(order.historyId, OrderStatus.FILLED, 0));
     } else {
       quantity = remain;
-      tradeHistory.push(
-        new TradeHistoryRequestDto(
-          order.historyId,
-          OrderStatus.PARTIALLY_FILLED,
-          availableAmount - remain,
-        ),
-      );
     }
 
-    tradeHistory.push(
-      new TradeHistoryRequestDto(
-        historyId,
-        remain === quantity ? OrderStatus.FILLED : OrderStatus.PARTIALLY_FILLED,
-        remain - quantity,
-      ),
-    );
-
-    return { quantity, tradeHistory };
+    const opposite = new TradeHistoryRequestDto(order.historyId, availableAmount - quantity);
+    return { quantity, opposite };
   }
 
-  async settleTransaction(type, current, order, tradePrice, quantity, tradeHistory) {
+  getRemain(order: BuyOrder | SellOrder) {
+    if ('remainingQuote' in order) {
+      return order.remainingQuote;
+    }
+    if ('remainingBase' in order) {
+      return order.remainingBase;
+    }
+    throw new NotFoundException('Invalid order type');
+  }
+
+  async settleTransaction(
+    type: OrderType,
+    current: BuyOrder | SellOrder,
+    order: BuyOrder | SellOrder,
+    tradePrice: number,
+    quantity: number,
+  ) {
     const buyer = new TradeBuyerRequestDto(
       type === OrderType.BUY ? current.userId : order.userId,
       current.coinCode,
@@ -120,31 +126,63 @@ export class TradeService {
       tradePrice,
       quantity,
     );
-    const tradeRequest = new TradeRequestDto(buyer, seller, tradeHistory);
+    const tradeRequest = new TradeRequestDto(buyer, seller);
     await this.tradeBalanceService.settleTransaction(tradeRequest);
   }
 
   async updateOrderAndTradeLog(
-    type,
-    historyId,
-    tradeHistory,
-    coinCode,
-    tradePrice,
-    quantity,
-    remain,
+    type: OrderType,
+    historyId: string,
+    opposite: TradeHistoryRequestDto,
+    coinCode: string,
+    tradePrice: number,
+    quantity: number,
+    remain: number,
   ) {
     const trade = {
-      buyOrderId: type === OrderType.BUY ? historyId : tradeHistory.historyId,
-      sellOrderId: type === OrderType.BUY ? tradeHistory.historyId : historyId,
+      buyOrderId: type === OrderType.BUY ? historyId : opposite.historyId,
+      sellOrderId: type === OrderType.BUY ? opposite.historyId : historyId,
       coinCode: coinCode,
       price: formatFixedPoint(tradePrice),
       quantity: String(quantity),
     };
 
     if (type === OrderType.BUY) {
-      await this.tradeRepository.tradeBuyOrder(tradeHistory, remain, historyId, trade);
+      await this.tradeRepository.tradeBuyOrder(opposite, remain, historyId, trade);
     } else {
-      await this.tradeRepository.tradeSellOrder(tradeHistory, remain, historyId, trade);
+      await this.tradeRepository.tradeSellOrder(opposite, remain, historyId, trade);
     }
+  }
+
+  async cancelOrder(userId: bigint, historyId: string, orderType: OrderType) {
+    const getOrder = this.getOrderFetcher(orderType);
+    const order: BuyOrder | SellOrder = await getOrder(historyId);
+
+    if (!order) return;
+
+    const deleteOrder = this.deleteOrderFetcher(orderType);
+    await deleteOrder(historyId);
+
+    const remain = this.getRemain(order);
+    const cancelRequest = new TradeCancelRequestDto(
+      String(userId),
+      order.coinCode,
+      order.price,
+      remain,
+      orderType,
+    );
+    await this.tradeBalanceService.cancelOrder(cancelRequest);
+  }
+
+  getOrderFetcher(type: OrderType) {
+    return type === OrderType.BUY
+      ? (historyId: string) => this.tradeRepository.findBuyOrderByHistoryId(historyId)
+      : (historyId: string) => this.tradeRepository.findSellOrderByHistoryId(historyId);
+  }
+
+  deleteOrderFetcher(type: OrderType) {
+    return type === OrderType.BUY
+      ? (historyId: string) => this.tradeRepository.deleteBuyOrderByHistoryId(historyId)
+      : (historyId: string) => this.tradeRepository.deleteSellOrderByHistoryId(historyId);
   }
 }

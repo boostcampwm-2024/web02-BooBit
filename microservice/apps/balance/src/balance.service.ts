@@ -12,10 +12,27 @@ import { AccountCreateResponseDto } from '@app/grpc/dto/account.create.response.
 import { AccountCreateRequestDto } from '@app/grpc/dto/account.create.request.dto';
 import { GetTransactionsDto } from './dto/get.transactions.request.dto';
 import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
+import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 
 @Injectable()
 export class BalanceService implements OrderService, AccountService {
   constructor(private balanceRepository: BalanceRepository) {}
+
+  async getOrdersHistory(userId: bigint, lastId?: number) {
+    const { items, nextId } = await this.balanceRepository.getOrdersHistory(userId, lastId);
+    const orders = items.map((item) => ({
+      orderType: item.orderType,
+      coinCode: item.coinCode,
+      quantity: item.quantity,
+      price: item.price,
+      status: item.status,
+      timestamp: item.createdAt.toISOString(),
+    }));
+    return {
+      nextId,
+      orders,
+    };
+  }
 
   async getTransactions(userId: bigint, getTransactionsDto: GetTransactionsDto) {
     const { items, nextId } = await this.balanceRepository.getBankHistory(
@@ -34,16 +51,6 @@ export class BalanceService implements OrderService, AccountService {
       nextId,
       transactions,
     };
-  }
-
-  async getPending(userId: bigint) {
-    const pending = await this.balanceRepository.getPending(userId);
-    return pending.map((item) => ({
-      ...item,
-      historyId: Number(item.historyId),
-      createdAt: item.createdAt.toLocaleString('sv'),
-      unfilledAmount: item.quantity,
-    }));
   }
 
   async createAccount(accountRequest: AccountCreateRequestDto): Promise<AccountCreateResponseDto> {
@@ -102,5 +109,9 @@ export class BalanceService implements OrderService, AccountService {
 
   async settleTransaction(tradeRequest: TradeRequestDto) {
     return await this.balanceRepository.settleTransaction(tradeRequest);
+  }
+
+  async cancelOrder(cancelRequest: TradeCancelRequestDto) {
+    return await this.balanceRepository.cancelOrder(cancelRequest);
   }
 }
