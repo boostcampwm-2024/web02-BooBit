@@ -37,16 +37,6 @@ export class BalanceService implements OrderService, AccountService {
     };
   }
 
-  async getPending(userId: bigint) {
-    const pending = await this.balanceRepository.getPending(userId);
-    return pending.map((item) => ({
-      ...item,
-      historyId: Number(item.historyId),
-      createdAt: item.createdAt.toLocaleString('sv'),
-      unfilledAmount: item.quantity,
-    }));
-  }
-
   async createAccount(accountRequest: AccountCreateRequestDto): Promise<AccountCreateResponseDto> {
     try {
       await this.balanceRepository.createEmptyAccount(BigInt(accountRequest.userId));
