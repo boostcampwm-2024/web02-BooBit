@@ -46,6 +46,9 @@ const Home = () => {
       case 'TRADE': {
         const tradePrevData = message.data;
 
+        if (!tradeRecords && tradePrevData && tradePrevData.length > 0) {
+          setOrderPrice(tradePrevData[0].price.toLocaleString());
+        }
         setTradeRecords((prevRecords) => {
           return prevRecords ? [...tradePrevData, ...prevRecords] : [...tradePrevData];
         });
