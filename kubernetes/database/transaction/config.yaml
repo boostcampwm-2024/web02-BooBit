@@ -5,39 +5,76 @@ metadata:
   labels:
     app: transaction-db
 data:
-  init.sh: |
+  mongo_init.js: |
+    db = db.getSiblingDB("boobit");
+    try {
+      db.createUser({
+        user: process.env.MONGO_INITDB_ROOT_USERNAME,
+        pwd: process.env.MONGO_INITDB_ROOT_PASSWORD,
+        roles: [
+          { role: "dbAdmin", db: "boobit" },
+          { role: "readWrite", db: "boobit" },
+        ],
+      });
+      quit(0);
+    } catch (error) {
+      quit(1);
+    }
+
+  init_mongodb.sh: |
     #!/bin/bash
-    # Wait for all pods to be ready
-    until mongosh --host transaction-db-0.transaction-db-service:27017 --eval "print(\"waiting for connection\")" > /dev/null 2>&1
-    do
-      echo "Waiting for transaction-db-0..."
-      sleep 2
+
+    log_with_time() {
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+    }
+
+    # MongoDB 서버 시작
+    mongod --replSet rs0 --bind_ip_all &
+
+    log_with_time "Waiting for MongoDB to start..."
+    until mongosh --quiet --eval "db.adminCommand('ping').ok" >/dev/null 2>&1; do
+        log_with_time "Waiting for MongoDB to be ready..."
+        sleep 2
     done
-    until mongosh --host transaction-db-1.transaction-db-service:27017 --eval "print(\"waiting for connection\")" > /dev/null 2>&1
-    do
-      echo "Waiting for transaction-db-1..."
-      sleep 2
+    sleep 10
+    log_with_time "MongoDB is ready"
+
+    log_with_time "Initializing replica set..."
+    until mongosh --quiet --eval '
+        rs.initiate({
+            _id: "rs0",
+            members: [
+                {_id: 0, host: "transaction-db-0.transaction-db:27017", priority: 1},
+            ]
+        })
+    ' >/dev/null 2>&1; do
+        log_with_time "Waiting for replica set initialization..."
+        sleep 2
     done
-    until mongosh --host transaction-db-2.transaction-db-service:27017 --eval "print(\"waiting for connection\")" > /dev/null 2>&1
-    do
-      echo "Waiting for transaction-db-2..."
-      sleep 2
+    log_with_time "Replica set initialized"
+
+    log_with_time "Waiting for PRIMARY status..."
+    until mongosh --quiet --eval 'rs.status().members.some(m => m.stateStr === "PRIMARY")' >/dev/null 2>&1; do
+        log_with_time "Waiting for PRIMARY status..."
+        sleep 2
+    done
+    log_with_time "Replica set is ready with PRIMARY status"
+    sleep 30
+
+    log_with_time "Starting user creation..."
+    max_attempts=30
+    attempt=1
+    until mongosh /mongo_init.js || [ $attempt -eq $max_attempts ]; do
+        log_with_time "Attempt $attempt of $max_attempts failed. Waiting 5 seconds before retry..."
+        sleep 3
+        attempt=$((attempt + 1))
     done
 
-    # Check if already initialized
-    INIT_STATUS=$(mongosh --host transaction-db-0.transaction-db-service:27017 --eval "rs.status()" | grep "not initialized")
-    if [ ! -z "$INIT_STATUS" ]; then
-      echo "Initializing replica set..."
-      mongosh --host transaction-db-0.transaction-db-service:27017 --eval '
-        rs.initiate({
-          _id: "rs0",
-          members: [
-            {_id: 0, host: "transaction-db-0.transaction-db-service:27017"},
-            {_id: 1, host: "transaction-db-1.transaction-db-service:27017"},
-            {_id: 2, host: "transaction-db-2.transaction-db-service:27017"}
-          ]
-        })
-      '
-    else
-      echo "Replica set already initialized"
+    if [ $attempt -eq $max_attempts ]; then
+        log_with_time "Failed to initialize MongoDB after $max_attempts attempts"
+        exit 1
     fi
+
+    log_with_time "MongoDB initialization completed successfully"
+
+    tail -f /dev/null

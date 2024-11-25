@@ -5,8 +5,8 @@ metadata:
   labels:
     app: transaction-db
 spec:
-  serviceName: transaction-db-service
-  replicas: 3
+  serviceName: transaction-db
+  replicas: 1
   selector:
     matchLabels:
       app: transaction-db
@@ -15,33 +15,10 @@ spec:
       labels:
         app: transaction-db
     spec:
-      initContainers:
-        - name: init-replicaset
-          image: mongo:8.0
-          command: ["/bin/bash"]
-          args: ["/config/init.sh"]
-          volumeMounts:
-            - name: config
-              mountPath: /config
-          env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: db-credentials
-                  key: DB_USER
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: db-credentials
-                  key: DB_PASSWORD
       containers:
         - name: transaction-db
           image: mongo:8.0
-          command:
-            - "mongod"
-            - "--bind_ip_all"
-            - "--replSet"
-            - "rs0"
+          command: ["sh", "/init_mongodb.sh"]
           ports:
             - containerPort: 27017
               name: mongodb
@@ -59,31 +36,39 @@ spec:
           volumeMounts:
             - name: transaction-db-data
               mountPath: /data/db
+            - name: init-scripts
+              mountPath: /mongo_init.js
+              subPath: mongo_init.js
+            - name: init-scripts
+              mountPath: /init_mongodb.sh
+              subPath: init_mongodb.sh
           livenessProbe:
             exec:
               command:
                 - mongosh
+                - boobit
                 - --eval
-                - "db.runCommand('ping').ok"
+                - |
+                  if (db.getUsers().users.length > 0) {
+                    exit(0);
+                  } else {
+                    exit(1);
+                  }
+                - --quiet
             initialDelaySeconds: 30
-            periodSeconds: 10
+            periodSeconds: 3
             timeoutSeconds: 5
-            failureThreshold: 5
-          readinessProbe:
-            exec:
-              command:
-                - mongosh
-                - --eval
-                - "db.runCommand('ping').ok"
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 5
+            failureThreshold: 30
       volumes:
-        - name: config
+        - name: init-scripts
           configMap:
             name: transaction-db-init
             defaultMode: 0755
-        - name: transaction-db-data
-          persistentVolumeClaim:
-            claimName: transaction-db
+  volumeClaimTemplates:
+    - metadata:
+        name: transaction-db-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
