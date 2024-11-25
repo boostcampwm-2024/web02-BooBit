@@ -30,7 +30,6 @@ export class BalanceRepository {
     const orders = await this.prisma.orderHistory.findMany({
       where: {
         userId,
-        status: { not: OrderStatus.PENDING },
         ...(id && {
           historyId: {
             lte: BigInt(id),
