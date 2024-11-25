@@ -65,10 +65,6 @@ services:
     depends_on:
       transaction-db:
         condition: service_healthy
-      transaction-db-secondary1:
-        condition: service_healthy
-      transaction-db-secondary2:
-        condition: service_healthy
     restart: always
 
   # Trade 서비스
@@ -88,10 +84,6 @@ services:
       SESSION_SECRET: ${SESSION_SECRET}
     depends_on:
       transaction-db:
-        condition: service_healthy
-      transaction-db-secondary1:
-        condition: service_healthy
-      transaction-db-secondary2:
         condition: service_healthy
     restart: always
 
@@ -206,61 +198,9 @@ services:
       retries: 30
       start_period: 30s
 
-  transaction-db-secondary1:
-    image: mongo:8.0
-    container_name: transaction-db-secondary1
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MYSQL_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "${TRANSACTION_HOST_DB_PORT_SECONDARY1}:27017"
-    command:
-      - sh
-      - -c
-      - |
-        sleep 5
-        mongod --replSet rs0 --bind_ip_all
-    volumes:
-      - transaction-db-secondary1:/data/db
-    healthcheck:
-      test: mongosh --eval 'db.runCommand("ping").ok' --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    depends_on:
-      - transaction-db
-
-  transaction-db-secondary2:
-    image: mongo:8.0
-    container_name: transaction-db-secondary2
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MYSQL_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "${TRANSACTION_HOST_DB_PORT_SECONDARY2}:27017"
-    command:
-      - sh
-      - -c
-      - |
-        sleep 5
-        mongod --replSet rs0 --bind_ip_all
-    volumes:
-      - transaction-db-secondary2:/data/db
-    healthcheck:
-      test: mongosh --eval 'db.runCommand("ping").ok' --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    depends_on:
-      - transaction-db
-
 volumes:
   redis-db:
   auth-db:
   balance-db:
   transaction-db:
-  transaction-db-secondary1:
-  transaction-db-secondary2:
   trade-redis:
