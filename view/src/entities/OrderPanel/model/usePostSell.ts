@@ -11,7 +11,7 @@ const usePostSell = () => {
   return useMutation({
     mutationFn: postSellApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      queryClient.invalidateQueries({ queryKey: ['available'] });
       addToast(successMessages.sell, 'success');
     },
     onError: (error: unknown) => {
