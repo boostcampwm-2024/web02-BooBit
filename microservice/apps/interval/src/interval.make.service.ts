@@ -15,7 +15,7 @@ export class IntervalMakeService {
 
   candleAdd(value: CandleDataDto, secData: CandleDataDto): CandleDataDto {
     return {
-      date: secData.date,
+      date: value.date,
       open: value.open,
       high: Math.max(value.high, secData.high),
       low: Math.min(value.low, secData.low),

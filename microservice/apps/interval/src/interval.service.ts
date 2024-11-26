@@ -53,6 +53,7 @@ export class IntervalService implements OnModuleDestroy {
         this.saveCandleData(candle),
         this.publishOrderBook(),
       ]);
+      this.intervalDataInit(TimeScale.SEC_01);
     } catch (error) {
       this.logger.error('Error in everySecond task', error);
     }
