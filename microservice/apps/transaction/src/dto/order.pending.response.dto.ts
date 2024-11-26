@@ -1,4 +1,5 @@
 import { OrderType } from '@app/common/enums/order-type.enum';
+import { roundToSix } from '@app/common/utils/number.format.util';
 
 export class OrderPendingResponseDto {
   historyId: string;
@@ -21,9 +22,9 @@ export class OrderPendingResponseDto {
     this.historyId = historyId;
     this.orderType = orderType;
     this.coinCode = coinCode;
-    this.price = Number(price);
-    this.quantity = Number(quantity);
-    this.unfilledAmount = Number(unfilledAmount);
+    this.price = roundToSix(Number(price));
+    this.quantity = roundToSix(Number(quantity));
+    this.unfilledAmount = roundToSix(Number(unfilledAmount));
     this.createdAt = createdAt;
   }
 }

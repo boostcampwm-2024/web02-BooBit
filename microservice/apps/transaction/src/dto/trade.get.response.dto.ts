@@ -1,4 +1,5 @@
 import { OrderType } from '@app/common/enums/order-type.enum';
+import { roundToSix } from '@app/common/utils/number.format.util';
 
 export class TradeGetResponseDto {
   tradeId: string;
@@ -20,9 +21,9 @@ export class TradeGetResponseDto {
     this.tradeId = tradeId;
     this.orderType = orderType;
     this.coinCode = coinCode;
-    this.price = Number(price);
-    this.quantity = Number(quantity);
-    this.totalAmount = this.price * this.quantity;
+    this.price = roundToSix(Number(price));
+    this.quantity = roundToSix(Number(quantity));
+    this.totalAmount = roundToSix(this.price * this.quantity);
     this.tradedAt = tradedAt;
   }
 }

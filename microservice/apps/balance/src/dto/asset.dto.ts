@@ -1,4 +1,5 @@
 import { CurrencyCodeName } from '@app/common';
+import { roundToSix } from '@app/common/utils/number.format.util';
 
 export class AssetDto {
   currencyCode: string;
@@ -8,6 +9,6 @@ export class AssetDto {
   constructor(currencyCode: string, amount: number) {
     this.currencyCode = currencyCode;
     this.name = CurrencyCodeName[currencyCode];
-    this.amount = amount;
+    this.amount = roundToSix(amount);
   }
 }
