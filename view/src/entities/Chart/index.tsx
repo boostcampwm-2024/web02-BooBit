@@ -69,15 +69,40 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .selectAll('.bar')
       .data(data)
       .enter()
-      .append('rect')
-      .attr('x', (d) => xScale(d.date.toISOString())!)
-      .attr('y', (d) => yScale(Math.max(d.open, d.close)))
-      .attr('width', xScale.bandwidth())
-      .attr('height', (d) => Math.abs(yScale(d.open) - yScale(d.close)))
-      .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'))
-      .on('mouseover', (e, d) => {
-        e.preventDefault();
-        setMarketValues(d);
+      .append('g') // 그룹을 묶어 관리
+      .each(function (d, index) {
+        // 이전 캔들의 색상 초기화
+        let prevColor = '#E0E0E0'; // 기본 색상 (예: 회색)
+
+        if (index > 0) {
+          // 이전 캔들의 색상 결정 (이전 캔들의 open과 close에 따라 색상 설정)
+          prevColor = data[index - 1].open > data[index - 1].close ? '#FF5252' : '#00E676';
+        }
+
+        if (d.open === d.close) {
+          // open과 close가 같을 경우 이전 캔들의 색상을 사용
+          d3.select(this)
+            .append('line')
+            .attr('x1', xScale(d.date.toISOString())!)
+            .attr('x2', xScale(d.date.toISOString())! + xScale.bandwidth())
+            .attr('y1', yScale(d.open))
+            .attr('y2', yScale(d.open))
+            .attr('stroke', prevColor) // 이전 캔들의 색상 사용
+            .attr('stroke-width', 0.5);
+        } else {
+          // open과 close가 다를 경우
+          d3.select(this)
+            .append('rect')
+            .attr('x', xScale(d.date.toISOString())!)
+            .attr('y', yScale(Math.max(d.open, d.close)))
+            .attr('width', xScale.bandwidth())
+            .attr('height', Math.abs(yScale(d.open) - yScale(d.close)))
+            .attr('fill', d.open > d.close ? '#FF5252' : '#00E676')
+            .on('mouseover', (e) => {
+              e.preventDefault();
+              setMarketValues(d);
+            });
+        }
       });
 
     // Divider line
@@ -108,7 +133,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .attr('x', (d) => xScale(d.date.toISOString())!)
       .attr('y', (d) => height - volumeHeight + yVolumeScale(d.volume))
       .attr('width', xScale.bandwidth())
-      .attr('height', (d) => volumeHeight - yVolumeScale(d.volume))
+      .attr('height', (d) => (d.volume > 0 ? volumeHeight - yVolumeScale(d.volume) : 0))
       .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'))
       .on('mouseover', (e, d) => {
         e.preventDefault();
