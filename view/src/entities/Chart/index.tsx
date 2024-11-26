@@ -106,7 +106,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .enter()
       .append('rect')
       .attr('x', (d) => xScale(d.date.toISOString())!)
-      .attr('y', (d) => height - volumeHeight + yVolumeScale(d.volume))
+      .attr('height', (d) => (d.volume > 0 ? volumeHeight - yVolumeScale(d.volume) : 0))
       .attr('width', xScale.bandwidth())
       .attr('height', (d) => volumeHeight - yVolumeScale(d.volume))
       .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'))
