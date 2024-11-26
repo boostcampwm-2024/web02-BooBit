@@ -72,7 +72,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
     const requestParam = {
       coinCode: 'BTC',
       amount: Number(amount.replace(/,/g, '')),
-      price: Number(price.replace(/,/g, '')),
+      price: Number(tradePrice.replace(/,/g, '')),
     };
     if (selectedOrder === '매수') {
       if (myAsset < requestParam.price) {
