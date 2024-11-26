@@ -22,9 +22,12 @@ export class IntervalRepository {
     };
     return modelMap[interval];
   }
-  async getLatestTrade(coinCode: string) {
+  async getLatestTrade(coinCode: CurrencyCode) {
     try {
       const trade = await this.prisma.trade.findFirst({
+        where: {
+          coinCode: coinCode,
+        },
         orderBy: {
           tradedAt: 'desc',
         },
