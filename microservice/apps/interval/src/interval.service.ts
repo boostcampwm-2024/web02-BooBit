@@ -19,7 +19,8 @@ export class IntervalService implements OnModuleDestroy {
     private IntervalRepository: IntervalRepository,
     @Inject('REDIS_PUBLISHER') private readonly redisPublisher: Redis,
   ) {
-    Object.entries(TimeScale).forEach(async ([, value]) => {
+    Object.entries(TimeScale).forEach(async ([key, value]) => {
+      this.logger.log(`${key} : ${value}`);
       this.intervalData.set(
         value,
         new CandleDataDto({
@@ -52,6 +53,7 @@ export class IntervalService implements OnModuleDestroy {
         this.saveCandleData(candle),
         this.publishOrderBook(),
       ]);
+      this.intervalDataInit(TimeScale.SEC_01);
     } catch (error) {
       this.logger.error('Error in everySecond task', error);
     }
@@ -74,10 +76,13 @@ export class IntervalService implements OnModuleDestroy {
     try {
       const candleDataArray = [currentData];
 
-      if (this.isTimeScalePoint(date, timeScale) && timeScale !== TimeScale.SEC_01) {
+      if (this.isTimeScalePoint(date, timeScale)) {
         const nextDate = new Date(currentData.date);
 
         switch (timeScale) {
+          case TimeScale.SEC_01:
+            nextDate.setSeconds(nextDate.getSeconds() + 1);
+            break;
           case TimeScale.MIN_01:
             nextDate.setMinutes(nextDate.getMinutes() + 1);
             break;
@@ -106,7 +111,6 @@ export class IntervalService implements OnModuleDestroy {
 
         candleDataArray.push(nextCandleData);
       }
-
       await this.redisPublisher.publish(
         RedisChannel.CANDLE_CHART,
         JSON.stringify({
@@ -261,14 +265,18 @@ export class IntervalService implements OnModuleDestroy {
   }
 
   intervalDataInit(timescale: TimeScale) {
-    this.intervalData[timescale] = new CandleDataDto({
-      date: new Date(),
-      open: 0,
-      close: 0,
-      high: 0,
-      low: 0,
-      volume: 0,
-    });
+    const currentData = this.intervalData.get(timescale);
+    this.intervalData.set(
+      timescale,
+      new CandleDataDto({
+        date: new Date(),
+        open: currentData.close,
+        close: currentData.close,
+        high: currentData.close,
+        low: currentData.close,
+        volume: 0,
+      }),
+    );
   }
 
   private async publishOrderBook() {

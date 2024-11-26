@@ -24,8 +24,9 @@ export class IntervalMakeService {
     };
   }
   async makeSecData(date: Date) {
+    const startTime = new Date(date.getTime() - 1000);
     const trades = await this.intervalRepository.getTradesByDateRange(
-      new Date(date.getTime() - 1000),
+      startTime,
       date,
       CurrencyCode.BTC,
     );
@@ -35,7 +36,7 @@ export class IntervalMakeService {
       this.lastClose = latestTrade ? Number(latestTrade.price) : 0;
       return {
         candle: new CandleDataDto({
-          date,
+          date: startTime,
           open: this.lastClose,
           close: this.lastClose,
           high: this.lastClose,
@@ -48,7 +49,7 @@ export class IntervalMakeService {
       this.lastClose = Number(trades[trades.length - 1].price);
       return {
         candle: new CandleDataDto({
-          date,
+          date: startTime,
           open: Number(trades[0].price),
           close: Number(trades[trades.length - 1].price),
           high: Math.max(...trades.map((trade) => Number(trade.price))),
