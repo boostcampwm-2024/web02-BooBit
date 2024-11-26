@@ -1,29 +1,28 @@
 import { OrderType } from '@app/common/enums/order-type.enum';
 
-export class OrderPendingResponseDto {
-  historyId: string;
+export class TradeGetResponseDto {
+  tradeId: string;
   orderType: OrderType;
   coinCode: string;
   price: number;
   quantity: number;
-  unfilledAmount: number;
-  createdAt: Date;
+  totalAmount: number;
+  tradedAt: Date;
 
   constructor(
-    historyId: string,
+    tradeId: string,
     orderType: OrderType,
     coinCode: string,
     price: string,
     quantity: string,
-    unfilledAmount: string,
-    createdAt: Date,
+    tradedAt: Date,
   ) {
-    this.historyId = historyId;
+    this.tradeId = tradeId;
     this.orderType = orderType;
     this.coinCode = coinCode;
     this.price = Number(price);
     this.quantity = Number(quantity);
-    this.unfilledAmount = Number(unfilledAmount);
-    this.createdAt = createdAt;
+    this.totalAmount = this.price * this.quantity;
+    this.tradedAt = tradedAt;
   }
 }
