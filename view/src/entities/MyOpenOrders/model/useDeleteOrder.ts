@@ -15,7 +15,7 @@ const useDeleteOrder = () => {
   return useMutation({
     mutationFn: deleteOrderApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      queryClient.invalidateQueries({ queryKey: ['pending'] });
       addToast(successMessages.deleteOrder, 'success');
     },
     onError: (error: unknown) => {

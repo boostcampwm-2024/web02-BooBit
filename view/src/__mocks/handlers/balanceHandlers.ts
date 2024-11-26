@@ -1,9 +1,6 @@
-import { http, HttpResponse } from 'msw';
-import { BASE_URLS } from '../../shared/consts/baseUrl';
-
 export const balanceHandlers = [
   // 거래 내역 조회 핸들러
-  http.get(`${BASE_URLS.BALANCE}/api/users/orderHistory`, ({ request }) => {
+  /*http.get(`${BASE_URLS.BALANCE}/api/users/orderHistory`, ({ request }) => {
     const url = new URL(request.url);
     const productId = url.searchParams.get('id');
 
@@ -103,5 +100,5 @@ export const balanceHandlers = [
     if (productId === '5') {
       return response(null, orders);
     }
-  }),
+  }),*/
 ];
