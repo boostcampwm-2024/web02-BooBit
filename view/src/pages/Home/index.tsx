@@ -118,6 +118,7 @@ const Home = () => {
       timeScale: selectedTimeScale,
     };
     sendMessage(JSON.stringify(initMessage));
+    setTradeRecords([]);
   }, [selectedTimeScale]);
 
   return (
