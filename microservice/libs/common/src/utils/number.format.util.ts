@@ -7,3 +7,7 @@ export function formatFixedPoint(value: number, paddingLength = 15): string {
 export const roundToSix = (num: number): number => {
   return Number(num.toFixed(6));
 };
+
+export const roundToThree = (num: number): number => {
+  return Number(num.toFixed(3));
+};

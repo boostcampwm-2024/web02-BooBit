@@ -17,6 +17,7 @@ import { Reflector } from '@nestjs/core';
 import { TradeResponseDto } from '@app/ws/dto/trade.response.dto';
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
 import { WsError } from '@app/ws/ws.error';
+import { roundToSix } from '@app/common/utils/number.format.util';
 
 @WebSocketGateway({
   path: '/ws',
@@ -145,6 +146,14 @@ export class TransactionWsGateway extends WsBaseGateway {
     const candleData = await this.transactionWsService.getLatestCandles(timeScale);
     const tradeData = await this.transactionWsService.getLatestTrades();
     const lastDayClose = await this.transactionWsService.getLastDayClosePrice();
+
+    const formattedTradeData = tradeData.map((trade) => ({
+      ...trade,
+      price: roundToSix(trade.price),
+      amount: roundToSix(trade.amount),
+      tradePrice: roundToSix(trade.tradePrice),
+    }));
+
     const chartInitResponse = {
       event: WsEvent.CANDLE_CHART_INIT,
       timeScale: timeScale,
@@ -153,7 +162,7 @@ export class TransactionWsGateway extends WsBaseGateway {
     };
     const tradeResponse: TradeResponseDto = {
       event: WsEvent.TRADE,
-      data: tradeData,
+      data: formattedTradeData,
     };
 
     return [chartInitResponse, tradeResponse];

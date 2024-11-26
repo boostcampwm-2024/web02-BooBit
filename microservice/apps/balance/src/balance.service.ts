@@ -26,7 +26,7 @@ export class BalanceService implements OrderService, AccountService {
     const orders = items.map((item) => ({
       orderType: item.orderType,
       coinCode: item.coinCode,
-      quantity: roundToSix(item.quantity),
+      quantity: roundToSix(Number(item.quantity)),
       price: item.price.toFixed(0),
       status: item.status,
       timestamp: item.createdAt.toISOString(),
