@@ -133,7 +133,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
     ]);
   }, [marketValues]);
 
-  return <svg className="w-full border-[1px] border-border-default" ref={svgRef} />;
+  return <svg className="w-full h-[460px] bg-surface-default" ref={svgRef} />;
 };
 
 export default Chart;
