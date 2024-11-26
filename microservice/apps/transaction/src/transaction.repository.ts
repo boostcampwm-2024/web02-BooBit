@@ -8,6 +8,22 @@ import { formatFixedPoint } from '@app/common/utils/number.format.util';
 export class TransactionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getLastDayClosePrice(): Promise<number> {
+    try {
+      const lastCandle = await this.prisma.candle01Day.findFirst({
+        orderBy: {
+          startTime: 'desc',
+        },
+        select: {
+          closePrice: true,
+        },
+      });
+
+      return lastCandle ? Number(lastCandle.closePrice) : 0;
+    } catch (error) {
+      throw error;
+    }
+  }
   async getLatestCandles(timeScale: TimeScale, count: number) {
     const modelName = this.getTableName(timeScale);
     const candles = await this.prisma[modelName].findMany({

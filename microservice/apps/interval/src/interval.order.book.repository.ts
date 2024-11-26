@@ -25,24 +25,6 @@ export class IntervalOrderBookRepository {
     }
   }
 
-  async getLastTradePrice(): Promise<number> {
-    try {
-      const lastTrade = await this.prisma.trade.findFirst({
-        orderBy: {
-          tradedAt: 'desc',
-        },
-        select: {
-          price: true,
-        },
-      });
-
-      return lastTrade ? Number(lastTrade.price) : 0;
-    } catch (error) {
-      this.logger.error('최근 체결가 조회 중 오류 발생:', error);
-      throw error;
-    }
-  }
-
   async getSellOrders() {
     try {
       return await this.prisma.sellOrder.findMany({

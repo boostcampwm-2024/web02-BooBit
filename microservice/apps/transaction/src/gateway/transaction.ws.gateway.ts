@@ -131,9 +131,9 @@ export class TransactionWsGateway extends WsBaseGateway {
   ) {
     try {
       this.wsService.moveClientToRoom(client, data.timeScale);
-      const [chartResponse, tradeResponse] = await this.getInitialData(data.timeScale);
+      const [chartInitResponse, tradeResponse] = await this.getInitialData(data.timeScale);
 
-      client.send(JSON.stringify(chartResponse));
+      client.send(JSON.stringify(chartInitResponse));
       client.send(JSON.stringify(tradeResponse));
     } catch (error) {
       console.error('Error in handleSubscribe:', error);
@@ -144,17 +144,18 @@ export class TransactionWsGateway extends WsBaseGateway {
   async getInitialData(timeScale: TimeScale): Promise<[ChartResponseDto, TradeResponseDto]> {
     const candleData = await this.transactionWsService.getLatestCandles(timeScale);
     const tradeData = await this.transactionWsService.getLatestTrades();
-
-    const chartResponse: ChartResponseDto = {
+    const lastDayClose = await this.transactionWsService.getLastDayClosePrice();
+    const chartInitResponse = {
       event: WsEvent.CANDLE_CHART_INIT,
       timeScale: timeScale,
       data: candleData,
+      lastDayClose: lastDayClose,
     };
     const tradeResponse: TradeResponseDto = {
       event: WsEvent.TRADE,
       data: tradeData,
     };
 
-    return [chartResponse, tradeResponse];
+    return [chartInitResponse, tradeResponse];
   }
 }

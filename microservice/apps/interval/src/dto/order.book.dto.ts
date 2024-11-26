@@ -5,7 +5,6 @@ export class OrderItemDto {
 }
 
 export class OrderBookDto {
-  currentPrice: number;
   sell: OrderItemDto[];
   buy: OrderItemDto[];
 }

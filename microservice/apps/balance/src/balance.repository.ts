@@ -222,7 +222,7 @@ export class BalanceRepository {
     const orderPrice = amount * price;
     try {
       return await this.prisma.$transaction(async (prisma) => {
-        const asset = await this.getAvailableBalance(prisma, userId, CurrencyCode.KRW);
+        const asset = await this.getAvailableBalanceTx(prisma, userId, CurrencyCode.KRW);
         if (asset.availableBalance < orderPrice) {
           return new OrderResponseDto(GrpcOrderStatusCode.NO_BALANCE, 'NONE');
         }
@@ -248,7 +248,7 @@ export class BalanceRepository {
     const { userId, coinCode, amount, price } = orderRequest;
     try {
       return await this.prisma.$transaction(async (prisma) => {
-        const asset = await this.getAvailableBalance(prisma, userId, coinCode);
+        const asset = await this.getAvailableBalanceTx(prisma, userId, coinCode);
         if (asset.availableBalance < amount) {
           return new OrderResponseDto(GrpcOrderStatusCode.NO_BALANCE, 'NONE');
         }
@@ -270,7 +270,7 @@ export class BalanceRepository {
     }
   }
 
-  async getAvailableBalance(prisma, userId, currencyCode) {
+  async getAvailableBalanceTx(prisma, userId, currencyCode) {
     return await prisma.asset.findUnique({
       select: { availableBalance: true },
       where: {
@@ -442,6 +442,18 @@ export class BalanceRepository {
       }
 
       return new TradeResponseDto('SUCCESS');
+    });
+  }
+
+  async getAvailableBalance(userId, currencyCode) {
+    return await this.prisma.asset.findUnique({
+      select: { availableBalance: true },
+      where: {
+        userId_currencyCode: {
+          userId: BigInt(userId),
+          currencyCode: currencyCode,
+        },
+      },
     });
   }
 }

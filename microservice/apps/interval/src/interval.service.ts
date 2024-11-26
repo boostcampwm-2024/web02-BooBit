@@ -23,7 +23,7 @@ export class IntervalService implements OnModuleDestroy {
       this.intervalData.set(
         value,
         new CandleDataDto({
-          date: new Date(),
+          date: this.getSeoulTime(),
           open: 0,
           close: 0,
           high: 0,
@@ -42,7 +42,7 @@ export class IntervalService implements OnModuleDestroy {
   @Cron(CronExpression.EVERY_SECOND, { timeZone: 'Asia/Seoul' })
   async everySecond() {
     try {
-      const date = new Date();
+      const date = this.getSeoulTime();
       date.setMilliseconds(0);
 
       const { candle, trades } = await this.intervalMakeService.makeSecData(date);
@@ -74,8 +74,37 @@ export class IntervalService implements OnModuleDestroy {
     try {
       const candleDataArray = [currentData];
 
-      if (this.isTimeScalePoint(date, timeScale)) {
-        candleDataArray.push(this.createNextCandleData(currentData));
+      if (this.isTimeScalePoint(date, timeScale) && timeScale !== TimeScale.SEC_01) {
+        const nextDate = new Date(currentData.date);
+
+        switch (timeScale) {
+          case TimeScale.MIN_01:
+            nextDate.setMinutes(nextDate.getMinutes() + 1);
+            break;
+          case TimeScale.MIN_10:
+            nextDate.setMinutes(nextDate.getMinutes() + 10);
+            break;
+          case TimeScale.MIN_30:
+            nextDate.setMinutes(nextDate.getMinutes() + 30);
+            break;
+          case TimeScale.HOUR_01:
+            nextDate.setHours(nextDate.getHours() + 1);
+            break;
+          case TimeScale.DAY_01:
+            nextDate.setDate(nextDate.getDate() + 1);
+            break;
+          case TimeScale.WEEK_01:
+            nextDate.setDate(nextDate.getDate() + 7);
+            break;
+          case TimeScale.MONTH_01:
+            nextDate.setMonth(nextDate.getMonth() + 1);
+            break;
+        }
+
+        const nextCandleData = this.createNextCandleData(currentData);
+        nextCandleData.date = nextDate;
+
+        candleDataArray.push(nextCandleData);
       }
 
       await this.redisPublisher.publish(
@@ -255,5 +284,9 @@ export class IntervalService implements OnModuleDestroy {
     } catch (error) {
       this.logger.error('Error publishing order book:', error);
     }
+  }
+
+  getSeoulTime() {
+    return new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
   }
 }

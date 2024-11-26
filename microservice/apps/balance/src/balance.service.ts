@@ -13,6 +13,7 @@ import { AccountCreateRequestDto } from '@app/grpc/dto/account.create.request.dt
 import { GetTransactionsDto } from './dto/get.transactions.request.dto';
 import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
+import { AvailableBalanceResponseDto } from './dto/available.balance.response.dto';
 
 @Injectable()
 export class BalanceService implements OrderService, AccountService {
@@ -113,5 +114,10 @@ export class BalanceService implements OrderService, AccountService {
 
   async cancelOrder(cancelRequest: TradeCancelRequestDto) {
     return await this.balanceRepository.cancelOrder(cancelRequest);
+  }
+
+  async getAvailableBalance(userId: string, currencyCode: string) {
+    const asset = await this.balanceRepository.getAvailableBalance(userId, currencyCode);
+    return new AvailableBalanceResponseDto(Number(asset?.availableBalance || 0), currencyCode);
   }
 }

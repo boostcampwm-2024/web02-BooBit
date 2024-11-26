@@ -10,10 +10,9 @@ export class IntervalOrderBookService {
 
   async getOrderBook(): Promise<OrderBookDto> {
     try {
-      const [sellOrders, buyOrders, lastPrice, lastDayClose] = await Promise.all([
+      const [sellOrders, buyOrders, lastDayClose] = await Promise.all([
         this.orderBookRepository.getSellOrders(),
         this.orderBookRepository.getBuyOrders(),
-        this.orderBookRepository.getLastTradePrice(),
         this.orderBookRepository.getLastDayClosePrice(),
       ]);
 
@@ -22,7 +21,6 @@ export class IntervalOrderBookService {
       };
 
       return {
-        currentPrice: lastPrice,
         sell: sellOrders.map(
           (order): OrderItemDto => ({
             price: Number(order.price),
