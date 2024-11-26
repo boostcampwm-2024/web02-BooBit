@@ -154,7 +154,7 @@ export class TransactionRepository {
       },
       where: {
         OR: [{ buyerId: userId }, { sellerId: userId }],
-        ...(lastId ? { tradeId: { gte: lastId } } : {}),
+        ...(lastId ? { tradeId: { lte: lastId } } : {}),
       },
       orderBy: {
         tradedAt: 'desc',
