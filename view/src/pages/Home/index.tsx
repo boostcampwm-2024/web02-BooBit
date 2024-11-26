@@ -9,118 +9,134 @@ import TimeScaleSelector from './UI/TimeScaleSelector';
 import Title from './UI/Title';
 
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
-import useWebSocket from '../../shared/model/useWebSocket';
 import { RecordType } from '../../shared/types/RecordType';
 import { CandleData } from '../../entities/Chart/model/candleDataType';
-import { CandleSocketType } from '../../shared/types/socket/CandleSocketType';
 import { OrderType } from '../../shared/types/socket/OrderType';
+import { CandleSocketType } from '../../shared/types/socket/CandleSocketType';
 
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
+
 const Home = () => {
-  const { message, sendMessage } = useWebSocket(socketUrl);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+
   const [candleData, setCandleData] = useState<CandleData[]>();
   const [tradeRecords, setTradeRecords] = useState<RecordType[]>();
   const [orderBookData, setOrderBookData] = useState<{ buy: OrderType[]; sell: OrderType[] }>();
   const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1sec');
   const [currentPrice, setCurrentPrice] = useState(0);
-
-  const hasIncreased = false;
   const [orderPrice, setOrderPrice] = useState<string>('');
 
+  const hasIncreased = false;
+
+  // WebSocket 연결 및 메시지 처리
   useEffect(() => {
-    if (!message) return;
-    switch (message.event) {
-      case 'CANDLE_CHART_INIT': {
-        const candlePrevData = message.data;
+    const ws = new WebSocket(socketUrl);
+    setSocket(ws);
 
-        const transformedData = candlePrevData.map((item: CandleSocketType) => ({
-          date: new Date(item.date),
-          open: item.open,
-          close: item.close,
-          high: item.high,
-          low: item.low,
-          volume: item.volume,
-        }));
+    ws.onopen = () => {
+      console.log('웹소켓 연결 완료');
+      const initMessage = {
+        event: 'CANDLE_CHART_INIT',
+        timeScale: '1sec', // 원하는 시간 단위로 변경 가능
+      };
+      ws.send(JSON.stringify(initMessage));
+    };
 
-        setCandleData(transformedData);
-        break;
-      }
-      case 'CANDLE_CHART': {
-        const candleData = message.data.map((item: CandleSocketType) => ({
-          date: new Date(item.date),
-          open: item.open,
-          close: item.close,
-          high: item.high,
-          low: item.low,
-          volume: item.volume,
-        }));
+    ws.onmessage = (event) => {
+      const receivedData = JSON.parse(event.data);
+      switch (receivedData.event) {
+        case 'CANDLE_CHART_INIT': {
+          const candlePrevData = receivedData.data.map((item: CandleSocketType) => ({
+            date: new Date(item.date),
+            open: item.open,
+            close: item.close,
+            high: item.high,
+            low: item.low,
+            volume: item.volume,
+          }));
+          setCandleData(candlePrevData);
+          break;
+        }
+        case 'CANDLE_CHART': {
+          const candleData = receivedData.data.map((item: CandleSocketType) => ({
+            date: new Date(item.date),
+            open: item.open,
+            close: item.close,
+            high: item.high,
+            low: item.low,
+            volume: item.volume,
+          }));
 
-        if (candleData.length === 1) {
-          const [currentCandle] = candleData;
+          if (candleData.length === 1) {
+            const [currentCandle] = candleData;
 
-          setCandleData((prevCandleData) => {
-            if (!prevCandleData) {
-              return [currentCandle];
-            }
+            setCandleData((prevCandleData) => {
+              if (!prevCandleData) {
+                return [currentCandle];
+              }
 
-            // 마지막 데이터 업데이트
-            const updatedData = [...prevCandleData];
-            updatedData[updatedData.length - 1] = currentCandle;
+              const updatedData = [...prevCandleData];
+              updatedData[updatedData.length - 1] = currentCandle;
+              return updatedData;
+            });
+          } else {
+            const [prevCandle, currentCandle] = candleData;
 
-            return updatedData;
+            setCandleData((prevCandleData) => {
+              if (!prevCandleData) {
+                return [...candleData];
+              }
+
+              const updatedData = [...prevCandleData];
+              updatedData.shift();
+              updatedData[updatedData.length - 1] = prevCandle;
+
+              return [...updatedData, currentCandle];
+            });
+          }
+          break;
+        }
+        case 'TRADE': {
+          const tradePrevData = receivedData.data;
+
+          if (!tradeRecords && tradePrevData && tradePrevData.length > 0) {
+            setOrderPrice(tradePrevData[0].price.toLocaleString());
+          }
+          if (tradePrevData && tradePrevData.length > 0) {
+            setCurrentPrice(tradePrevData[0].price);
+          }
+          setTradeRecords((prevRecords) => {
+            return prevRecords ? [...tradePrevData, ...prevRecords] : [...tradePrevData];
           });
-        } else {
-          const [prevCandle, currentCandle] = candleData;
-
-          setCandleData((prevCandleData) => {
-            if (!prevCandleData) {
-              return [...candleData];
-            }
-
-            // 이전 데이터 추가 및 현재 데이터 추가
-            const updatedData = [...prevCandleData];
-            updatedData.shift();
-            updatedData[updatedData.length - 1] = prevCandle;
-
-            return [...updatedData, currentCandle];
-          });
+          break;
         }
-
-        break;
-      }
-      case 'TRADE': {
-        const tradePrevData = message.data;
-
-        if (!tradeRecords && tradePrevData && tradePrevData.length > 0) {
-          setOrderPrice(tradePrevData[0].price.toLocaleString());
+        case 'BUY_AND_SELL': {
+          const nowOrderBookData = receivedData.data;
+          setOrderBookData(nowOrderBookData);
+          break;
         }
-        if (tradePrevData && tradePrevData.length > 0) {
-          setCurrentPrice(tradePrevData[0].price);
-        }
-        setTradeRecords((prevRecords) => {
-          return prevRecords ? [...tradePrevData, ...prevRecords] : [...tradePrevData];
-        });
-        break;
-      }
-      case 'BUY_AND_SELL': {
-        const nowOrderBookData = message.data;
+        default:
+          break;
+      } // 서버에서 받은 데이터를 상태에 저장
+    };
 
-        setOrderBookData(nowOrderBookData);
-        break;
-      }
-      default:
-        break;
-    }
-  }, [message]);
+    // WebSocket 연결 종료 시
+    return () => {
+      ws.close();
+    };
+  }, [socketUrl]);
 
+  // 시간 단위 변경 시 WebSocket 초기화 메시지 전송
   useEffect(() => {
     const initMessage = {
       event: 'CANDLE_CHART_INIT',
       timeScale: selectedTimeScale,
     };
-    sendMessage(JSON.stringify(initMessage));
+    if (socket) {
+      socket.send(JSON.stringify(initMessage));
+    }
     setTradeRecords([]);
-  }, [selectedTimeScale]);
+  }, [selectedTimeScale, socket]);
 
   return (
     <div>
