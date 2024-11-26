@@ -389,7 +389,7 @@ export class BalanceRepository {
         },
       },
       data: {
-        lockedBalance: {
+        availableBalance: {
           increment: payment,
         },
       },
@@ -405,7 +405,7 @@ export class BalanceRepository {
         },
       },
       data: {
-        availableBalance: {
+        lockedBalance: {
           decrement: soldCoins,
         },
       },
