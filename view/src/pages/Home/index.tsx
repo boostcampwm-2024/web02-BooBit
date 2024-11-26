@@ -35,15 +35,11 @@ const Home = () => {
 
     ws.onopen = () => {
       console.log('웹소켓 연결 완료');
-      const initMessage = {
-        event: 'CANDLE_CHART_INIT',
-        timeScale: '1sec', // 원하는 시간 단위로 변경 가능
-      };
-      ws.send(JSON.stringify(initMessage));
     };
 
     ws.onmessage = (event) => {
       const receivedData = JSON.parse(event.data);
+
       switch (receivedData.event) {
         case 'CANDLE_CHART_INIT': {
           const candlePrevData = receivedData.data.map((item: CandleSocketType) => ({
@@ -124,7 +120,7 @@ const Home = () => {
     return () => {
       ws.close();
     };
-  }, [socketUrl]);
+  }, []);
 
   // 시간 단위 변경 시 WebSocket 초기화 메시지 전송
   useEffect(() => {
