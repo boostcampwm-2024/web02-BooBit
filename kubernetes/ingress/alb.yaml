@@ -11,6 +11,13 @@ spec:
   rules:
     - http:
         paths:
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: transaction-service
+                port:
+                  number: 80
           - path: /api/auth
             pathType: Prefix
             backend:
