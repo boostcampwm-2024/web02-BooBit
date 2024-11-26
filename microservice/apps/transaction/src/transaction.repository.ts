@@ -24,6 +24,7 @@ export class TransactionRepository {
       throw error;
     }
   }
+
   async getLatestCandles(timeScale: TimeScale, count: number) {
     const modelName = this.getTableName(timeScale);
     const candles = await this.prisma[modelName].findMany({

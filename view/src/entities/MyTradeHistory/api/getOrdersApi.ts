@@ -1,11 +1,10 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
-
 const getOrdersApi = async ({ id }: { id: number | null }) => {
   const queryParams = new URLSearchParams({
     id: id !== null ? String(id) : '',
   }).toString();
+  const apiUrl = import.meta.env.VITE_BALANCE_URL;
 
-  const response = await fetch(`${BASE_URLS.BALANCE}/api/users/orderHistory?${queryParams}`, {
+  const response = await fetch(`${apiUrl}/api/users/orderHistory?${queryParams}`, {
     method: 'GET',
     credentials: 'include',
   });

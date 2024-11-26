@@ -1,12 +1,8 @@
-import { BASE_URLS } from '../consts/baseUrl';
-
+const apiUrl = import.meta.env.VITE_BALANCE_URL;
 const getAssetsApi = async () => {
-  const response = await fetch(`${BASE_URLS.BALANCE}/api/users/assets`, {
+  const response = await fetch(`${apiUrl}/api/users/assets`, {
     method: 'GET',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
   });
 
   if (!response.ok) {

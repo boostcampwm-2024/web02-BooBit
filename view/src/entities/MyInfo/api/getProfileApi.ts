@@ -1,12 +1,8 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
-
+const apiUrl = import.meta.env.VITE_AUTH_URL;
 const getProfileApi = async () => {
-  const response = await fetch(`${BASE_URLS.AUTH}/api/auth/profile`, {
+  const response = await fetch(`${apiUrl}/api/auth/profile`, {
     method: 'GET',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
   });
 
   if (!response.ok) {

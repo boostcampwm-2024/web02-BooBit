@@ -1,8 +1,8 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
 import { AssetType } from '../model/AssetType';
 
+const apiUrl = import.meta.env.VITE_BALANCE_URL;
 const depositApi = async ({ currencyCode, amount }: AssetType) => {
-  const response = await fetch(`${BASE_URLS.BALANCE}/api/users/deposit`, {
+  const response = await fetch(`${apiUrl}/api/users/deposit`, {
     method: 'POST',
     credentials: 'include',
     headers: {

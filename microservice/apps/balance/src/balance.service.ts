@@ -14,6 +14,8 @@ import { GetTransactionsDto } from './dto/get.transactions.request.dto';
 import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 import { AvailableBalanceResponseDto } from './dto/available.balance.response.dto';
+import { roundToSix } from '@app/common/utils/number.format.util';
+import { CurrencyCode } from '@app/common';
 
 @Injectable()
 export class BalanceService implements OrderService, AccountService {
@@ -24,8 +26,8 @@ export class BalanceService implements OrderService, AccountService {
     const orders = items.map((item) => ({
       orderType: item.orderType,
       coinCode: item.coinCode,
-      quantity: item.quantity,
-      price: item.price,
+      quantity: roundToSix(Number(item.quantity)),
+      price: item.price.toFixed(0),
       status: item.status,
       timestamp: item.createdAt.toISOString(),
     }));
@@ -43,7 +45,10 @@ export class BalanceService implements OrderService, AccountService {
 
     const transactions = items.map((tx) => ({
       tx_type: tx.txType.toLowerCase(),
-      amount: tx.amount.toNumber(),
+      amount:
+        tx.currencyCode === CurrencyCode.KRW
+          ? tx.amount.toNumber().toFixed(0)
+          : roundToSix(tx.amount.toNumber()),
       currency_code: tx.currencyCode,
       timestamp: tx.createdAt.toISOString(),
     }));

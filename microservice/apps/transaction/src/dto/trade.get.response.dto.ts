@@ -1,12 +1,13 @@
 import { OrderType } from '@app/common/enums/order-type.enum';
+import { roundToSix } from '@app/common/utils/number.format.util';
 
 export class TradeGetResponseDto {
   tradeId: string;
   orderType: OrderType;
   coinCode: string;
-  price: number;
+  price: string;
   quantity: number;
-  totalAmount: number;
+  totalAmount: string;
   tradedAt: Date;
 
   constructor(
@@ -20,9 +21,10 @@ export class TradeGetResponseDto {
     this.tradeId = tradeId;
     this.orderType = orderType;
     this.coinCode = coinCode;
-    this.price = Number(price);
-    this.quantity = Number(quantity);
-    this.totalAmount = this.price * this.quantity;
+    const priceNum = Number(price);
+    this.price = priceNum.toFixed(0);
+    this.quantity = roundToSix(Number(quantity));
+    this.totalAmount = (priceNum * this.quantity).toFixed(0);
     this.tradedAt = tradedAt;
   }
 }

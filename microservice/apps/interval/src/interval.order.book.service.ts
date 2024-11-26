@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IntervalOrderBookRepository } from './interval.order.book.repository';
 import { OrderBookDto, OrderItemDto } from './dto/order.book.dto';
+import { roundToThree } from '@app/common/utils/number.format.util';
 
 @Injectable()
 export class IntervalOrderBookService {
@@ -17,22 +18,24 @@ export class IntervalOrderBookService {
       ]);
 
       const calculatePriceChangeRate = (price: number): number => {
-        return lastDayClose ? ((price - lastDayClose) / lastDayClose) * 100 : 0;
+        return lastDayClose
+          ? roundToThree(((price - lastDayClose) / lastDayClose) * 100)
+          : roundToThree(0);
       };
 
       return {
         sell: sellOrders.map(
           (order): OrderItemDto => ({
-            price: Number(order.price),
-            priceChangeRate: calculatePriceChangeRate(Number(order.price)),
-            amount: Number(order.remainingBase),
+            price: roundToThree(Number(order.price)),
+            priceChangeRate: roundToThree(calculatePriceChangeRate(Number(order.price))),
+            amount: roundToThree(Number(order.remainingBase)),
           }),
         ),
         buy: buyOrders.map(
           (order): OrderItemDto => ({
-            price: Number(order.price),
-            priceChangeRate: calculatePriceChangeRate(Number(order.price)),
-            amount: Number(order.remainingQuote),
+            price: roundToThree(Number(order.price)),
+            priceChangeRate: roundToThree(calculatePriceChangeRate(Number(order.price))),
+            amount: roundToThree(Number(order.remainingQuote)),
           }),
         ),
       };
