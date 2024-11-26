@@ -4,9 +4,9 @@ export class OrderPendingResponseDto {
   historyId: string;
   orderType: OrderType;
   coinCode: string;
-  price: string;
-  quantity: string;
-  unfilledAmount: string;
+  price: number;
+  quantity: number;
+  unfilledAmount: number;
   createdAt: Date;
 
   constructor(
@@ -21,9 +21,9 @@ export class OrderPendingResponseDto {
     this.historyId = historyId;
     this.orderType = orderType;
     this.coinCode = coinCode;
-    this.price = price;
-    this.quantity = quantity;
-    this.unfilledAmount = unfilledAmount;
+    this.price = Number(price);
+    this.quantity = Number(quantity);
+    this.unfilledAmount = Number(unfilledAmount);
     this.createdAt = createdAt;
   }
 }
