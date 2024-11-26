@@ -68,6 +68,10 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
       navigate('/signin');
       return;
     }
+    if (Number(amount) === 0 || Number(tradePrice) === 0 || Number(price) === 0) {
+      addToast('금액이나 수량이 올바르지 않습니다. 다시 확인해 주세요.', 'error');
+      return;
+    }
 
     const requestParam = {
       coinCode: 'BTC',
