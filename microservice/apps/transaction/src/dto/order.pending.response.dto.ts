@@ -5,7 +5,7 @@ export class OrderPendingResponseDto {
   historyId: string;
   orderType: OrderType;
   coinCode: string;
-  price: number;
+  price: string;
   quantity: number;
   unfilledAmount: number;
   createdAt: Date;
@@ -22,7 +22,7 @@ export class OrderPendingResponseDto {
     this.historyId = historyId;
     this.orderType = orderType;
     this.coinCode = coinCode;
-    this.price = roundToSix(Number(price));
+    this.price = Number(price).toFixed(0);
     this.quantity = roundToSix(Number(quantity));
     this.unfilledAmount = roundToSix(Number(unfilledAmount));
     this.createdAt = createdAt;

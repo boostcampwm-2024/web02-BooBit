@@ -5,9 +5,9 @@ export class TradeGetResponseDto {
   tradeId: string;
   orderType: OrderType;
   coinCode: string;
-  price: number;
+  price: string;
   quantity: number;
-  totalAmount: number;
+  totalAmount: string;
   tradedAt: Date;
 
   constructor(
@@ -21,9 +21,10 @@ export class TradeGetResponseDto {
     this.tradeId = tradeId;
     this.orderType = orderType;
     this.coinCode = coinCode;
-    this.price = roundToSix(Number(price));
+    const priceNum = Number(price);
+    this.price = priceNum.toFixed(0);
     this.quantity = roundToSix(Number(quantity));
-    this.totalAmount = roundToSix(this.price * this.quantity);
+    this.totalAmount = (priceNum * this.quantity).toFixed(0);
     this.tradedAt = tradedAt;
   }
 }
