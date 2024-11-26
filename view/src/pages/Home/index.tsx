@@ -15,8 +15,9 @@ import { CandleData } from '../../entities/Chart/model/candleDataType';
 import { CandleSocketType } from '../../shared/types/socket/CandleSocketType';
 import { OrderType } from '../../shared/types/socket/OrderType';
 
+const socketUrl = import.meta.env.VITE_SOCKET_URL;
 const Home = () => {
-  const { message, sendMessage } = useWebSocket('ws://localhost:3200/ws');
+  const { message, sendMessage } = useWebSocket(socketUrl);
   const [candleData, setCandleData] = useState<CandleData[]>();
   const [tradeRecords, setTradeRecords] = useState<RecordType[]>();
   const [orderBookData, setOrderBookData] = useState<{ buy: OrderType[]; sell: OrderType[] }>();
