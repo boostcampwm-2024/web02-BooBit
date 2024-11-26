@@ -44,6 +44,49 @@ const Home = () => {
         setCandleData(transformedData);
         break;
       }
+      case 'CANDLE_CHART': {
+        const candleData = message.data.map((item: CandleSocketType) => ({
+          date: new Date(item.date),
+          open: item.open,
+          close: item.close,
+          high: item.high,
+          low: item.low,
+          volume: item.volume,
+        }));
+
+        if (candleData.length === 1) {
+          const [currentCandle] = candleData;
+
+          setCandleData((prevCandleData) => {
+            if (!prevCandleData) {
+              return [currentCandle];
+            }
+
+            // 마지막 데이터 업데이트
+            const updatedData = [...prevCandleData];
+            updatedData[updatedData.length - 1] = currentCandle;
+
+            return updatedData;
+          });
+        } else {
+          const [prevCandle, currentCandle] = candleData;
+
+          setCandleData((prevCandleData) => {
+            if (!prevCandleData) {
+              return [...candleData];
+            }
+
+            // 이전 데이터 추가 및 현재 데이터 추가
+            const updatedData = [...prevCandleData];
+            updatedData.shift();
+            updatedData[updatedData.length - 1] = prevCandle;
+
+            return [...updatedData, currentCandle];
+          });
+        }
+
+        break;
+      }
       case 'TRADE': {
         const tradePrevData = message.data;
 
