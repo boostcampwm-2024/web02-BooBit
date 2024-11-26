@@ -1,7 +1,6 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
-
+const apiUrl = import.meta.env.VITE_AUTH_URL;
 const signoutApi = async () => {
-  const response = await fetch(`${BASE_URLS.AUTH}/api/auth/logout`, {
+  const response = await fetch(`${apiUrl}/api/auth/logout`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
