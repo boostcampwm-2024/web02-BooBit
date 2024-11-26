@@ -24,7 +24,7 @@ export class IntervalService implements OnModuleDestroy {
       this.intervalData.set(
         value,
         new CandleDataDto({
-          date: this.getSeoulTime(),
+          date: new Date(),
           open: 0,
           close: 0,
           high: 0,
@@ -43,148 +43,25 @@ export class IntervalService implements OnModuleDestroy {
   @Cron(CronExpression.EVERY_SECOND, { timeZone: 'Asia/Seoul' })
   async everySecond() {
     try {
-      const date = this.getSeoulTime();
+      const date = new Date();
       date.setMilliseconds(0);
 
       const { candle, trades } = await this.intervalMakeService.makeSecData(date);
       await this.handleCandleData(date, candle);
       await Promise.all([
         this.handleTradeData(trades),
-        this.saveCandleData(candle),
+        this.IntervalRepository.saveCandle(
+          TimeScale.SEC_01,
+          this.intervalData.get(TimeScale.SEC_01),
+        ),
         this.publishOrderBook(),
+        ...Array.from(this.intervalData.keys()).map((timeScale) =>
+          this.publishCandleData(date, timeScale, this.intervalData.get(timeScale)),
+        ),
       ]);
       this.intervalDataInit(TimeScale.SEC_01);
     } catch (error) {
       this.logger.error('Error in everySecond task', error);
-    }
-  }
-
-  private async handleCandleData(date: Date, secData: CandleDataDto) {
-    this.intervalData.forEach((value, timeScale) => {
-      try {
-        const updatedData = this.intervalMakeService.candleAdd(value, secData);
-        this.intervalData.set(timeScale, updatedData);
-
-        this.publishCandleData(date, timeScale, updatedData);
-      } catch (error) {
-        this.logger.error(`Error handling candle data for timeScale ${timeScale}:`, error);
-      }
-    });
-  }
-
-  private async publishCandleData(date: Date, timeScale: TimeScale, currentData: CandleDataDto) {
-    try {
-      const candleDataArray = [currentData];
-
-      if (this.isTimeScalePoint(date, timeScale)) {
-        const nextDate = new Date(currentData.date);
-
-        switch (timeScale) {
-          case TimeScale.SEC_01:
-            nextDate.setSeconds(nextDate.getSeconds() + 1);
-            break;
-          case TimeScale.MIN_01:
-            nextDate.setMinutes(nextDate.getMinutes() + 1);
-            break;
-          case TimeScale.MIN_10:
-            nextDate.setMinutes(nextDate.getMinutes() + 10);
-            break;
-          case TimeScale.MIN_30:
-            nextDate.setMinutes(nextDate.getMinutes() + 30);
-            break;
-          case TimeScale.HOUR_01:
-            nextDate.setHours(nextDate.getHours() + 1);
-            break;
-          case TimeScale.DAY_01:
-            nextDate.setDate(nextDate.getDate() + 1);
-            break;
-          case TimeScale.WEEK_01:
-            nextDate.setDate(nextDate.getDate() + 7);
-            break;
-          case TimeScale.MONTH_01:
-            nextDate.setMonth(nextDate.getMonth() + 1);
-            break;
-        }
-
-        const nextCandleData = this.createNextCandleData(currentData);
-        nextCandleData.date = nextDate;
-
-        candleDataArray.push(nextCandleData);
-      }
-      await this.redisPublisher.publish(
-        RedisChannel.CANDLE_CHART,
-        JSON.stringify({
-          event: RedisChannel.CANDLE_CHART,
-          timeScale,
-          data: candleDataArray,
-        }),
-      );
-    } catch (error) {
-      this.logger.error(`Error publishing candle data for ${timeScale}:`, error);
-    }
-  }
-
-  private createNextCandleData(currentData: CandleDataDto): CandleDataDto {
-    return {
-      date: currentData.date,
-      open: currentData.close,
-      high: currentData.close,
-      low: currentData.close,
-      close: currentData.close,
-      volume: 0,
-    };
-  }
-
-  private async handleTradeData(trades: any[]) {
-    try {
-      if (trades.length > 0) {
-        await this.redisPublisher.publish(
-          RedisChannel.TRADE,
-          JSON.stringify({
-            event: RedisChannel.TRADE,
-            data: trades,
-          }),
-        );
-      }
-    } catch (error) {
-      this.logger.error('Error handling trade data:', error);
-    }
-  }
-
-  private async saveCandleData(secData: CandleDataDto) {
-    try {
-      await this.IntervalRepository.saveCandle(TimeScale.SEC_01, secData);
-    } catch (error) {
-      this.logger.error('Error saving candle data:', error);
-    }
-  }
-
-  private isTimeScalePoint(date: Date, timeScale: TimeScale): boolean {
-    const seconds = date.getSeconds();
-    const minutes = date.getMinutes();
-    const hours = date.getHours();
-    const dayOfWeek = date.getDay();
-    const dayOfMonth = date.getDate();
-
-    switch (timeScale) {
-      case TimeScale.SEC_01:
-        return true;
-      case TimeScale.MIN_01:
-        return seconds === 0;
-      case TimeScale.MIN_10:
-        return seconds === 0 && minutes % 10 === 0;
-      case TimeScale.MIN_30:
-        return seconds === 0 && minutes % 30 === 0;
-      case TimeScale.HOUR_01:
-        return seconds === 0 && minutes === 0;
-      case TimeScale.DAY_01:
-        return seconds === 0 && minutes === 0 && hours === 0;
-      case TimeScale.WEEK_01:
-        return seconds === 0 && minutes === 0 && hours === 0 && dayOfWeek === 1; // 월요일
-      case TimeScale.MONTH_01:
-        return seconds === 0 && minutes === 0 && hours === 0 && dayOfMonth === 1; // 매월 1일
-      default:
-        return false;
     }
   }
 
@@ -294,7 +171,121 @@ export class IntervalService implements OnModuleDestroy {
     }
   }
 
-  getSeoulTime() {
-    return new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+  // getSeoulTime() {
+  //   return new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+  // }
+  private async handleCandleData(date: Date, secData: CandleDataDto) {
+    return this.intervalData.forEach((value, timeScale) => {
+      const updatedData = this.intervalMakeService.candleAdd(value, secData);
+      this.intervalData.set(timeScale, updatedData);
+    });
+  }
+
+  private async publishCandleData(date: Date, timeScale: TimeScale, currentData: CandleDataDto) {
+    try {
+      const candleDataArray = [currentData];
+
+      if (this.isTimeScalePoint(date, timeScale)) {
+        const nextDate = new Date(currentData.date);
+
+        switch (timeScale) {
+          case TimeScale.SEC_01:
+            nextDate.setSeconds(nextDate.getSeconds() + 1);
+            break;
+          case TimeScale.MIN_01:
+            nextDate.setMinutes(nextDate.getMinutes() + 1);
+            break;
+          case TimeScale.MIN_10:
+            nextDate.setMinutes(nextDate.getMinutes() + 10);
+            break;
+          case TimeScale.MIN_30:
+            nextDate.setMinutes(nextDate.getMinutes() + 30);
+            break;
+          case TimeScale.HOUR_01:
+            nextDate.setHours(nextDate.getHours() + 1);
+            break;
+          case TimeScale.DAY_01:
+            nextDate.setDate(nextDate.getDate() + 1);
+            break;
+          case TimeScale.WEEK_01:
+            nextDate.setDate(nextDate.getDate() + 7);
+            break;
+          case TimeScale.MONTH_01:
+            nextDate.setMonth(nextDate.getMonth() + 1);
+            break;
+        }
+
+        const nextCandleData = this.createNextCandleData(currentData);
+        nextCandleData.date = nextDate;
+
+        candleDataArray.push(nextCandleData);
+      }
+      await this.redisPublisher.publish(
+        RedisChannel.CANDLE_CHART,
+        JSON.stringify({
+          event: RedisChannel.CANDLE_CHART,
+          timeScale,
+          data: candleDataArray,
+        }),
+      );
+    } catch (error) {
+      this.logger.error(`Error publishing candle data for ${timeScale}:`, error);
+    }
+  }
+
+  private createNextCandleData(currentData: CandleDataDto): CandleDataDto {
+    return {
+      date: currentData.date,
+      open: currentData.close,
+      high: currentData.close,
+      low: currentData.close,
+      close: currentData.close,
+      volume: 0,
+    };
+  }
+
+  private async handleTradeData(trades: any[]) {
+    try {
+      if (trades.length > 0) {
+        await this.redisPublisher.publish(
+          RedisChannel.TRADE,
+          JSON.stringify({
+            event: RedisChannel.TRADE,
+            data: trades,
+          }),
+        );
+      }
+    } catch (error) {
+      this.logger.error('Error handling trade data:', error);
+    }
+  }
+
+  private isTimeScalePoint(date: Date, timeScale: TimeScale): boolean {
+    const seconds = date.getSeconds();
+    const minutes = date.getMinutes();
+    const hours = date.getHours();
+    const dayOfWeek = date.getDay();
+    const dayOfMonth = date.getDate();
+
+    switch (timeScale) {
+      case TimeScale.SEC_01:
+        return true;
+      case TimeScale.MIN_01:
+        return seconds === 0;
+      case TimeScale.MIN_10:
+        return seconds === 0 && minutes % 10 === 0;
+      case TimeScale.MIN_30:
+        return seconds === 0 && minutes % 30 === 0;
+      case TimeScale.HOUR_01:
+        return seconds === 0 && minutes === 0;
+      case TimeScale.DAY_01:
+        return seconds === 0 && minutes === 0 && hours === 0;
+      case TimeScale.WEEK_01:
+        return seconds === 0 && minutes === 0 && hours === 0 && dayOfWeek === 1; // 월요일
+      case TimeScale.MONTH_01:
+        return seconds === 0 && minutes === 0 && hours === 0 && dayOfMonth === 1; // 매월 1일
+      default:
+        return false;
+    }
   }
 }
