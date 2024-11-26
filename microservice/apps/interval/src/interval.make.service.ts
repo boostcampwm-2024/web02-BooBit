@@ -7,11 +7,8 @@ import { TradeGradient } from '@app/common/enums/trade.gradient.enum';
 @Injectable()
 export class IntervalMakeService {
   private readonly logger = new Logger(IntervalMakeService.name);
-  private lastClose: number;
 
-  constructor(private intervalRepository: IntervalRepository) {
-    this.lastClose = 0;
-  }
+  constructor(private intervalRepository: IntervalRepository) {}
 
   candleAdd(value: CandleDataDto, secData: CandleDataDto): CandleDataDto {
     return {
@@ -23,7 +20,7 @@ export class IntervalMakeService {
       volume: value.volume + secData.volume,
     };
   }
-  async makeSecData(date: Date) {
+  async makeSecData(date: Date, beforeData: CandleDataDto) {
     const startTime = new Date(date.getTime() - 1000);
     const trades = await this.intervalRepository.getTradesByDateRange(
       startTime,
@@ -32,21 +29,18 @@ export class IntervalMakeService {
     );
 
     if (trades.length === 0) {
-      const latestTrade = await this.intervalRepository.getLatestTrade(CurrencyCode.BTC);
-      this.lastClose = latestTrade ? Number(latestTrade.price) : 0;
       return {
         candle: new CandleDataDto({
           date: startTime,
-          open: this.lastClose,
-          close: this.lastClose,
-          high: this.lastClose,
-          low: this.lastClose,
+          open: beforeData.close,
+          close: beforeData.close,
+          high: beforeData.close,
+          low: beforeData.close,
           volume: 0,
         }),
         trades: [],
       };
     } else {
-      this.lastClose = Number(trades[trades.length - 1].price);
       return {
         candle: new CandleDataDto({
           date: startTime,
