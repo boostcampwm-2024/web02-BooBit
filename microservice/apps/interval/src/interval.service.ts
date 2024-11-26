@@ -1,15 +1,16 @@
 import { IntervalRepository } from './interval.candle.repository';
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
 import { CandleDataDto } from '@app/ws/dto/candle.data.dto';
-import { Injectable, Logger, OnModuleDestroy, Inject } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, Inject, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { IntervalMakeService } from './interval.make.service';
 import { Redis } from 'ioredis';
 import { RedisChannel } from '@app/common/enums/redis-channel.enum';
 import { IntervalOrderBookService } from './interval.order.book.service';
+import { CurrencyCode } from '@app/common';
 
 @Injectable()
-export class IntervalService implements OnModuleDestroy {
+export class IntervalService implements OnModuleDestroy, OnModuleInit {
   private readonly logger = new Logger(IntervalService.name);
   private intervalData: Map<TimeScale, CandleDataDto> = new Map<TimeScale, CandleDataDto>();
 
@@ -18,17 +19,20 @@ export class IntervalService implements OnModuleDestroy {
     private IntervalOrderBookService: IntervalOrderBookService,
     private IntervalRepository: IntervalRepository,
     @Inject('REDIS_PUBLISHER') private readonly redisPublisher: Redis,
-  ) {
-    Object.entries(TimeScale).forEach(async ([key, value]) => {
-      this.logger.log(`${key} : ${value}`);
+  ) {}
+  async onModuleInit() {
+    const latestPrice = Number(
+      (await this.IntervalRepository.getLatestTrade(CurrencyCode.BTC)).price,
+    );
+    Object.entries(TimeScale).forEach(async ([, value]) => {
       this.intervalData.set(
         value,
         new CandleDataDto({
           date: new Date(),
-          open: 0,
-          close: 0,
-          high: 0,
-          low: 0,
+          open: latestPrice,
+          close: latestPrice,
+          high: latestPrice,
+          low: latestPrice,
           volume: 0,
         }),
       );
@@ -46,7 +50,10 @@ export class IntervalService implements OnModuleDestroy {
       const date = new Date();
       date.setMilliseconds(0);
 
-      const { candle, trades } = await this.intervalMakeService.makeSecData(date);
+      const { candle, trades } = await this.intervalMakeService.makeSecData(
+        date,
+        this.intervalData.get(TimeScale.SEC_01),
+      );
       await this.handleCandleData(date, candle);
       await Promise.all([
         this.handleTradeData(trades),
