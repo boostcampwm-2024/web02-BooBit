@@ -11,7 +11,6 @@ import { useAuthActions } from '../shared/store/auth/authActions';
 import { useToast } from '../shared/store/ToastContext';
 import Toast from '../shared/UI/Toast';
 import errorMessages from '../shared/consts/errorMessages';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const App = () => {
   const navigate = useNavigate();
@@ -42,7 +41,6 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools />
       <Toast />
       <Routes>
         <Route path="/" element={<Home />} />
