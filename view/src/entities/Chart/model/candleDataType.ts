@@ -1,5 +1,5 @@
 export interface CandleData {
-  date: Date;
+  date: string;
   open: number;
   high: number;
   low: number;
