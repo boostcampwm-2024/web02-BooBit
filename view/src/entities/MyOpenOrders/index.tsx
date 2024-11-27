@@ -42,7 +42,7 @@ const MyOpenOrders = () => {
         </thead>
 
         <tbody className="block h-[16rem] overflow-y-auto">
-          {openOrders ? (
+          {openOrders && openOrders.length !== 0 ? (
             openOrders.map((t: OrderType) => (
               <TableRow
                 key={t.createdAt}
