@@ -56,8 +56,8 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .data(data)
       .enter()
       .append('line')
-      .attr('x1', (d) => xScale(d.date.toISOString())! + xScale.bandwidth() / 2)
-      .attr('x2', (d) => xScale(d.date.toISOString())! + xScale.bandwidth() / 2)
+      .attr('x1', (d) => xScale(d.date)! + xScale.bandwidth() / 2)
+      .attr('x2', (d) => xScale(d.date)! + xScale.bandwidth() / 2)
       .attr('y1', (d) => yScale(d.high))
       .attr('y2', (d) => yScale(d.low))
       .attr('stroke', '#E0E0E0')
@@ -71,11 +71,9 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .enter()
       .append('g') // 그룹을 묶어 관리
       .each(function (d, index) {
-        // 이전 캔들의 색상 초기화
-        let prevColor = '#E0E0E0'; // 기본 색상 (예: 회색)
+        let prevColor = '#FF5252'; //
 
         if (index > 0) {
-          // 이전 캔들의 색상 결정 (이전 캔들의 open과 close에 따라 색상 설정)
           prevColor = data[index - 1].open > data[index - 1].close ? '#FF5252' : '#00E676';
         }
 
@@ -83,8 +81,8 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
           // open과 close가 같을 경우 이전 캔들의 색상을 사용
           d3.select(this)
             .append('line')
-            .attr('x1', xScale(d.date.toISOString())!)
-            .attr('x2', xScale(d.date.toISOString())! + xScale.bandwidth())
+            .attr('x1', xScale(d.date)!)
+            .attr('x2', xScale(d.date)! + xScale.bandwidth())
             .attr('y1', yScale(d.open))
             .attr('y2', yScale(d.open))
             .attr('stroke', prevColor) // 이전 캔들의 색상 사용
@@ -93,7 +91,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
           // open과 close가 다를 경우
           d3.select(this)
             .append('rect')
-            .attr('x', xScale(d.date.toISOString())!)
+            .attr('x', xScale(d.date)!)
             .attr('y', yScale(Math.max(d.open, d.close)))
             .attr('width', xScale.bandwidth())
             .attr('height', Math.abs(yScale(d.open) - yScale(d.close)))
@@ -130,7 +128,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .data(data)
       .enter()
       .append('rect')
-      .attr('x', (d) => xScale(d.date.toISOString())!)
+      .attr('x', (d) => xScale(d.date)!)
       .attr('y', (d) => height - volumeHeight + yVolumeScale(d.volume))
       .attr('width', xScale.bandwidth())
       .attr('height', (d) => (d.volume > 0 ? volumeHeight - yVolumeScale(d.volume) : 0))

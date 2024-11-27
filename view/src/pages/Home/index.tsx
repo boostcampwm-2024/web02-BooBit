@@ -12,7 +12,6 @@ import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 import { RecordType } from '../../shared/types/RecordType';
 import { CandleData } from '../../entities/Chart/model/candleDataType';
 import { OrderType } from '../../shared/types/socket/OrderType';
-import { CandleSocketType } from '../../shared/types/socket/CandleSocketType';
 
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
 
@@ -46,26 +45,12 @@ const Home = () => {
 
       switch (receivedData.event) {
         case 'CANDLE_CHART_INIT': {
-          const candlePrevData = receivedData.data.map((item: CandleSocketType) => ({
-            date: new Date(item.date),
-            open: item.open,
-            close: item.close,
-            high: item.high,
-            low: item.low,
-            volume: item.volume,
-          }));
+          const candlePrevData = receivedData.data;
           setCandleData(candlePrevData);
           break;
         }
         case 'CANDLE_CHART': {
-          const candleData = receivedData.data.map((item: CandleSocketType) => ({
-            date: new Date(item.date),
-            open: item.open,
-            close: item.close,
-            high: item.high,
-            low: item.low,
-            volume: item.volume,
-          }));
+          const candleData = receivedData.data;
 
           if (candleData.length === 1) {
             const [currentCandle] = candleData;
