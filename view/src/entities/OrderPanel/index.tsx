@@ -13,6 +13,7 @@ import usePostBuy from './model/usePostBuy';
 import { useToast } from '../../shared/store/ToastContext';
 import usePostSell from './model/usePostSell';
 import useGetAvailableAsset from './model/useGetAvailableAsset';
+import formatPrice from '../../shared/model/formatPrice';
 
 interface OrderPanelProps {
   tradePrice: string;
@@ -115,15 +116,16 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
       <div className="pt-8 px-10">
         <SectionBlock title="주문 가능">
           <div className="text-display-bold-16 mr-2">
-            {authState.isAuthenticated ? myAsset.toLocaleString() : 0}
+            {authState.isAuthenticated ? formatPrice(myAsset) : 0}
           </div>
           <div className="available-medium-12 text-text-dark">{coinCode}</div>
         </SectionBlock>
         <SectionBlock title={`${selectedOrder} 가격`} subtitle="KRW">
-          <InputNumber amount={tradePrice} setAmount={setTradePrice} />
+          <InputNumber coinCode="KRW" amount={tradePrice} setAmount={setTradePrice} />
         </SectionBlock>
         <SectionBlock title="주문 수량" subtitle="BTC">
           <InputNumber
+            coinCode="BTC"
             amount={amount}
             setAmount={setAmount}
             updateRelatedValues={updatePriceWithAmount}
@@ -131,6 +133,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
         </SectionBlock>
         <SectionBlock title="주문 총액" subtitle="KRW">
           <InputNumber
+            coinCode="KRW"
             amount={price}
             setAmount={setPrice}
             updateRelatedValues={updateAmountWithPrice}

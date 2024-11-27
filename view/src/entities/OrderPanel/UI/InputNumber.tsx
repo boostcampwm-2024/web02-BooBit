@@ -1,22 +1,35 @@
 import { ChangeEvent } from 'react';
 
 interface InputNumberProps {
+  coinCode: string;
   amount: string;
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   updateRelatedValues?: (value: number) => void;
 }
 
-const InputNumber: React.FC<InputNumberProps> = ({ amount, setAmount, updateRelatedValues }) => {
+const InputNumber: React.FC<InputNumberProps> = ({
+  coinCode,
+  amount,
+  setAmount,
+  updateRelatedValues,
+}) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/,/g, '');
 
-    if (!/^\d*\.?\d*$/.test(value)) return;
+    const [intPart, decimalPart] = value.split('.');
+
+    if ((coinCode === 'KRW' && value.includes('.')) || (decimalPart && decimalPart.length === 7)) {
+      return;
+    }
 
     if (updateRelatedValues) {
       updateRelatedValues(parseFloat(value));
     }
 
-    setAmount(value.replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+    const newValue =
+      Number(intPart).toLocaleString() + (decimalPart !== undefined ? `.${decimalPart}` : '');
+
+    setAmount(newValue);
   };
 
   return (

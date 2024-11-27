@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import formatPrice from '../../../shared/model/formatPrice';
 
 interface UseOrderAmountProps {
   tradePrice: string;
@@ -15,7 +16,7 @@ const useOrderAmount = ({ tradePrice }: UseOrderAmountProps) => {
     }
     const tradePriceToNum = Number(tradePrice.replace(/,/g, ''));
 
-    const result = (value * tradePriceToNum).toLocaleString();
+    const result = formatPrice(Math.floor(value * tradePriceToNum));
     setPrice(result);
   };
 
@@ -26,7 +27,7 @@ const useOrderAmount = ({ tradePrice }: UseOrderAmountProps) => {
     }
     const tradePriceToNum = Number(tradePrice.replace(/,/g, ''));
 
-    const result = (value / tradePriceToNum).toFixed(6).toLocaleString();
+    const result = formatPrice((value / tradePriceToNum).toFixed(6));
     setAmount(result);
   };
 
