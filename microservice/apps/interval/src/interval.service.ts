@@ -24,6 +24,9 @@ export class IntervalService implements OnModuleDestroy, OnModuleInit {
     const latestPrice = Number(
       (await this.IntervalRepository.getLatestTrade(CurrencyCode.BTC))?.price ?? 0,
     );
+    for (const [, value] of Object.entries(TimeScale)) {
+      await this.ensureMinimumCandles(value);
+    }
     Object.entries(TimeScale).forEach(async ([, value]) => {
       this.intervalData.set(
         value,
@@ -294,5 +297,133 @@ export class IntervalService implements OnModuleDestroy, OnModuleInit {
       default:
         return false;
     }
+  }
+
+  async ensureMinimumCandles(timeScale: TimeScale) {
+    this.logger.log(`Ensuring minimum candles for ${timeScale}`);
+    const now = new Date();
+    const endDate = new Date(now);
+    let startDate = new Date(now);
+
+    // timeScale에 따라 시작 시간 조정
+    switch (timeScale) {
+      case TimeScale.SEC_01:
+        startDate.setSeconds(startDate.getSeconds() - 60);
+        endDate.setMilliseconds(0);
+        startDate.setMilliseconds(0);
+        break;
+      case TimeScale.MIN_01:
+        startDate.setMinutes(startDate.getMinutes() - 60);
+        startDate.setSeconds(0, 0);
+        endDate.setSeconds(0, 0);
+        break;
+      case TimeScale.MIN_10:
+        startDate.setMinutes(startDate.getMinutes() - 600);
+        startDate.setSeconds(0, 0);
+        endDate.setSeconds(0, 0);
+        if (startDate.getMinutes() % 10 !== 0) {
+          startDate.setMinutes(startDate.getMinutes() - (startDate.getMinutes() % 10));
+          endDate.setMinutes(endDate.getMinutes() - (endDate.getMinutes() % 10));
+        }
+        break;
+      case TimeScale.MIN_30:
+        startDate.setMinutes(startDate.getMinutes() - 1800);
+        startDate.setSeconds(0, 0);
+        endDate.setSeconds(0, 0);
+        if (startDate.getMinutes() % 30 !== 0) {
+          startDate.setMinutes(startDate.getMinutes() - (startDate.getMinutes() % 30));
+          endDate.setMinutes(endDate.getMinutes() - (endDate.getMinutes() % 30));
+        }
+        break;
+      case TimeScale.HOUR_01:
+        startDate.setHours(startDate.getHours() - 60);
+        startDate.setMinutes(0, 0, 0);
+        endDate.setMinutes(0, 0, 0);
+        break;
+      case TimeScale.DAY_01:
+        startDate.setDate(startDate.getDate() - 60);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(0, 0, 0, 0);
+        break;
+      case TimeScale.WEEK_01:
+        startDate.setDate(startDate.getDate() - 420); // 60주
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(0, 0, 0, 0);
+        break;
+      case TimeScale.MONTH_01:
+        startDate.setMonth(startDate.getMonth() - 60);
+        startDate.setDate(1);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(0, 0, 0, 0);
+        break;
+      default:
+        throw new Error(`Unsupported time scale: ${timeScale}`);
+    }
+
+    // 해당 기간의 모든 캔들 데이터 조회
+    const existingCandles = await this.IntervalRepository.getCandles(
+      timeScale,
+      CurrencyCode.BTC,
+      startDate,
+      endDate,
+      undefined, // 가져오는 캔들 수 제한 없음
+    );
+
+    // 생성 가능한 모든 더미 데이터 생성
+    const dummyStartTimes = new Set<string>();
+    const dummyStartTime = new Date(startDate);
+
+    while (dummyStartTime < endDate) {
+      dummyStartTimes.add(dummyStartTime.toISOString());
+
+      switch (timeScale) {
+        case TimeScale.SEC_01:
+          dummyStartTime.setSeconds(dummyStartTime.getSeconds() + 1);
+          break;
+        case TimeScale.MIN_01:
+          dummyStartTime.setMinutes(dummyStartTime.getMinutes() + 1);
+          break;
+        case TimeScale.MIN_10:
+          dummyStartTime.setMinutes(dummyStartTime.getMinutes() + 10);
+          break;
+        case TimeScale.MIN_30:
+          dummyStartTime.setMinutes(dummyStartTime.getMinutes() + 30);
+          break;
+        case TimeScale.HOUR_01:
+          dummyStartTime.setHours(dummyStartTime.getHours() + 1);
+          break;
+        case TimeScale.DAY_01:
+          dummyStartTime.setDate(dummyStartTime.getDate() + 1);
+          break;
+        case TimeScale.WEEK_01:
+          dummyStartTime.setDate(dummyStartTime.getDate() + 7);
+          break;
+        case TimeScale.MONTH_01:
+          dummyStartTime.setMonth(dummyStartTime.getMonth() + 1);
+          break;
+      }
+    }
+
+    // 존재하는 캔들의 타임스탬프 제거
+    existingCandles.forEach((candle) => {
+      dummyStartTimes.delete(candle.startTime.toISOString());
+    });
+
+    // 누락된 캔들 생성
+    const missingCandlePromises = Array.from(dummyStartTimes).map((timestamp) => {
+      return this.IntervalRepository.saveCandle(
+        timeScale,
+        new CandleDataDto({
+          date: new Date(timestamp),
+          open: 0,
+          close: 0,
+          high: 0,
+          low: 0,
+          volume: 0,
+        }),
+      );
+    });
+
+    await Promise.all(missingCandlePromises);
   }
 }
