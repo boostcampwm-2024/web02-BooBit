@@ -64,11 +64,6 @@ spec:
           configMap:
             name: transaction-db-init
             defaultMode: 0755
-  volumeClaimTemplates:
-    - metadata:
-        name: transaction-db-data
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 10Gi
+        - name: transaction-db-data
+          persistentVolumeClaim:
+            claimName: transaction-db

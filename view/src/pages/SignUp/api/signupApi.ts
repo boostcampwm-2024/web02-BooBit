@@ -1,8 +1,8 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
 import { FormData } from '../model/formDataType';
 
+const apiUrl = import.meta.env.VITE_AUTH_URL;
 const signUpApi = async (formData: FormData) => {
-  const response = await fetch(`${BASE_URLS.AUTH}/api/auth/signup`, {
+  const response = await fetch(`${apiUrl}/api/auth/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

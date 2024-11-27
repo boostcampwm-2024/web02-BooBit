@@ -8,6 +8,7 @@ import {
   Param,
   Query,
   Get,
+  BadRequestException,
 } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { AuthenticatedGuard } from '@app/session/guard/authenticated.guard';
@@ -35,6 +36,10 @@ export class TransactionController {
       buyLimitRequest.amount,
       buyLimitRequest.price,
     );
+
+    if (orderRequest.amount <= 0)
+      throw new BadRequestException('주문 수량은 1개 이상이어야 합니다.');
+
     const response = await this.transactionOrderService.makeBuyOrder(orderRequest);
 
     await this.transactionService.registerBuyOrder(orderRequest, response);
@@ -51,6 +56,10 @@ export class TransactionController {
       sellLimitRequest.amount,
       sellLimitRequest.price,
     );
+
+    if (orderRequest.amount <= 0)
+      throw new BadRequestException('주문 수량은 1개 이상이어야 합니다.');
+
     const response = await this.transactionOrderService.makeSellOrder(orderRequest);
 
     await this.transactionService.registerSellOrder(orderRequest, response);
@@ -80,5 +89,12 @@ export class TransactionController {
   @Get('/price')
   async getPrice(/*@Query('coinCode') coinCode: CurrencyCode*/) {
     return await this.transactionService.getPrice(/*coinCode*/);
+  }
+
+  @Get()
+  @UseGuards(AuthenticatedGuard)
+  async getOrders(@Request() req, @Query('id') id?: string) {
+    const userId = String(req.user.userId);
+    return await this.transactionService.getOrders(userId, id);
   }
 }

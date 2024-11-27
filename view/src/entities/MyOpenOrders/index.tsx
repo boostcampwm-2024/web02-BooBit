@@ -1,3 +1,5 @@
+import formatDate from '../../shared/model/formatDate.ts';
+import formatPrice from '../../shared/model/formatPrice.ts';
 import TableCell from '../../shared/UI/TableCell.tsx';
 import TableRow from '../../shared/UI/TableRow.tsx';
 import { OrderType } from './model/OrderType.ts';
@@ -30,7 +32,7 @@ const MyOpenOrders = () => {
   return (
     <div className="pt-[1.5rem] text-text-light text-available-medium-14 border-border-default border-t-[1px]">
       <div className="text-available-medium-18 mb-[0.5rem]">미체결</div>
-      <table className="w-full h-[18rem] mb-12 border-[1px] bg-surface-default border-border-default text-text-light">
+      <table className="w-full h-[18rem] mb-4 border-[1px] bg-surface-default border-border-default text-text-light">
         <thead>
           <TableRow height="h-[2rem]" styles="bg-surface-hover-light pr-[10px]">
             {columnData.map((c) => (
@@ -42,7 +44,7 @@ const MyOpenOrders = () => {
         </thead>
 
         <tbody className="block h-[16rem] overflow-y-auto">
-          {openOrders ? (
+          {openOrders && openOrders.length !== 0 ? (
             openOrders.map((t: OrderType) => (
               <TableRow
                 key={t.createdAt}
@@ -50,8 +52,8 @@ const MyOpenOrders = () => {
                 styles="border-border-default border-b-[1px]"
               >
                 <TableCell width={columnData[0].width}>
-                  <span>{t.createdAt.slice(0, 10).replace(/-/g, '.')}</span>
-                  <div className="mt-[-6px]">{t.createdAt.slice(11, 19)}</div>
+                  <span>{formatDate(t.createdAt).slice(0, 10)}</span>
+                  <div className="mt-[-6px]">{formatDate(t.createdAt).slice(11)}</div>
                 </TableCell>
                 <TableCell
                   width={columnData[1].width}
@@ -59,9 +61,9 @@ const MyOpenOrders = () => {
                 >
                   {t.orderType === 'BUY' ? '매수' : '매도'}
                 </TableCell>
-                <TableCell width={columnData[2].width}>{t.price}</TableCell>
-                <TableCell width={columnData[3].width}>{t.quantity}</TableCell>
-                <TableCell width={columnData[4].width}>{t.unfilledAmount}</TableCell>
+                <TableCell width={columnData[2].width}>{formatPrice(t.quantity)}</TableCell>
+                <TableCell width={columnData[3].width}>{formatPrice(t.price)}</TableCell>
+                <TableCell width={columnData[4].width}>{formatPrice(t.unfilledAmount)}</TableCell>
                 <TableCell width={columnData[5].width}>
                   <button
                     className={`w-[5rem] h-[2rem] rounded bg-surface-hover-light`}

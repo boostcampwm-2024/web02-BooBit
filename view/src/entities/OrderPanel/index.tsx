@@ -9,10 +9,11 @@ import CATEGORY from './const/orderCategory';
 import { useAuth } from '../../shared/store/auth/authContext';
 import { useAuthActions } from '../../shared/store/auth/authActions';
 import useOrderAmount from './model/useOrderAmount';
-import useGetAssets from '../../shared/model/useGetAssets';
 import usePostBuy from './model/usePostBuy';
 import { useToast } from '../../shared/store/ToastContext';
 import usePostSell from './model/usePostSell';
+import useGetAvailableAsset from './model/useGetAvailableAsset';
+import formatPrice from '../../shared/model/formatPrice';
 
 interface OrderPanelProps {
   tradePrice: string;
@@ -20,6 +21,13 @@ interface OrderPanelProps {
 }
 
 const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) => {
+  const { addToast } = useToast();
+  const { state: authState } = useAuth();
+  const { login } = useAuthActions();
+  const navigate = useNavigate();
+  const [myAsset, setMyAsset] = useState(0);
+  const [selectedOrder, setSelectedOrder] = useState('매수');
+  const [coinCode, setCoinCode] = useState('KRW');
   const {
     amount,
     setAmount,
@@ -29,16 +37,9 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
     updateAmountWithPrice,
     reset,
   } = useOrderAmount({ tradePrice });
+  const { data, refetch } = useGetAvailableAsset({ currencyCode: coinCode });
   const { mutate: orderBuy } = usePostBuy();
   const { mutate: orderSell } = usePostSell();
-  const { addToast } = useToast();
-  const { state: authState } = useAuth();
-  const navigate = useNavigate();
-  const [myAsset, setMyAsset] = useState(0);
-  const [selectedOrder, setSelectedOrder] = useState('매수');
-  const [coinCode, setCoinCode] = useState('KRW');
-  const { data } = useGetAssets();
-  const { login } = useAuthActions();
 
   useEffect(() => {
     setCoinCode(selectedOrder === '매수' ? 'KRW' : 'BTC');
@@ -46,13 +47,15 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
 
     if (data) {
       login();
-      if (selectedOrder === '매수') {
-        setMyAsset(data[1] ? data[1].amount : 0);
-      } else {
-        setMyAsset(data[0] ? data[0].amount : 0);
-      }
+      setMyAsset(data.availableBalance);
     }
   }, [data, selectedOrder]);
+
+  useEffect(() => {
+    if (coinCode) {
+      refetch();
+    }
+  }, [coinCode]);
 
   const handleSubClick = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
@@ -68,11 +71,15 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
       navigate('/signin');
       return;
     }
+    if (Number(amount) === 0 || Number(tradePrice) === 0 || Number(price) === 0) {
+      addToast('금액이나 수량이 올바르지 않습니다. 다시 확인해 주세요.', 'error');
+      return;
+    }
 
     const requestParam = {
       coinCode: 'BTC',
       amount: Number(amount.replace(/,/g, '')),
-      price: Number(price.replace(/,/g, '')),
+      price: Number(tradePrice.replace(/,/g, '')),
     };
     if (selectedOrder === '매수') {
       if (myAsset < requestParam.price) {
@@ -109,15 +116,16 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
       <div className="pt-8 px-10">
         <SectionBlock title="주문 가능">
           <div className="text-display-bold-16 mr-2">
-            {authState.isAuthenticated ? myAsset.toLocaleString() : 0}
+            {authState.isAuthenticated ? formatPrice(myAsset) : 0}
           </div>
           <div className="available-medium-12 text-text-dark">{coinCode}</div>
         </SectionBlock>
         <SectionBlock title={`${selectedOrder} 가격`} subtitle="KRW">
-          <InputNumber amount={tradePrice} setAmount={setTradePrice} />
+          <InputNumber coinCode="KRW" amount={tradePrice} setAmount={setTradePrice} />
         </SectionBlock>
         <SectionBlock title="주문 수량" subtitle="BTC">
           <InputNumber
+            coinCode="BTC"
             amount={amount}
             setAmount={setAmount}
             updateRelatedValues={updatePriceWithAmount}
@@ -125,6 +133,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
         </SectionBlock>
         <SectionBlock title="주문 총액" subtitle="KRW">
           <InputNumber
+            coinCode="KRW"
             amount={price}
             setAmount={setPrice}
             updateRelatedValues={updateAmountWithPrice}

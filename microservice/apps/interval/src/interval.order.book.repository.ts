@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class IntervalOrderBookRepository {
@@ -25,35 +26,39 @@ export class IntervalOrderBookRepository {
     }
   }
 
-  async getLastTradePrice(): Promise<number> {
-    try {
-      const lastTrade = await this.prisma.trade.findFirst({
-        orderBy: {
-          tradedAt: 'desc',
-        },
-        select: {
-          price: true,
-        },
-      });
-
-      return lastTrade ? Number(lastTrade.price) : 0;
-    } catch (error) {
-      this.logger.error('최근 체결가 조회 중 오류 발생:', error);
-      throw error;
-    }
-  }
-
   async getSellOrders() {
     try {
-      return await this.prisma.sellOrder.findMany({
-        select: {
-          price: true,
-          remainingBase: true,
-        },
-        orderBy: {
-          price: 'desc',
-        },
-        take: 5,
+      const result = await this.prisma.sellOrder.aggregateRaw({
+        pipeline: [
+          {
+            $addFields: {
+              remaining_base_double: { $toDouble: '$remaining_base' },
+            },
+          },
+          {
+            $group: {
+              _id: '$price',
+              totalRemainingBase: { $sum: '$remaining_base_double' },
+            },
+          },
+          {
+            $sort: { _id: 1 },
+          },
+          {
+            $limit: 5,
+          },
+          {
+            $sort: { _id: -1 },
+          },
+        ],
+      });
+      const aggregatedData = result as unknown as Prisma.JsonArray;
+      return aggregatedData.map((item) => {
+        const data = item as { _id: number; totalRemainingBase: number };
+        return {
+          price: data._id,
+          remainingBase: data.totalRemainingBase,
+        };
       });
     } catch (error) {
       this.logger.error('매도 주문 조회 중 오류 발생:', error);
@@ -63,15 +68,34 @@ export class IntervalOrderBookRepository {
 
   async getBuyOrders() {
     try {
-      return await this.prisma.buyOrder.findMany({
-        select: {
-          price: true,
-          remainingQuote: true,
-        },
-        orderBy: {
-          price: 'desc',
-        },
-        take: 5,
+      const result = await this.prisma.buyOrder.aggregateRaw({
+        pipeline: [
+          {
+            $addFields: {
+              remaining_quote_double: { $toDouble: '$remaining_quote' },
+            },
+          },
+          {
+            $group: {
+              _id: '$price',
+              totalRemainingQuote: { $sum: '$remaining_quote_double' },
+            },
+          },
+          {
+            $sort: { _id: -1 },
+          },
+          {
+            $limit: 5,
+          },
+        ],
+      });
+      const aggregatedData = result as unknown as Prisma.JsonArray;
+      return aggregatedData.map((item) => {
+        const data = item as { _id: number; totalRemainingQuote: number };
+        return {
+          price: data._id,
+          remainingQuote: data.totalRemainingQuote,
+        };
       });
     } catch (error) {
       this.logger.error('매수 주문 조회 중 오류 발생:', error);

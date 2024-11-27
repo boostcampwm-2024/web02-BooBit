@@ -2,6 +2,7 @@ import { ChangeEvent } from 'react';
 import SubmitButton from '../../../shared/UI/SubmitButton';
 
 interface TransactionFormProps {
+  currencyCode: string;
   type: string;
   amount: string;
   handleSubmit: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -10,6 +11,7 @@ interface TransactionFormProps {
 }
 
 const TransactionForm: React.FC<TransactionFormProps> = ({
+  currencyCode,
   type,
   amount,
   handleSubmit,
@@ -17,20 +19,28 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   isError = false,
 }) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = e.target.value.replace(/,/g, '');
 
-    if (isNaN(Number(value))) {
+    const [intPart, decimalPart] = value.split('.');
+
+    if (currencyCode === 'KRW' && value.includes('.')) {
+      return;
+    }
+    if (decimalPart && decimalPart.length === 7) {
       return;
     }
 
-    setAmount(value);
+    const newValue =
+      Number(intPart).toLocaleString() + (decimalPart !== undefined ? `.${decimalPart}` : '');
+
+    setAmount(newValue);
   };
 
   return (
     <div className="w-[100%] h-[17rem] px-[3vw] py-[1.5rem] text-text-dark text-available-midium-16">
       <div className="w-[100%] flex justify-between pb-[1rem]">
         <div>실명 계좌</div>
-        <div className="text-text-light">10001212**** 케이뱅크</div>
+        <div className="text-text-light">20240819**** 네이버뱅크</div>
       </div>
       {type} 금액
       <input

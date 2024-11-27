@@ -57,7 +57,7 @@ services:
     ports:
       - "${TRANSACTION_HOST_SERVICE_PORT}:3000"
     environment:
-      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017,${TRANSACTION_DB}-secondary1:27017,${TRANSACTION_DB}-secondary2:27017/${MYSQL_DATABASE}?replicaSet=rs0
+      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}?replicaSet=rs0
       BALANCE_GRPC_URL: balance:50051
       REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
       TRADE_REDIS_URL: "redis://${TRADE_REDIS}:${REDIS_PORT}"
@@ -77,7 +77,7 @@ services:
     ports:
       - "${TRADE_HOST_SERVICE_PORT}:3000"
     environment:
-      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017,${TRANSACTION_DB}-secondary1:27017,${TRANSACTION_DB}-secondary2:27017/${MYSQL_DATABASE}?replicaSet=rs0
+      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}?replicaSet=rs0
       BALANCE_GRPC_URL: balance:50051
       REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
       TRADE_REDIS_URL: "redis://${TRADE_REDIS}:${REDIS_PORT}"
@@ -93,7 +93,7 @@ services:
     ports:
       - "${INTERVAL_HOST_SERVICE_PORT}:3000"
     environment:
-      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017,${TRANSACTION_DB}-secondary1:27017,${TRANSACTION_DB}-secondary2:27017/${MYSQL_DATABASE}?replicaSet=rs0
+      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}?replicaSet=rs0
       TRADE_REDIS_URL: "redis://${TRADE_REDIS}:${REDIS_PORT}"
       TZ: Asia/Seoul
     depends_on:

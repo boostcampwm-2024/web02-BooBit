@@ -13,11 +13,8 @@ const MyAssetList = ({ assetList, setSelectedAssetIdx }: AssetListProps) => {
     <BoxContainer>
       <InfoBar />
       <ul className="h-[10rem] overflow-y-auto">
-        {assetList.map((a, i) => {
-          return (
-            <AssetItem key={a.currencyCode} asset={a} handleClick={() => setSelectedAssetIdx(i)} />
-          );
-        })}
+        <AssetItem asset={assetList[1]} handleClick={() => setSelectedAssetIdx(1)} />
+        <AssetItem asset={assetList[0]} handleClick={() => setSelectedAssetIdx(0)} />
       </ul>
     </BoxContainer>
   );
