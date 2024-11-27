@@ -10,7 +10,7 @@ export const createXAxisScale = (
   // X축 스케일 생성
   const xScale = d3
     .scaleBand()
-    .domain(data.map((d) => d.date.toISOString()))
+    .domain(data.map((d) => d.date))
     .range([0, width])
     .padding(0.3);
 
@@ -18,23 +18,24 @@ export const createXAxisScale = (
   const tickValues = data
     .map((d) => {
       const date = d.date;
+      const [month, day, hour, minute, second] = date.slice(5, -5).split(/[-T:]/).map(Number);
       switch (scaleType) {
         case '1sec':
-          return date.getSeconds() % 12 === 0 ? date.toISOString() : null;
+          return second % 12 === 0 ? date : null;
         case '1min':
-          return date.getMinutes() % 12 === 0 ? date.toISOString() : null;
+          return minute % 12 === 0 ? date : null;
         case '10min':
-          return date.getHours() % 2 === 0 && date.getMinutes() === 0 ? date.toISOString() : null;
+          return hour % 2 === 0 && minute === 0 ? date : null;
         case '30min':
-          return date.getHours() % 6 === 0 && date.getMinutes() === 0 ? date.toISOString() : null;
+          return hour % 6 === 0 && minute === 0 ? date : null;
         case '1hour':
-          return date.getHours() % 12 === 0 ? date.toISOString() : null;
+          return hour % 12 === 0 ? date : null;
         case '1day':
-          return date.getDate() === 1 || date.getDate() === 16 ? date.toISOString() : null;
+          return day === 1 || day === 16 ? date : null;
         case '1week':
-          return date.getDate() === 1 ? date.toISOString() : null;
+          return day === 1 ? date : null;
         case '1month':
-          return date.getMonth() === 1 ? date.toISOString() : null;
+          return month === 1 ? date : null;
         default:
           return null;
       }
@@ -44,28 +45,25 @@ export const createXAxisScale = (
   // 틱 포맷 함수
   const tickFormat = (d: string | null) => {
     if (!d) return '';
-    const date = new Date(d);
+    const [year, month, day, hour, minute, second] = d.slice(0, -5).split(/[-T:]/);
     switch (scaleType) {
       case '1sec':
-        return d3.timeFormat('%H:%M:%S')(date);
+        return `${hour}:${minute}:${second}`;
       case '1min':
       case '10min':
-        return d3.timeFormat('%H:%M')(date);
+        return `${hour}:${minute}`;
       case '30min':
       case '1hour': {
-        const hour = date.getHours();
-        return hour === 0 ? d3.timeFormat('%m/%d')(date) : d3.timeFormat('%H:%M')(date);
+        return hour === '0' ? `${month}/${day}` : `${hour}:${minute}`;
       }
       case '1day': {
-        const day = date.getDate();
-        return day === 1 ? d3.timeFormat('%b')(date) : '16';
+        return day === '1' ? `${month}월` : '16';
       }
       case '1week': {
-        const month = date.getMonth();
-        return month === 0 ? d3.timeFormat('%Y')(date) : d3.timeFormat('%b')(date);
+        return month === '1' ? `${year}년` : `${month}월`;
       }
       case '1month':
-        return d3.timeFormat('%Y')(date);
+        return `${year}`;
       default:
         return '';
     }

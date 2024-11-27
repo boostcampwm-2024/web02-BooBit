@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import addText from './lib/addText';
 import { CandleData } from './model/candleDataType';
 import { createXAxisScale } from './lib/createXAxisScale';
 import { createYAxisScale } from './lib/createYAxisScale';
 import { createBarAxisScale } from './lib/createBarYAsixScale';
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
+import updateMarketText from './lib/updateMarketText';
 
 interface CandleChartProps {
   data?: CandleData[];
@@ -14,7 +14,6 @@ interface CandleChartProps {
 
 const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const [marketValues, setMarketValues] = useState<CandleData>();
 
   useEffect(() => {
     if (!data || data.length === 0 || !svgRef.current) return;
@@ -56,8 +55,8 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .data(data)
       .enter()
       .append('line')
-      .attr('x1', (d) => xScale(d.date.toISOString())! + xScale.bandwidth() / 2)
-      .attr('x2', (d) => xScale(d.date.toISOString())! + xScale.bandwidth() / 2)
+      .attr('x1', (d) => xScale(d.date)! + xScale.bandwidth() / 2)
+      .attr('x2', (d) => xScale(d.date)! + xScale.bandwidth() / 2)
       .attr('y1', (d) => yScale(d.high))
       .attr('y2', (d) => yScale(d.low))
       .attr('stroke', '#E0E0E0')
@@ -71,11 +70,9 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .enter()
       .append('g') // 그룹을 묶어 관리
       .each(function (d, index) {
-        // 이전 캔들의 색상 초기화
-        let prevColor = '#E0E0E0'; // 기본 색상 (예: 회색)
+        let prevColor = '#00E676'; //
 
         if (index > 0) {
-          // 이전 캔들의 색상 결정 (이전 캔들의 open과 close에 따라 색상 설정)
           prevColor = data[index - 1].open > data[index - 1].close ? '#FF5252' : '#00E676';
         }
 
@@ -83,8 +80,8 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
           // open과 close가 같을 경우 이전 캔들의 색상을 사용
           d3.select(this)
             .append('line')
-            .attr('x1', xScale(d.date.toISOString())!)
-            .attr('x2', xScale(d.date.toISOString())! + xScale.bandwidth())
+            .attr('x1', xScale(d.date)!)
+            .attr('x2', xScale(d.date)! + xScale.bandwidth())
             .attr('y1', yScale(d.open))
             .attr('y2', yScale(d.open))
             .attr('stroke', prevColor) // 이전 캔들의 색상 사용
@@ -93,14 +90,15 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
           // open과 close가 다를 경우
           d3.select(this)
             .append('rect')
-            .attr('x', xScale(d.date.toISOString())!)
+            .attr('x', xScale(d.date)!)
             .attr('y', yScale(Math.max(d.open, d.close)))
             .attr('width', xScale.bandwidth())
             .attr('height', Math.abs(yScale(d.open) - yScale(d.close)))
             .attr('fill', d.open > d.close ? '#FF5252' : '#00E676')
             .on('mouseover', (e) => {
               e.preventDefault();
-              setMarketValues(d);
+              const mainGroup = d3.select(svgRef.current).select('g');
+              updateMarketText(mainGroup, d);
             });
         }
       });
@@ -130,33 +128,17 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .data(data)
       .enter()
       .append('rect')
-      .attr('x', (d) => xScale(d.date.toISOString())!)
+      .attr('x', (d) => xScale(d.date)!)
       .attr('y', (d) => height - volumeHeight + yVolumeScale(d.volume))
       .attr('width', xScale.bandwidth())
       .attr('height', (d) => (d.volume > 0 ? volumeHeight - yVolumeScale(d.volume) : 0))
       .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'))
       .on('mouseover', (e, d) => {
         e.preventDefault();
-        setMarketValues(d);
+        const mainGroup = d3.select(svgRef.current).select('g');
+        updateMarketText(mainGroup, d);
       });
   }, [data, scaleType]);
-
-  useEffect(() => {
-    if (!marketValues) return;
-    d3.select(svgRef.current).selectAll('.market-text').remove();
-
-    const mainGroup = d3.select(svgRef.current).select('g');
-    addText(mainGroup, 10, [
-      `시가: ${marketValues.open}`,
-      `종가: ${marketValues.close}`,
-      `PRICE: ${marketValues.open}`,
-    ]);
-    addText(mainGroup, 22, [
-      `고가: ${marketValues.high}`,
-      `저가: ${marketValues.low}`,
-      `VOL: ${marketValues.volume}`,
-    ]);
-  }, [marketValues]);
 
   return <svg className="w-full border-[1px] border-border-default" ref={svgRef} />;
 };
