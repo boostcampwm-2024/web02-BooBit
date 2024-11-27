@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import addText from './lib/addText';
 import { CandleData } from './model/candleDataType';
 import { createXAxisScale } from './lib/createXAxisScale';
 import { createYAxisScale } from './lib/createYAxisScale';
 import { createBarAxisScale } from './lib/createBarYAsixScale';
 import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
+import updateMarketText from './lib/updateMarketText';
 
 interface CandleChartProps {
   data?: CandleData[];
@@ -14,7 +14,6 @@ interface CandleChartProps {
 
 const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const [marketValues, setMarketValues] = useState<CandleData>();
 
   useEffect(() => {
     if (!data || data.length === 0 || !svgRef.current) return;
@@ -71,7 +70,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .enter()
       .append('g') // 그룹을 묶어 관리
       .each(function (d, index) {
-        let prevColor = '#FF5252'; //
+        let prevColor = '#00E676'; //
 
         if (index > 0) {
           prevColor = data[index - 1].open > data[index - 1].close ? '#FF5252' : '#00E676';
@@ -98,7 +97,8 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
             .attr('fill', d.open > d.close ? '#FF5252' : '#00E676')
             .on('mouseover', (e) => {
               e.preventDefault();
-              setMarketValues(d);
+              const mainGroup = d3.select(svgRef.current).select('g');
+              updateMarketText(mainGroup, d);
             });
         }
       });
@@ -135,26 +135,10 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'))
       .on('mouseover', (e, d) => {
         e.preventDefault();
-        setMarketValues(d);
+        const mainGroup = d3.select(svgRef.current).select('g');
+        updateMarketText(mainGroup, d);
       });
   }, [data, scaleType]);
-
-  useEffect(() => {
-    if (!marketValues) return;
-    d3.select(svgRef.current).selectAll('.market-text').remove();
-
-    const mainGroup = d3.select(svgRef.current).select('g');
-    addText(mainGroup, 10, [
-      `시가: ${marketValues.open}`,
-      `종가: ${marketValues.close}`,
-      `PRICE: ${marketValues.open}`,
-    ]);
-    addText(mainGroup, 22, [
-      `고가: ${marketValues.high}`,
-      `저가: ${marketValues.low}`,
-      `VOL: ${marketValues.volume}`,
-    ]);
-  }, [marketValues]);
 
   return <svg className="w-full border-[1px] border-border-default" ref={svgRef} />;
 };
