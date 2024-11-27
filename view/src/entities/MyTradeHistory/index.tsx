@@ -4,6 +4,7 @@ import TableCell from '../../shared/UI/TableCell';
 import useGetTrades from './model/useGetTrades';
 import { TradeType } from './model/TradeType';
 import formatPrice from '../../shared/model/formatPrice';
+import formatDate from '../../shared/model/formatDate';
 const columnData = [
   { content: '코인', width: 'w-[3rem]' },
   { content: '종류', width: 'w-[3rem]' },
@@ -68,8 +69,8 @@ const MyTradeHistory = () => {
                   <TableCell width={columnData[3].width}>{formatPrice(h.price)}</TableCell>
                   <TableCell width={columnData[4].width}>{formatPrice(h.totalAmount)}</TableCell>
                   <TableCell width={columnData[5].width}>
-                    <span>{h.tradedAt.slice(0, 10).replace(/-/g, '.')}</span>
-                    <div className="mt-[-6px]">{h.tradedAt.slice(11, 19)}</div>
+                    <span>{formatDate(h.tradedAt).slice(0, 10)}</span>
+                    <div className="mt-[-6px]">{formatDate(h.tradedAt).slice(11)}</div>
                   </TableCell>
                 </TableRow>
               ))

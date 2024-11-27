@@ -1,3 +1,4 @@
+import formatDate from '../../../shared/model/formatDate';
 import formatPrice from '../../../shared/model/formatPrice';
 import { TransactionType } from '../model/TransactionType';
 
@@ -18,9 +19,7 @@ const TransactionLogItem: React.FC<TransactionLogItemProps> = ({ log, currency_c
         >
           {log.tx_type === 'withdrawal' ? '출금' : '입금'} 완료
         </div>
-        <div className="text-text-dark text-available-medium-14">
-          {new Date(log.timestamp).toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
-        </div>
+        <div className="text-text-dark text-available-medium-14">{formatDate(log.timestamp)}</div>
       </div>
       <div className="text-text-light text-display-bold-16">
         {formatPrice(log.amount)} {currency_code}

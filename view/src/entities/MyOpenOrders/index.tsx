@@ -1,3 +1,4 @@
+import formatDate from '../../shared/model/formatDate.ts';
 import formatPrice from '../../shared/model/formatPrice.ts';
 import TableCell from '../../shared/UI/TableCell.tsx';
 import TableRow from '../../shared/UI/TableRow.tsx';
@@ -51,8 +52,8 @@ const MyOpenOrders = () => {
                 styles="border-border-default border-b-[1px]"
               >
                 <TableCell width={columnData[0].width}>
-                  <span>{t.createdAt.slice(0, 10).replace(/-/g, '.')}</span>
-                  <div className="mt-[-6px]">{t.createdAt.slice(11, 19)}</div>
+                  <span>{formatDate(t.createdAt).slice(0, 10)}</span>
+                  <div className="mt-[-6px]">{formatDate(t.createdAt).slice(11)}</div>
                 </TableCell>
                 <TableCell
                   width={columnData[1].width}
