@@ -8,7 +8,7 @@ export const createYAxisScale = (data: CandleData[], height: number, volumeHeigh
 
   const yScale = d3
     .scaleLinear()
-    .domain([0, yMax + (yMax - yMin) * paddingRatio])
+    .domain([yMin - (yMax - yMin) * paddingRatio, yMax + (yMax - yMin) * paddingRatio])
     .nice()
     .range([height - volumeHeight, 0]);
 
