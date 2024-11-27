@@ -69,8 +69,8 @@ const MyTradeHistory = () => {
                     {h.totalAmount.toLocaleString()}
                   </TableCell>
                   <TableCell width={columnData[5].width}>
-                    <span>{h.timestamp.slice(0, 10).replace(/-/g, '.')}</span>
-                    <div className="mt-[-6px]">{h.timestamp.slice(11, 19)}</div>
+                    <span>{h.tradedAt.slice(0, 10).replace(/-/g, '.')}</span>
+                    <div className="mt-[-6px]">{h.tradedAt.slice(11, 19)}</div>
                   </TableCell>
                 </TableRow>
               ))

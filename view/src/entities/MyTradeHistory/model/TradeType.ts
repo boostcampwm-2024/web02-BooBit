@@ -5,5 +5,5 @@ export interface TradeType {
   quantity: string;
   price: string;
   totalAmount: string;
-  timestamp: string;
+  tradedAt: string;
 }
