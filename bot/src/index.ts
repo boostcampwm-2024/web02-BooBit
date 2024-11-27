@@ -2,44 +2,32 @@ import { TradingBot } from './boobit/boobit.bot';
 import { CurrencyCode } from './boobit/currency.code';
 import { OrderLimitRequestDto } from './boobit/order.limit.request.dto';
 import { getConfig } from './utils/config.setting.client';
-import { getBitcoinPrice } from './upbit/upbit.index';
-import { BotConfig } from './boobit/bot.config';
+import { getBoobitPrice, getUpbitPrice } from './upbit/upbit.index';
+import { ActionType, BotConfig } from './boobit/bot.config';
 import { getArgs } from './utils/config.setting.argv';
-let price: number;
-let orderRequest: OrderLimitRequestDto;
+let upbitPrice: number = -1;
+let boobitPrice: number = -1;
 let count = 0;
 const trader = new TradingBot();
 const intervalList: NodeJS.Timeout[] = [];
 
 async function main() {
-  const argv = await getArgs();
-  const config = argv.client
-    ? await getConfig()
-    : new BotConfig(
-        argv.cpi,
-        argv.ai,
-        argv.at,
-        argv.minp,
-        argv.maxp,
-        argv.mina,
-        argv.maxa,
-        argv.count,
-      );
+  const config = await setConfig(await getArgs());
   console.log(config);
-  price = await getBitcoinPrice();
-  orderRequest = new OrderLimitRequestDto(CurrencyCode.BTC, 0.1, price);
 
   await trader.initialize();
 
-  intervalList.push(registerGetPrice(config));
-  intervalList.push(registerOrder(config));
+  start(config);
 }
 
 function registerGetPrice(config: BotConfig) {
   return setInterval(async () => {
     try {
-      price = await getBitcoinPrice();
-      orderRequest = new OrderLimitRequestDto(CurrencyCode.BTC, 0.1, price);
+      if (config.actionType === ActionType.AUTO) {
+        [boobitPrice, upbitPrice] = await Promise.all([getBoobitPrice(), getUpbitPrice()]);
+      } else {
+        upbitPrice = await getUpbitPrice();
+      }
     } catch (error) {
       console.error('Error getting price:', error);
     }
@@ -51,14 +39,21 @@ function registerOrder(config: BotConfig) {
     const orderRequest = new OrderLimitRequestDto(
       CurrencyCode.BTC,
       config.generateRandomAmount(),
-      config.generateRandomPrice(price),
+      config.generateRandomPrice(upbitPrice),
     );
-    const type = config.getActionType();
     try {
-      if (type === 'buy') {
-        await trader.placeBuyOrder(orderRequest);
+      const type =
+        config.actionType === ActionType.AUTO
+          ? boobitPrice <= upbitPrice
+            ? ActionType.BUY
+            : ActionType.SELL
+          : config.getActionType();
+      if (config.actionType === ActionType.AUTO) {
+        if (boobitPrice <= upbitPrice) await trader.placeBuyOrder(orderRequest);
+        else await trader.placeSellOrder(orderRequest);
       } else {
-        await trader.placeSellOrder(orderRequest);
+        if (type === ActionType.BUY) await trader.placeBuyOrder(orderRequest);
+        else await trader.placeSellOrder(orderRequest);
       }
       if (count++ >= config.count && !(config.count < 0)) {
         await trader.logout();
@@ -73,6 +68,32 @@ function registerOrder(config: BotConfig) {
       }
     }
   }, config.actionInterval);
+}
+
+function start(config: BotConfig) {
+  intervalList.push(registerGetPrice(config));
+
+  const id = setInterval(() => {
+    if (upbitPrice > 0) {
+      intervalList.push(registerOrder(config));
+      clearInterval(id);
+    }
+  }, 500);
+}
+
+async function setConfig(argv: any) {
+  return argv.client
+    ? await getConfig()
+    : new BotConfig(
+        argv.cpi,
+        argv.ai,
+        argv.at,
+        argv.minp,
+        argv.maxp,
+        argv.mina,
+        argv.maxa,
+        argv.count,
+      );
 }
 
 main();

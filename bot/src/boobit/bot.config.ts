@@ -2,13 +2,14 @@ export enum ActionType {
   BUY = 'buy',
   SELL = 'sell',
   ALL = 'all',
+  AUTO = 'auto',
 }
 
 export class BotConfig {
   constructor(
     public getPriceInterval: number = 1000,
     public actionInterval: number = 300,
-    public actionType: string = ActionType.ALL,
+    public actionType: ActionType = ActionType.ALL,
     public minPercent: number = 3,
     public maxPercent: number = 3,
     public minAmount: number = 0.02,
@@ -36,11 +37,11 @@ export class BotConfig {
 
     return price - (price % 500);
   }
-  getActionType(): 'buy' | 'sell' {
+  getActionType(): ActionType {
     if (this.actionType === ActionType.ALL) {
-      return Math.random() < 0.5 ? 'buy' : 'sell';
+      return Math.random() < 0.5 ? ActionType.BUY : ActionType.SELL;
     }
-    return this.actionType as 'buy' | 'sell';
+    return this.actionType;
   }
   toString(): string {
     return `BotConfig {

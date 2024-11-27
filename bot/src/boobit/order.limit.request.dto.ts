@@ -9,6 +9,11 @@ export class OrderLimitRequestDto {
   price: number;
 
   toString() {
-    return `OrderLimitRequestDto { coinCode: ${this.coinCode}, amount: ${this.amount}, price: ${this.price} }`;
+    return `OrderLimitRequestDto { coinCode: ${this.coinCode}, amount: ${
+      this.amount
+    }, price: ${this.price.toLocaleString('ko-KR', {
+      style: 'currency',
+      currency: 'KRW',
+    })} }`;
   }
 }
