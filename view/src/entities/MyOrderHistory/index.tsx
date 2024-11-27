@@ -15,7 +15,7 @@ const columnData = [
   { content: '주문시간', width: 'w-[6rem]' },
 ];
 
-const MyTradeHistory = () => {
+const MyOrderHistory = () => {
   const { data: history, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetOrders();
 
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -92,4 +92,4 @@ const MyTradeHistory = () => {
   );
 };
 
-export default MyTradeHistory;
+export default MyOrderHistory;

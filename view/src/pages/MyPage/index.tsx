@@ -8,7 +8,7 @@ import Title from './UI/Title';
 import MyInfo from '../../entities/MyInfo';
 
 import CATEGORY from './consts/category';
-import MyTradeHistory from '../../entities/MyTradeHistory';
+import MyTradeHistory from '../../entities/MyOrderHistory';
 import MyOpenOrders from '../../entities/MyOpenOrders';
 import CashTransaction from '../../widgets/CashTransaction';
 
