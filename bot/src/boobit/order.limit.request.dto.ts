@@ -7,4 +7,8 @@ export class OrderLimitRequestDto {
   coinCode: string;
   amount: number;
   price: number;
+
+  toString() {
+    return `OrderLimitRequestDto { coinCode: ${this.coinCode}, amount: ${this.amount}, price: ${this.price} }`;
+  }
 }

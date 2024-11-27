@@ -9,14 +9,14 @@ export class BotConfig {
     public getPriceInterval: number = 1000,
     public actionInterval: number = 300,
     public actionType: string = ActionType.ALL,
-    public minPercent: number = 0.5,
-    public maxPercent: number = 0.5,
-    public minAmount: number = 0.001,
-    public maxAmount: number = 1,
+    public minPercent: number = 3,
+    public maxPercent: number = 3,
+    public minAmount: number = 0.02,
+    public maxAmount: number = 2,
     public count: number = 100,
   ) {
     this.getPriceInterval = validateNumber(getPriceInterval, 1000, 1000 * 60 * 60);
-    this.actionInterval = validateNumber(actionInterval, 100, 1000 * 60 * 60);
+    this.actionInterval = validateNumber(actionInterval, 1, 1000 * 60 * 60);
     this.actionType = validateActionType(actionType);
     this.minPercent = validateNumber(minPercent, 0.1, 5);
     this.maxPercent = validateNumber(maxPercent, 0.1, 5);
@@ -41,6 +41,18 @@ export class BotConfig {
       return Math.random() < 0.5 ? 'buy' : 'sell';
     }
     return this.actionType as 'buy' | 'sell';
+  }
+  toString(): string {
+    return `BotConfig {
+  getPriceInterval: ${this.getPriceInterval},
+  actionInterval: ${this.actionInterval},
+  actionType: ${this.actionType},
+  minPercent: ${this.minPercent},
+  maxPercent: ${this.maxPercent},
+  minAmount: ${this.minAmount},
+  maxAmount: ${this.maxAmount},
+  count: ${this.count},
+  }`;
   }
 }
 function validateNumber(value: number, min: number = 0, max: number = 0): number {
