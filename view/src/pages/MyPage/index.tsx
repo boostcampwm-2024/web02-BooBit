@@ -8,9 +8,10 @@ import Title from './UI/Title';
 import MyInfo from '../../entities/MyInfo';
 
 import CATEGORY from './consts/category';
-import MyTradeHistory from '../../entities/MyOrderHistory';
+import MyOrderHistory from '../../entities/MyOrderHistory';
 import MyOpenOrders from '../../entities/MyOpenOrders';
 import CashTransaction from '../../widgets/CashTransaction';
+import MyTradeHistory from '../../entities/MyTradeHistory';
 
 const Home = () => {
   const [selectedCateIdx, setSelectedCateIdx] = useState(0);
@@ -41,6 +42,7 @@ const Home = () => {
             <div>
               <MyTradeHistory />
               <MyOpenOrders />
+              <MyOrderHistory />
             </div>
           )}
         </MainviewLayout>
