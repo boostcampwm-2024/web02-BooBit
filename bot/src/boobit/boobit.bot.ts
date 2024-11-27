@@ -94,7 +94,6 @@ export class TradingBot {
 
     try {
       await this.client.post('/api/orders/limit/buy', orderRequest);
-      console.log('Successfully Buy order placed');
     } catch (error) {
       throw new TradingError(
         'Error placing buy order:' + (error instanceof Error ? error.message : 'Unknown error'),
@@ -107,7 +106,6 @@ export class TradingBot {
 
     try {
       await this.client.post('/api/orders/limit/sell', orderRequest);
-      console.log('Successfully Sell order placed');
     } catch (error) {
       throw new TradingError(
         'Error placing sell order:' + (error instanceof Error ? error.message : 'Unknown error'),

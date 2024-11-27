@@ -3,13 +3,14 @@ import { CurrencyCode } from './boobit/currency.code';
 import { OrderLimitRequestDto } from './boobit/order.limit.request.dto';
 import { getConfig } from './utils/config.setting.client';
 import { getBitcoinPrice } from './upbit/upbit.index';
-import { ActionType, BotConfig } from './boobit/bot.config';
+import { BotConfig } from './boobit/bot.config';
 import { getArgs } from './utils/config.setting.argv';
 let price: number;
 let orderRequest: OrderLimitRequestDto;
 let count = 0;
 const trader = new TradingBot();
 const intervalList: NodeJS.Timeout[] = [];
+
 async function main() {
   const argv = await getArgs();
   const config = argv.client
@@ -24,7 +25,7 @@ async function main() {
         argv.maxa,
         argv.count,
       );
-
+  console.log(config);
   price = await getBitcoinPrice();
   orderRequest = new OrderLimitRequestDto(CurrencyCode.BTC, 0.1, price);
 
@@ -52,15 +53,18 @@ function registerOrder(config: BotConfig) {
       config.generateRandomAmount(),
       config.generateRandomPrice(price),
     );
+    const type = config.getActionType();
     try {
-      if (config.getActionType() === 'buy') {
+      if (type === 'buy') {
         await trader.placeBuyOrder(orderRequest);
       } else {
         await trader.placeSellOrder(orderRequest);
       }
-      if (config.count < 0 || count++ >= config.count) {
+      if (count++ >= config.count && !(config.count < 0)) {
         await trader.logout();
         intervalList.forEach((interval) => clearInterval(interval));
+      } else {
+        console.log(`[${count}] [${type}] ${orderRequest}`);
       }
     } catch (error) {
       if (error instanceof Error) {
