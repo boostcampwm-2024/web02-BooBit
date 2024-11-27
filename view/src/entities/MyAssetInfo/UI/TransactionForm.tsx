@@ -2,6 +2,7 @@ import { ChangeEvent } from 'react';
 import SubmitButton from '../../../shared/UI/SubmitButton';
 
 interface TransactionFormProps {
+  currencyCode: string;
   type: string;
   amount: string;
   handleSubmit: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -10,6 +11,7 @@ interface TransactionFormProps {
 }
 
 const TransactionForm: React.FC<TransactionFormProps> = ({
+  currencyCode,
   type,
   amount,
   handleSubmit,
@@ -17,13 +19,21 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   isError = false,
 }) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = e.target.value.replace(/,/g, '');
 
-    if (isNaN(Number(value))) {
+    const [intPart, decimalPart] = value.split('.');
+
+    if (currencyCode === 'KRW' && value.includes('.')) {
+      return;
+    }
+    if (decimalPart && decimalPart.length === 7) {
       return;
     }
 
-    setAmount(value);
+    const newValue =
+      Number(intPart).toLocaleString() + (decimalPart !== undefined ? `.${decimalPart}` : '');
+
+    setAmount(newValue);
   };
 
   return (

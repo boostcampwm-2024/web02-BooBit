@@ -1,3 +1,4 @@
+import formatDate from '../../shared/model/formatDate';
 import { RecordType } from '../../shared/types/RecordType';
 import TradeRecordsRow from './UI/TradeRecordRow';
 import TradeRecordsCell from './UI/TradeRecordsCell';
@@ -32,8 +33,8 @@ const TradeRecords: React.FC<TradeRecordsProps> = ({ tradeRecords }) => {
               styles="even:bg-surface-hover-light"
             >
               <TradeRecordsCell start>
-                <span>{r.date.slice(5, 10).replace('-', '.')}</span>
-                <span className="ml-[0.5rem] text-text-dark">{r.date.slice(11, 19)}</span>
+                <span>{formatDate(r.date).slice(5, 10)}</span>
+                <span className="ml-[0.5rem] text-text-dark">{formatDate(r.date).slice(11)}</span>
               </TradeRecordsCell>
               <TradeRecordsCell>{r.price.toLocaleString()}</TradeRecordsCell>
               <TradeRecordsCell

@@ -1,6 +1,7 @@
 import React from 'react';
 import image from '../consts/mockImg.png';
 import { MyAsset } from '../../../shared/types/MyAsset';
+import formatPrice from '../../../shared/model/formatPrice';
 
 type AssetItemProps = {
   asset: MyAsset;
@@ -24,7 +25,7 @@ const AssetItem: React.FC<AssetItemProps> = ({ asset, handleClick }) => {
       </div>
 
       <div className="flex">
-        <div className="text-display-bold-16 mr-[0.5rem]">{asset.amount.toLocaleString()}</div>
+        <div className="text-display-bold-16 mr-[0.5rem]">{formatPrice(asset.amount)}</div>
         <div>{asset.currencyCode}</div>
       </div>
     </li>

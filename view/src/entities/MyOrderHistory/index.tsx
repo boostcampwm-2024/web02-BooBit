@@ -4,6 +4,8 @@ import { OrderType } from './model/OrderType.ts';
 import useGetOrders from './model/useGetOrders.ts';
 import { useCallback, useRef } from 'react';
 import ORDER_STATUS from './const/status.ts';
+import formatPrice from '../../shared/model/formatPrice.ts';
+import formatDate from '../../shared/model/formatDate.ts';
 
 const columnData = [
   { content: '주문상태', width: 'w-[4rem]' },
@@ -67,14 +69,14 @@ const MyOrderHistory = () => {
                   >
                     {h.orderType === 'BUY' ? '매수' : '매도'}
                   </TableCell>
-                  <TableCell width={columnData[3].width}>{h.quantity.toLocaleString()}</TableCell>
-                  <TableCell width={columnData[4].width}>{h.price.toLocaleString()}</TableCell>
+                  <TableCell width={columnData[3].width}>{formatPrice(h.quantity)}</TableCell>
+                  <TableCell width={columnData[4].width}>{formatPrice(h.price)}</TableCell>
                   <TableCell width={columnData[5].width}>
-                    {(Number(h.quantity) * Number(h.price)).toLocaleString()}
+                    {formatPrice(Number(h.quantity) * Number(h.price))}
                   </TableCell>
                   <TableCell width={columnData[6].width}>
-                    <span>{h.timestamp.slice(0, 10).replace(/-/g, '.')}</span>
-                    <div className="mt-[-6px]">{h.timestamp.slice(11, 19)}</div>
+                    <span>{formatDate(h.timestamp).slice(0, 10)}</span>
+                    <div className="mt-[-6px]">{formatDate(h.timestamp).slice(11)}</div>
                   </TableCell>
                 </TableRow>
               ))

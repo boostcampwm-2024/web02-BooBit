@@ -43,7 +43,7 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
     setWithdrawAmount('');
     setDepositAmount('');
     setWithdrawError(false);
-  }, [selectedCate]);
+  }, [currencyCode, selectedCate]);
 
   return (
     <BoxContainer>
@@ -52,6 +52,7 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
       {selectedCate === '내역' && <TransactionLogs currencyCode={currencyCode} />}
       {selectedCate === '입금' && (
         <TransactionForm
+          currencyCode={currencyCode}
           type="입금"
           handleSubmit={handleDeposit}
           amount={depositAmount}
@@ -60,6 +61,7 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
       )}
       {selectedCate === '출금' && (
         <TransactionForm
+          currencyCode={currencyCode}
           type="출금"
           handleSubmit={handleWithdraw}
           amount={withdrawAmount}

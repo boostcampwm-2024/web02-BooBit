@@ -1,3 +1,5 @@
+import formatDate from '../../shared/model/formatDate.ts';
+import formatPrice from '../../shared/model/formatPrice.ts';
 import TableCell from '../../shared/UI/TableCell.tsx';
 import TableRow from '../../shared/UI/TableRow.tsx';
 import { OrderType } from './model/OrderType.ts';
@@ -50,8 +52,8 @@ const MyOpenOrders = () => {
                 styles="border-border-default border-b-[1px]"
               >
                 <TableCell width={columnData[0].width}>
-                  <span>{t.createdAt.slice(0, 10).replace(/-/g, '.')}</span>
-                  <div className="mt-[-6px]">{t.createdAt.slice(11, 19)}</div>
+                  <span>{formatDate(t.createdAt).slice(0, 10)}</span>
+                  <div className="mt-[-6px]">{formatDate(t.createdAt).slice(11)}</div>
                 </TableCell>
                 <TableCell
                   width={columnData[1].width}
@@ -59,9 +61,9 @@ const MyOpenOrders = () => {
                 >
                   {t.orderType === 'BUY' ? '매수' : '매도'}
                 </TableCell>
-                <TableCell width={columnData[2].width}>{t.price}</TableCell>
-                <TableCell width={columnData[3].width}>{t.quantity}</TableCell>
-                <TableCell width={columnData[4].width}>{t.unfilledAmount}</TableCell>
+                <TableCell width={columnData[2].width}>{formatPrice(t.quantity)}</TableCell>
+                <TableCell width={columnData[3].width}>{formatPrice(t.price)}</TableCell>
+                <TableCell width={columnData[4].width}>{formatPrice(t.unfilledAmount)}</TableCell>
                 <TableCell width={columnData[5].width}>
                   <button
                     className={`w-[5rem] h-[2rem] rounded bg-surface-hover-light`}
