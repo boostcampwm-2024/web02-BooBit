@@ -1,3 +1,4 @@
+import formatPrice from '../../shared/model/formatPrice.ts';
 import TableCell from '../../shared/UI/TableCell.tsx';
 import TableRow from '../../shared/UI/TableRow.tsx';
 import { OrderType } from './model/OrderType.ts';
@@ -59,9 +60,9 @@ const MyOpenOrders = () => {
                 >
                   {t.orderType === 'BUY' ? '매수' : '매도'}
                 </TableCell>
-                <TableCell width={columnData[2].width}>{t.price}</TableCell>
-                <TableCell width={columnData[3].width}>{t.quantity}</TableCell>
-                <TableCell width={columnData[4].width}>{t.unfilledAmount}</TableCell>
+                <TableCell width={columnData[2].width}>{formatPrice(t.quantity)}</TableCell>
+                <TableCell width={columnData[3].width}>{formatPrice(t.price)}</TableCell>
+                <TableCell width={columnData[4].width}>{formatPrice(t.unfilledAmount)}</TableCell>
                 <TableCell width={columnData[5].width}>
                   <button
                     className={`w-[5rem] h-[2rem] rounded bg-surface-hover-light`}
