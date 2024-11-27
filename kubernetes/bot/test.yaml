@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: trading-bot-2
+spec:
+  template:
+    spec:
+      containers:
+        - name: trading-bot
+          image: boobit-ncr.kr.ncr.ntruss.com/trading-bot:latest
+          env:
+            - name: OPTIONS
+              value: "--count=1000 --ai=10"
+      restartPolicy: Never
+  backoffLimit: 0 # 실패 시 재시도 횟수를 0으로 설정

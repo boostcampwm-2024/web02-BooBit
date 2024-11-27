@@ -86,6 +86,11 @@ export class TransactionController {
     return await this.transactionService.getPending(userId);
   }
 
+  @Get('/price')
+  async getPrice(/*@Query('coinCode') coinCode: CurrencyCode*/) {
+    return await this.transactionService.getPrice(/*coinCode*/);
+  }
+
   @Get()
   @UseGuards(AuthenticatedGuard)
   async getOrders(@Request() req, @Query('id') id?: string) {

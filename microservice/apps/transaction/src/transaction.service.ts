@@ -127,4 +127,10 @@ export class TransactionService {
 
     return { nextId, orders };
   }
+
+  async getPrice(/*coinCode: CurrencyCode*/) {
+    return (await this.transactionRepository.getLatestTrades(1)).reduce((acc, trade) => {
+      return acc + trade.price;
+    }, 0);
+  }
 }
