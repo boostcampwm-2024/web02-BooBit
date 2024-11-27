@@ -30,7 +30,7 @@ const MyOpenOrders = () => {
   return (
     <div className="pt-[1.5rem] text-text-light text-available-medium-14 border-border-default border-t-[1px]">
       <div className="text-available-medium-18 mb-[0.5rem]">미체결</div>
-      <table className="w-full h-[18rem] mb-12 border-[1px] bg-surface-default border-border-default text-text-light">
+      <table className="w-full h-[18rem] mb-4 border-[1px] bg-surface-default border-border-default text-text-light">
         <thead>
           <TableRow height="h-[2rem]" styles="bg-surface-hover-light pr-[10px]">
             {columnData.map((c) => (
@@ -42,7 +42,7 @@ const MyOpenOrders = () => {
         </thead>
 
         <tbody className="block h-[16rem] overflow-y-auto">
-          {openOrders ? (
+          {openOrders && openOrders.length !== 0 ? (
             openOrders.map((t: OrderType) => (
               <TableRow
                 key={t.createdAt}
