@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Chart from '../../entities/Chart';
 import Header from '../../widgets/Header';
 import Layout from '../../widgets/Layout';
@@ -17,7 +17,8 @@ import { CandleSocketType } from '../../shared/types/socket/CandleSocketType';
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
 
 const Home = () => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
+  const messageQueue: string[] = [];
 
   const [candleData, setCandleData] = useState<CandleData[]>();
   const [tradeRecords, setTradeRecords] = useState<RecordType[]>();
@@ -31,10 +32,13 @@ const Home = () => {
   // WebSocket 연결 및 메시지 처리
   useEffect(() => {
     const ws = new WebSocket(socketUrl);
-    setSocket(ws);
+    socketRef.current = ws;
 
     ws.onopen = () => {
       console.log('웹소켓 연결 완료');
+      while (messageQueue.length > 0) {
+        ws.send(messageQueue.shift()!);
+      }
     };
 
     ws.onmessage = (event) => {
@@ -119,20 +123,28 @@ const Home = () => {
     // WebSocket 연결 종료 시
     return () => {
       ws.close();
+
+      socketRef.current = null;
     };
   }, []);
 
+  const sendMessage = (message: object) => {
+    const serializedMessage = JSON.stringify(message);
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(serializedMessage);
+    } else {
+      messageQueue.push(serializedMessage);
+    }
+  };
+
   // 시간 단위 변경 시 WebSocket 초기화 메시지 전송
   useEffect(() => {
-    const initMessage = {
+    sendMessage({
       event: 'CANDLE_CHART_INIT',
       timeScale: selectedTimeScale,
-    };
-    if (socket) {
-      socket.send(JSON.stringify(initMessage));
-    }
+    });
     setTradeRecords([]);
-  }, [selectedTimeScale, socket]);
+  }, [selectedTimeScale]);
 
   return (
     <div>
