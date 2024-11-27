@@ -58,7 +58,7 @@ function registerOrder(config: BotConfig) {
       } else {
         await trader.placeSellOrder(orderRequest);
       }
-      if (count++ >= config.count) {
+      if (config.count < 0 || count++ >= config.count) {
         await trader.logout();
         intervalList.forEach((interval) => clearInterval(interval));
       }
