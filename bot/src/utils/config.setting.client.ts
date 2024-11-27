@@ -46,33 +46,41 @@ class ConfigSettingCLI {
       }
 
       // minPercent 입력
-      const minPercentStr = await this.question('최소 퍼센트(%) [기본값: 0.5]: ');
+      const minPercentStr = await this.question(
+        '최소 퍼센트(%) [기본값: 3, 최소값: 0.1, 최대값 5]: ',
+      );
       if (minPercentStr.trim()) {
         config.minPercent = validateNumber(minPercentStr, 0.1, 5);
       }
 
       // maxPercent 입력
-      const maxPercentStr = await this.question('최대 퍼센트(%) [기본값: 0.5]: ');
+      const maxPercentStr = await this.question(
+        '최대 퍼센트(%) [기본값: 3, 최소값: 0.1, 최대값 5]: ',
+      );
       if (maxPercentStr.trim()) {
         config.maxPercent = validateNumber(maxPercentStr, 0.1, 5);
       }
 
       // minAmount 입력
-      const minAmountStr = await this.question('최소 수량 [기본값: 0.001]: ');
+      const minAmountStr = await this.question(
+        '최소 수량 [기본값: 0.02, 최소값: 0.001 최대값: 0.5]: ',
+      );
       if (minAmountStr.trim()) {
         config.minAmount = validateNumber(minAmountStr, 0.001, 0.5);
       }
 
       // maxAmount 입력
-      const maxAmountStr = await this.question('최대 수량 [기본값: 1]: ');
+      const maxAmountStr = await this.question(
+        '최대 수량 [기본값: 2, 최소값: minAmount 최대값: 5]: ',
+      );
       if (maxAmountStr.trim()) {
-        config.maxAmount = validateNumber(maxAmountStr, config.minAmount, 1);
+        config.maxAmount = validateNumber(maxAmountStr, config.minAmount, 5);
       }
 
       // count 입력
-      const countStr = await this.question('최대 반복 횟수 [기본값: 100]: ');
+      const countStr = await this.question('최대 반복 횟수 [기본값: 100, 반복: -1]: ');
       if (countStr.trim()) {
-        config.count = validateNumber(countStr, -1, Infinity);
+        config.count = validateNumber(countStr, -1);
       }
     } catch (error) {
       console.error('오류가 발생했습니다:', (error as Error).message);
@@ -82,9 +90,9 @@ class ConfigSettingCLI {
     return config;
   }
 }
-function validateNumber(value: string = '', min: number = 0, max: number = 0): number {
+function validateNumber(value: string = '', min: number = 0, max: number = Infinity): number {
   const num = parseFloat(value);
-  if (isNaN(num) || num < min) {
+  if (isNaN(num) || num < min || num > max) {
     throw new Error(`유효하지 않은 숫자입니다. ${min} 이상 ${max} 이하의 숫자를 입력해주세요.`);
   }
   return num;
