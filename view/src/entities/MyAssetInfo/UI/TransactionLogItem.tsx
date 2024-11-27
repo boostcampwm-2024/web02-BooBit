@@ -1,3 +1,4 @@
+import formatPrice from '../../../shared/model/formatPrice';
 import { TransactionType } from '../model/TransactionType';
 
 interface TransactionLogItemProps {
@@ -22,7 +23,7 @@ const TransactionLogItem: React.FC<TransactionLogItemProps> = ({ log, currency_c
         </div>
       </div>
       <div className="text-text-light text-display-bold-16">
-        {log.amount.toLocaleString()} {currency_code}
+        {formatPrice(log.amount)} {currency_code}
       </div>
     </div>
   );
