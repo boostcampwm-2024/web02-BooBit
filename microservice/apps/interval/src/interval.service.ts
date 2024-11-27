@@ -8,6 +8,7 @@ import { Redis } from 'ioredis';
 import { RedisChannel } from '@app/common/enums/redis-channel.enum';
 import { IntervalOrderBookService } from './interval.order.book.service';
 import { CurrencyCode } from '@app/common';
+import { roundToSix } from '@app/common/utils/number.format.util';
 
 @Injectable()
 export class IntervalService implements OnModuleDestroy, OnModuleInit {
@@ -257,11 +258,17 @@ export class IntervalService implements OnModuleDestroy, OnModuleInit {
   private async handleTradeData(trades: any[]) {
     try {
       if (trades.length > 0) {
+        const formattedTradeData = trades.map((trade) => ({
+          ...trade,
+          price: roundToSix(trade.price),
+          amount: roundToSix(trade.amount),
+          tradePrice: roundToSix(trade.tradePrice),
+        }));
         await this.redisPublisher.publish(
           RedisChannel.TRADE,
           JSON.stringify({
             event: RedisChannel.TRADE,
-            data: trades,
+            data: formattedTradeData,
           }),
         );
       }
