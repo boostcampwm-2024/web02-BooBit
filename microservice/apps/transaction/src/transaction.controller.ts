@@ -76,4 +76,9 @@ export class TransactionController {
     const userId = req.user.userId;
     return await this.transactionService.getPending(userId);
   }
+
+  @Get('/price')
+  async getPrice(/*@Query('coinCode') coinCode: CurrencyCode*/) {
+    return await this.transactionService.getPrice(/*coinCode*/);
+  }
 }

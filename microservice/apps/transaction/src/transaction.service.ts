@@ -90,4 +90,10 @@ export class TransactionService {
 
     return sortedOrders;
   }
+
+  async getPrice(/*coinCode: CurrencyCode*/) {
+    return (await this.transactionRepository.getLatestTrades(1)).reduce((acc, trade) => {
+      return acc + trade.price;
+    }, 0);
+  }
 }
