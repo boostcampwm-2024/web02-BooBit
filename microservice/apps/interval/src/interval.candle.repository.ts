@@ -81,6 +81,16 @@ export class IntervalRepository {
     }
   }
 
+  async getCandleCount(interval: TimeScale, coinCode: string) {
+    const model = this.getModelForInterval(interval);
+
+    return await (model as any).count({
+      where: {
+        coinCode,
+      },
+    });
+  }
+
   async getCandles(
     interval: TimeScale,
     coinCode: string,

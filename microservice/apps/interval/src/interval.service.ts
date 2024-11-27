@@ -26,7 +26,8 @@ export class IntervalService implements OnModuleDestroy, OnModuleInit {
       (await this.IntervalRepository.getLatestTrade(CurrencyCode.BTC))?.price ?? 0,
     );
     for (const [, value] of Object.entries(TimeScale)) {
-      await this.ensureMinimumCandles(value);
+      const count = await this.IntervalRepository.getCandleCount(value, CurrencyCode.BTC);
+      if (count === 0) await this.ensureMinimumCandles(value);
     }
     Object.entries(TimeScale).forEach(async ([, value]) => {
       this.intervalData.set(
