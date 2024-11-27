@@ -22,7 +22,7 @@ export class IntervalService implements OnModuleDestroy, OnModuleInit {
   ) {}
   async onModuleInit() {
     const latestPrice = Number(
-      (await this.IntervalRepository.getLatestTrade(CurrencyCode.BTC)).price,
+      (await this.IntervalRepository.getLatestTrade(CurrencyCode.BTC))?.price ?? 0,
     );
     Object.entries(TimeScale).forEach(async ([, value]) => {
       this.intervalData.set(
