@@ -17,6 +17,7 @@ import { Reflector } from '@nestjs/core';
 import { TradeResponseDto } from '@app/ws/dto/trade.response.dto';
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
 import { WsError } from '@app/ws/ws.error';
+import { roundToSix } from '@app/common/utils/number.format.util';
 
 @WebSocketGateway({
   path: '/ws',
@@ -43,7 +44,7 @@ export class TransactionWsGateway extends WsBaseGateway {
         this.redisSubscriber.disconnect();
       }
 
-      this.redisSubscriber = new Redis(this.configService.get('REDIS_PUB_SUB_URL'), {
+      this.redisSubscriber = new Redis(this.configService.get('TRADE_REDIS_URL'), {
         maxRetriesPerRequest: null,
         retryStrategy: () => null,
         enableReadyCheck: false,
@@ -131,9 +132,9 @@ export class TransactionWsGateway extends WsBaseGateway {
   ) {
     try {
       this.wsService.moveClientToRoom(client, data.timeScale);
-      const [chartResponse, tradeResponse] = await this.getInitialData(data.timeScale);
+      const [chartInitResponse, tradeResponse] = await this.getInitialData(data.timeScale);
 
-      client.send(JSON.stringify(chartResponse));
+      client.send(JSON.stringify(chartInitResponse));
       client.send(JSON.stringify(tradeResponse));
     } catch (error) {
       console.error('Error in handleSubscribe:', error);
@@ -144,17 +145,26 @@ export class TransactionWsGateway extends WsBaseGateway {
   async getInitialData(timeScale: TimeScale): Promise<[ChartResponseDto, TradeResponseDto]> {
     const candleData = await this.transactionWsService.getLatestCandles(timeScale);
     const tradeData = await this.transactionWsService.getLatestTrades();
+    const lastDayClose = await this.transactionWsService.getLastDayClosePrice();
 
-    const chartResponse: ChartResponseDto = {
+    const formattedTradeData = tradeData.map((trade) => ({
+      ...trade,
+      price: roundToSix(trade.price),
+      amount: roundToSix(trade.amount),
+      tradePrice: roundToSix(trade.tradePrice),
+    }));
+
+    const chartInitResponse = {
       event: WsEvent.CANDLE_CHART_INIT,
       timeScale: timeScale,
       data: candleData,
+      lastDayClose: lastDayClose,
     };
     const tradeResponse: TradeResponseDto = {
       event: WsEvent.TRADE,
-      data: tradeData,
+      data: formattedTradeData,
     };
 
-    return [chartResponse, tradeResponse];
+    return [chartInitResponse, tradeResponse];
   }
 }

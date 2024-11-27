@@ -21,8 +21,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
     <div className="w-[26vw] h-[24rem] relative border-[1px] bg-surface-default border-border-default">
       <div className="w-full text-positive absolute bottom-[212px]">
         {orderBook &&
-          orderBook.sell.map((o) => {
-            return <OrderItem key={o.price} setOrderPrice={setOrderPrice} orderInfo={o} />;
+          orderBook.sell.map((o, i) => {
+            return (
+              <OrderItem key={i.toString() + o.price} setOrderPrice={setOrderPrice} orderInfo={o} />
+            );
           })}
       </div>
 
@@ -34,8 +36,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
       <div className="w-full text-negative absolute top-[214px]">
         {orderBook &&
-          orderBook.buy.map((o) => {
-            return <OrderItem key={o.price} setOrderPrice={setOrderPrice} orderInfo={o} />;
+          orderBook.buy.map((o, i) => {
+            return (
+              <OrderItem key={i.toString() + o.price} setOrderPrice={setOrderPrice} orderInfo={o} />
+            );
           })}
       </div>
     </div>

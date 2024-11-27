@@ -1,5 +1,4 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
-
+const apiUrl = import.meta.env.VITE_TRANSACTION_URL;
 const deleteOrderApi = async ({
   historyId,
   orderType,
@@ -11,7 +10,7 @@ const deleteOrderApi = async ({
     orderType: orderType,
   }).toString();
 
-  const response = await fetch(`${BASE_URLS.TRANSACTION}/api/orders/${historyId}?${queryParams}`, {
+  const response = await fetch(`${apiUrl}/api/orders/${historyId}?${queryParams}`, {
     method: 'DELETE',
     credentials: 'include',
   });

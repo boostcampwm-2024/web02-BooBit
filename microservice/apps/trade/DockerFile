@@ -35,5 +35,3 @@ EXPOSE 3000
 
 # Run application
 CMD ["npm", "run", "start:prod:trade"]
-#CMD ["node", "dist/apps/trade/main"]
-

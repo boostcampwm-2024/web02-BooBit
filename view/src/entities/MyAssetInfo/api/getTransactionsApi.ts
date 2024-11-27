@@ -1,4 +1,3 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
 import { TransactionsRequestType } from '../model/TransactionsRequestType';
 
 const getTransactionsApi = async (requestData: TransactionsRequestType) => {
@@ -6,8 +5,9 @@ const getTransactionsApi = async (requestData: TransactionsRequestType) => {
     currencyCode: requestData.currencyCode,
     id: requestData.id !== null ? String(requestData.id) : '',
   }).toString();
+  const apiUrl = import.meta.env.VITE_BALANCE_URL;
 
-  const response = await fetch(`${BASE_URLS.BALANCE}/api/users/transactions?${queryParams}`, {
+  const response = await fetch(`${apiUrl}/api/users/transactions?${queryParams}`, {
     method: 'GET',
     credentials: 'include',
   });

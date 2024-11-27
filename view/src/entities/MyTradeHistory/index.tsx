@@ -38,7 +38,7 @@ const MyTradeHistory = () => {
 
   return (
     <div className="text-text-light text-available-medium-14">
-      <div className="text-available-medium-18 mb-[0.5rem]">거래내역</div>
+      <div className="text-available-medium-18 mb-[0.5rem]">주문내역</div>
       <table className="w-full h-[22rem] mb-4 border-[1px] bg-surface-default border-border-default text-text-light">
         <thead>
           <TableRow height="h-[2rem]" styles="bg-surface-hover-light pr-[10px]">
@@ -81,7 +81,7 @@ const MyTradeHistory = () => {
             )
           ) : (
             <tr className="w-full h-[19rem] flex justify-center items-center text-text-dark">
-              <td>거래 내역이 없습니다.</td>
+              <td>주문 내역이 없습니다.</td>
             </tr>
           )}
 

@@ -8,6 +8,10 @@ import { TradeGradient } from '@app/common/enums/trade.gradient.enum';
 export class TransactionWsService {
   constructor(private transactionRepository: TransactionRepository) {}
 
+  async getLastDayClosePrice(): Promise<number> {
+    return await this.transactionRepository.getLastDayClosePrice();
+  }
+
   async getLatestCandles(timeScale: TimeScale, count: number = 60): Promise<CandleDataDto[]> {
     const candles = await this.transactionRepository.getLatestCandles(timeScale, count);
     return candles

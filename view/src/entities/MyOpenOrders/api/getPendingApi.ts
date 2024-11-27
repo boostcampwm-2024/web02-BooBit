@@ -1,12 +1,8 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
-
+const apiUrl = import.meta.env.VITE_TRANSACTION_URL;
 const getPendingApi = async () => {
-  const response = await fetch(`${BASE_URLS.BALANCE}/api/users/pending`, {
+  const response = await fetch(`${apiUrl}/api/orders/pending`, {
     method: 'GET',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
   });
 
   if (!response.ok) {

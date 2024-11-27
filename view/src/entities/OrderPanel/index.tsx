@@ -9,10 +9,10 @@ import CATEGORY from './const/orderCategory';
 import { useAuth } from '../../shared/store/auth/authContext';
 import { useAuthActions } from '../../shared/store/auth/authActions';
 import useOrderAmount from './model/useOrderAmount';
-import useGetAssets from '../../shared/model/useGetAssets';
 import usePostBuy from './model/usePostBuy';
 import { useToast } from '../../shared/store/ToastContext';
 import usePostSell from './model/usePostSell';
+import useGetAvailableAsset from './model/useGetAvailableAsset';
 
 interface OrderPanelProps {
   tradePrice: string;
@@ -20,6 +20,13 @@ interface OrderPanelProps {
 }
 
 const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) => {
+  const { addToast } = useToast();
+  const { state: authState } = useAuth();
+  const { login } = useAuthActions();
+  const navigate = useNavigate();
+  const [myAsset, setMyAsset] = useState(0);
+  const [selectedOrder, setSelectedOrder] = useState('매수');
+  const [coinCode, setCoinCode] = useState('KRW');
   const {
     amount,
     setAmount,
@@ -29,16 +36,9 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
     updateAmountWithPrice,
     reset,
   } = useOrderAmount({ tradePrice });
+  const { data, refetch } = useGetAvailableAsset({ currencyCode: coinCode });
   const { mutate: orderBuy } = usePostBuy();
   const { mutate: orderSell } = usePostSell();
-  const { addToast } = useToast();
-  const { state: authState } = useAuth();
-  const navigate = useNavigate();
-  const [myAsset, setMyAsset] = useState(0);
-  const [selectedOrder, setSelectedOrder] = useState('매수');
-  const [coinCode, setCoinCode] = useState('KRW');
-  const { data } = useGetAssets();
-  const { login } = useAuthActions();
 
   useEffect(() => {
     setCoinCode(selectedOrder === '매수' ? 'KRW' : 'BTC');
@@ -46,13 +46,15 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
 
     if (data) {
       login();
-      if (selectedOrder === '매수') {
-        setMyAsset(data[1] ? data[1].amount : 0);
-      } else {
-        setMyAsset(data[0] ? data[0].amount : 0);
-      }
+      setMyAsset(data.availableBalance);
     }
   }, [data, selectedOrder]);
+
+  useEffect(() => {
+    if (coinCode) {
+      refetch();
+    }
+  }, [coinCode]);
 
   const handleSubClick = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
@@ -68,11 +70,15 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
       navigate('/signin');
       return;
     }
+    if (Number(amount) === 0 || Number(tradePrice) === 0 || Number(price) === 0) {
+      addToast('금액이나 수량이 올바르지 않습니다. 다시 확인해 주세요.', 'error');
+      return;
+    }
 
     const requestParam = {
       coinCode: 'BTC',
       amount: Number(amount.replace(/,/g, '')),
-      price: Number(price.replace(/,/g, '')),
+      price: Number(tradePrice.replace(/,/g, '')),
     };
     if (selectedOrder === '매수') {
       if (myAsset < requestParam.price) {

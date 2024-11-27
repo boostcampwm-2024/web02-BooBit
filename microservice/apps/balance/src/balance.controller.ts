@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, UseGuards, Request, HttpCode, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Request,
+  HttpCode,
+  Query,
+  Param,
+} from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import { CreateTransactionDto } from './dto/create.transaction.dto';
 import { GetTransactionsDto } from './dto/get.transactions.request.dto';
@@ -9,6 +19,7 @@ import { AccountService } from '@app/grpc/account.interface';
 import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
 import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
+import { AvailableBalanceResponseDto } from './dto/available.balance.response.dto';
 
 @Controller('api/users')
 export class BalanceController implements OrderService, AccountService {
@@ -76,5 +87,15 @@ export class BalanceController implements OrderService, AccountService {
   @GrpcMethod('TradeService', 'CancelOrder')
   async cancelOrder(cancelRequest: TradeCancelRequestDto): Promise<TradeResponseDto> {
     return await this.balanceService.cancelOrder(cancelRequest);
+  }
+
+  @Get('available/:currencyCode')
+  @UseGuards(AuthenticatedGuard)
+  async getAvailableBalance(
+    @Param('currencyCode') currencyCode: string,
+    @Request() req,
+  ): Promise<AvailableBalanceResponseDto> {
+    const userId = req.user.userId;
+    return this.balanceService.getAvailableBalance(userId, currencyCode);
   }
 }

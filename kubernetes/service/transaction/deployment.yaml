@@ -28,11 +28,7 @@ spec:
               memory: "1Gi"
           env:
             - name: DATABASE_URL
-              value: "mongodb://${DB_USER}:${DB_PASSWORD}@$(DB_HOST)-0.transaction-db-service:27017,$(DB_HOST)-1.transaction-db-service:27017,$(DB_HOST)-2.transaction-db-service:27017/${DB_SCHEMA}?replicaSet=rs0"
-            - name: BALANCE_GRPC_URL
-              value: "balance-service:50051"
-            - name: TRADE_REDIS_URL
-              value: "redis://trade-redis:6379"
+              value: "mongodb://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):27017/$(DB_SCHEMA)?replicaSet=rs0"
           envFrom:
             - configMapRef:
                 name: transaction-service-config

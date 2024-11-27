@@ -1,8 +1,8 @@
-import { BASE_URLS } from '../../../shared/consts/baseUrl';
 import { RequestDataType } from '../model/RequestDataType';
 
+const apiUrl = import.meta.env.VITE_TRANSACTION_URL;
 const postSellApi = async (requestData: RequestDataType) => {
-  const response = await fetch(`${BASE_URLS.TRANSACTION}/api/orders/limit/sell`, {
+  const response = await fetch(`${apiUrl}/api/orders/limit/sell`, {
     method: 'POST',
     credentials: 'include',
     headers: {

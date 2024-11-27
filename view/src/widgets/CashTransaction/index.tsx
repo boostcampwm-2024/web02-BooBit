@@ -4,7 +4,7 @@ import MyAssetList from '../../entities/MyAssetList';
 import useGetAssets from '../../shared/model/useGetAssets';
 
 const CashTransaction = () => {
-  const [selectedAssetIdx, setSelectedAssetIdx] = useState(0);
+  const [selectedAssetIdx, setSelectedAssetIdx] = useState(1);
 
   const { data: assets } = useGetAssets();
 

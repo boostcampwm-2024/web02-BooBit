@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: transaction-service-config
 data:
-  DB_HOST: 'transaction-db'
-  REDIS_URL: 'redis://session-db:6379'
-  #GRPC관련설정 추가필요
+  DB_HOST: "transaction-db"
+  REDIS_URL: "redis://session-db:6379"
+  BALANCE_GRPC_URL: "balance-service:50051"
+  TRADE_REDIS_URL: "redis://trade-redis:6379"
