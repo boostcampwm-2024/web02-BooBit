@@ -21,14 +21,14 @@ const MyAssetInfo: React.FC<AssetType> = ({ currencyCode, amount }) => {
 
   const handleDeposit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const amount = Number(depositAmount);
+    const amount = Number(depositAmount.replace(/,/g, ''));
     if (amount === 0) return;
     setDepositAmount('');
     deposit({ currencyCode, amount });
   };
 
   const handleWithdraw = () => {
-    const withdrawAmountToNum = Number(withdrawAmount);
+    const withdrawAmountToNum = Number(withdrawAmount.replace(/,/g, ''));
     if (withdrawAmountToNum === 0) return;
     if (withdrawAmountToNum > amount) {
       setWithdrawError(true);
