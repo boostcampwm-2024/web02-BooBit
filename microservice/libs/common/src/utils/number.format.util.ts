@@ -11,3 +11,7 @@ export const roundToSix = (num: number): number => {
 export const roundToThree = (num: number): number => {
   return Number(num.toFixed(3));
 };
+
+export const roundToZero = (num: number): number => {
+  return Number(num.toFixed(0));
+};

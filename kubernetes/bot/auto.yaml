@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trading-bot-normal
+  name: trading-bot
 spec:
   selector:
     matchLabels:
       app: trading-bot
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:
@@ -17,4 +17,4 @@ spec:
           image: boobit-ncr.kr.ncr.ntruss.com/trading-bot:latest
           env:
             - name: OPTIONS
-              value: "--count=-1"
+              value: "--count=-1 --at=auto"

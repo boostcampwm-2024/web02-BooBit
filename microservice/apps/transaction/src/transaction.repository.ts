@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
+import { OrderType } from '@app/common/enums/order-type.enum';
+import { OrderPendingDto } from './dto/order.pending.dto';
 
 @Injectable()
 export class TransactionRepository {
@@ -150,6 +152,102 @@ export class TransactionRepository {
         tradedAt: 'desc',
       },
       take: 31,
+    });
+  }
+  async getRecentOrders(userId: string, historyId?: string) {
+    const orders = await this.prisma.$runCommandRaw({
+      aggregate: 'buy_order',
+      pipeline: [
+        {
+          $match: {
+            user_id: userId,
+            ...(historyId && {
+              _id: {
+                $lte: historyId,
+              },
+            }),
+          },
+        },
+        {
+          $sort: { _id: -1 },
+        },
+        {
+          $limit: 31,
+        },
+        {
+          $addFields: {
+            order_type: 'BUY',
+          },
+        },
+        {
+          $unionWith: {
+            coll: 'sell_order',
+            pipeline: [
+              {
+                $match: {
+                  user_id: userId,
+                  ...(historyId && {
+                    _id: {
+                      $lte: historyId,
+                    },
+                  }),
+                },
+              },
+              {
+                $sort: { _id: -1 },
+              },
+              {
+                $limit: 31,
+              },
+              {
+                $addFields: {
+                  order_type: 'SELL',
+                },
+              },
+            ],
+          },
+        },
+        {
+          $sort: { _id: -1 },
+        },
+        {
+          $limit: 31,
+        },
+      ],
+      cursor: {},
+    });
+
+    // const cursor = orders.cursor as unknown as Prisma.JsonObject;
+    // cursor.firstBatch = cursor.firstBatch as unknown as Prisma.JsonArray;
+    const aggregatedData = orders as {
+      cursor: {
+        firstBatch: {
+          _id: string;
+          order_type: string;
+          price: string;
+          original_quote: string;
+          remaining_quote: string;
+          created_at: object;
+        }[];
+      };
+    };
+    return aggregatedData.cursor.firstBatch.map((item) => {
+      const data = item as {
+        _id: string;
+        order_type: string;
+        price: string;
+        original_quote: string;
+        remaining_quote: string;
+        created_at: object;
+      };
+      return new OrderPendingDto(
+        data._id,
+        data.order_type as OrderType,
+        data.price,
+        data.original_quote,
+        data.remaining_quote,
+        (data.created_at as { $date: string }).$date,
+      );
     });
   }
 }
