@@ -59,7 +59,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .attr('x2', (d) => xScale(d.date)! + xScale.bandwidth() / 2)
       .attr('y1', (d) => yScale(d.high))
       .attr('y2', (d) => yScale(d.low))
-      .attr('stroke', '#E0E0E0')
+      .attr('stroke', '#4D4D66')
       .attr('stroke-width', 1);
 
     // Candlestick rectangles
@@ -68,26 +68,18 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .selectAll('.bar')
       .data(data)
       .enter()
-      .append('g') // 그룹을 묶어 관리
-      .each(function (d, index) {
-        let prevColor = '#00E676'; //
-
-        if (index > 0) {
-          prevColor = data[index - 1].open > data[index - 1].close ? '#FF5252' : '#00E676';
-        }
-
+      .append('g')
+      .each(function (d) {
         if (d.open === d.close) {
-          // open과 close가 같을 경우 이전 캔들의 색상을 사용
           d3.select(this)
             .append('line')
             .attr('x1', xScale(d.date)!)
             .attr('x2', xScale(d.date)! + xScale.bandwidth())
             .attr('y1', yScale(d.open))
             .attr('y2', yScale(d.open))
-            .attr('stroke', prevColor) // 이전 캔들의 색상 사용
+            .attr('stroke', '#E0E0E0')
             .attr('stroke-width', 0.5);
         } else {
-          // open과 close가 다를 경우
           d3.select(this)
             .append('rect')
             .attr('x', xScale(d.date)!)
@@ -132,7 +124,10 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       .attr('y', (d) => height - volumeHeight + yVolumeScale(d.volume))
       .attr('width', xScale.bandwidth())
       .attr('height', (d) => (d.volume > 0 ? volumeHeight - yVolumeScale(d.volume) : 0))
-      .attr('fill', (d) => (d.open > d.close ? '#FF5252' : '#00E676'))
+      .attr('fill', (d) => {
+        if (d.open === d.close) return '#A0A0A0';
+        return d.open > d.close ? '#FF5252' : '#00E676';
+      })
       .on('mouseover', (e, d) => {
         e.preventDefault();
         const mainGroup = d3.select(svgRef.current).select('g');
