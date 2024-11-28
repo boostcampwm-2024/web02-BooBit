@@ -96,7 +96,7 @@ const MyOpenOrders = () => {
               ))
             )
           ) : (
-            <tr className="w-full h-full flex justify-center items-center text-text-dark">
+            <tr className="w-full h-[15.5rem] flex justify-center items-center text-text-dark">
               <td>미체결 내역이 없습니다.</td>
             </tr>
           )}

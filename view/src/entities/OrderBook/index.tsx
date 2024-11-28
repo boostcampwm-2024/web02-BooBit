@@ -19,7 +19,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
 }) => {
   return (
     <div className="w-[26vw] h-[24rem] relative border-[1px] bg-surface-default border-border-default">
-      <div className="w-full text-positive absolute bottom-[212px]">
+      <div className="w-full text-negative absolute bottom-[212px]">
         {orderBook &&
           orderBook.sell.map((o, i) => {
             return (
@@ -34,7 +34,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         {currentPrice && currentPrice.toLocaleString()}
       </div>
 
-      <div className="w-full text-negative absolute top-[214px]">
+      <div className="w-full text-positive absolute top-[214px]">
         {orderBook &&
           orderBook.buy.map((o, i) => {
             return (
