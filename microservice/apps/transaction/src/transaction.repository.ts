@@ -52,6 +52,7 @@ export class TransactionRepository {
         tradedAt: 'desc',
       },
       select: {
+        tradeId: true,
         tradedAt: true,
         price: true,
         quantity: true,

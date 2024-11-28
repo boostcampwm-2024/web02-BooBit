@@ -68,7 +68,7 @@ export class IntervalRepository {
       return await model.create({
         data: {
           coinCode: CurrencyCode.BTC,
-          startTime: data.date.setMilliseconds(0),
+          startTime: new Date(data.date.setMilliseconds(0)),
           openPrice: data.open.toString(),
           highPrice: data.high.toString(),
           lowPrice: data.low.toString(),

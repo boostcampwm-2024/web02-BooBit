@@ -29,6 +29,7 @@ export class TransactionWsService {
   async getLatestTrades(count: number = 20): Promise<TradeDataDto[]> {
     const trades = await this.transactionRepository.getLatestTrades(count);
     return trades.map((trade) => ({
+      tradeId: trade.tradeId,
       date: trade.tradedAt,
       price: parseFloat(trade.price),
       amount: parseFloat(trade.quantity),
