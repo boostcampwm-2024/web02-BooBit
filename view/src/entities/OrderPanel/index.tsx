@@ -82,7 +82,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({ tradePrice, setTradePrice }) =>
       price: Number(tradePrice.replace(/,/g, '')),
     };
     if (selectedOrder === '매수') {
-      if (myAsset < requestParam.price) {
+      if (myAsset < Number(price.replace(/,/g, ''))) {
         addToast('주문 금액이 보유 금액을 초과했습니다.', 'error');
         return;
       }
