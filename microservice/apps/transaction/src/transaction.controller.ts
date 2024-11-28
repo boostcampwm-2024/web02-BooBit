@@ -17,6 +17,7 @@ import { TransactionOrderService } from './transaction.order.service';
 import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
 import { OrderType } from '@app/common/enums/order-type.enum';
 import { TransactionQueueService } from './transaction.queue.service';
+import { TradeOrder } from '@app/grpc/dto/trade.order.dto';
 
 @Controller('api/orders')
 export class TransactionController {
@@ -41,9 +42,10 @@ export class TransactionController {
       throw new BadRequestException('주문 수량은 1개 이상이어야 합니다.');
 
     const response = await this.transactionOrderService.makeBuyOrder(orderRequest);
+    this.transactionService.validateOrderResponse(response);
 
-    await this.transactionService.registerBuyOrder(orderRequest, response);
-    return await this.transactionQueueService.addQueue(OrderType.BUY, response.historyId);
+    const trade = new TradeOrder(response.historyId, orderRequest);
+    return await this.transactionQueueService.addQueue(OrderType.BUY, trade);
   }
 
   @Post('/limit/sell')
@@ -61,9 +63,10 @@ export class TransactionController {
       throw new BadRequestException('주문 수량은 1개 이상이어야 합니다.');
 
     const response = await this.transactionOrderService.makeSellOrder(orderRequest);
+    this.transactionService.validateOrderResponse(response);
 
-    await this.transactionService.registerSellOrder(orderRequest, response);
-    return await this.transactionQueueService.addQueue(OrderType.SELL, response.historyId);
+    const trade = new TradeOrder(response.historyId, orderRequest);
+    return await this.transactionQueueService.addQueue(OrderType.SELL, trade);
   }
 
   @Delete('/:historyId')
