@@ -26,9 +26,9 @@ const TradeRecords: React.FC<TradeRecordsProps> = ({ tradeRecords }) => {
       <tbody className="block max-h-[25rem] overflow-y-auto">
         {tradeRecords &&
           tradeRecords.length !== 0 &&
-          tradeRecords.map((r) => (
+          tradeRecords.map((r, i) => (
             <TradeRecordsRow
-              key={r.amount + '.' + r.date}
+              key={r.amount + '.' + r.date + i}
               flex
               styles="even:bg-surface-hover-light"
             >

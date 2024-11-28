@@ -12,8 +12,11 @@ import { ChartTimeScaleType } from '../../shared/types/ChartTimeScaleType';
 import { RecordType } from '../../shared/types/RecordType';
 import { CandleData } from '../../entities/Chart/model/candleDataType';
 import { OrderType } from '../../shared/types/socket/OrderType';
+import formatPrice from '../../shared/model/formatPrice';
 
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
+const MAX_RECORDS = 200;
+const REMOVE_COUNT = 30;
 
 const Home = () => {
   const socketRef = useRef<WebSocket | null>(null);
@@ -25,6 +28,8 @@ const Home = () => {
   const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1sec');
   const [currentPrice, setCurrentPrice] = useState(0);
   const [orderPrice, setOrderPrice] = useState<string>('');
+
+  const isFirstTradeProcessed = useRef(false);
 
   const hasIncreased = false;
 
@@ -84,15 +89,28 @@ const Home = () => {
         case 'TRADE': {
           const tradePrevData = receivedData.data;
 
-          if (!tradeRecords && tradePrevData && tradePrevData.length > 0) {
-            setOrderPrice(tradePrevData[0].price.toLocaleString());
+          // 첫 번째 TRADE 이벤트에서만 실행
+          if (!isFirstTradeProcessed.current && tradePrevData && tradePrevData.length > 0) {
+            setOrderPrice(formatPrice(tradePrevData[0].price));
+            isFirstTradeProcessed.current = true; // 첫 번째 처리 완료
           }
+
           if (tradePrevData && tradePrevData.length > 0) {
             setCurrentPrice(tradePrevData[0].price);
           }
+
           setTradeRecords((prevRecords) => {
-            return prevRecords ? [...tradePrevData, ...prevRecords] : [...tradePrevData];
+            const updatedRecords = prevRecords
+              ? [...tradePrevData, ...prevRecords]
+              : [...tradePrevData];
+
+            if (updatedRecords.length > MAX_RECORDS) {
+              return updatedRecords.slice(0, MAX_RECORDS - REMOVE_COUNT);
+            }
+
+            return updatedRecords;
           });
+
           break;
         }
         case 'BUY_AND_SELL': {
@@ -102,13 +120,12 @@ const Home = () => {
         }
         default:
           break;
-      } // 서버에서 받은 데이터를 상태에 저장
+      }
     };
 
     // WebSocket 연결 종료 시
     return () => {
       ws.close();
-
       socketRef.current = null;
     };
   }, []);
@@ -122,7 +139,6 @@ const Home = () => {
     }
   };
 
-  // 시간 단위 변경 시 WebSocket 초기화 메시지 전송
   useEffect(() => {
     sendMessage({
       event: 'CANDLE_CHART_INIT',
@@ -145,7 +161,6 @@ const Home = () => {
         ) : (
           <div className="h-[460px] bg-surface-default"></div>
         )}
-
         <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
             currentPrice={currentPrice}
@@ -155,7 +170,6 @@ const Home = () => {
           />
           <OrderPanel tradePrice={orderPrice} setTradePrice={setOrderPrice} />
         </div>
-
         <TradeRecords tradeRecords={tradeRecords} />
       </Layout>
     </div>
