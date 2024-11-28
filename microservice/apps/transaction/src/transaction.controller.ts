@@ -81,7 +81,7 @@ export class TransactionController {
 
   @Get('/pending')
   @UseGuards(AuthenticatedGuard)
-  async getPending(@Request() req, @Param('historyId') historyId?: string) {
+  async getPending(@Request() req, @Param('id') historyId?: string) {
     const userId = req.user.userId;
     return await this.transactionService.getPending(userId, historyId);
   }
