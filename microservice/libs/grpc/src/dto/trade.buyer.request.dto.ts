@@ -1,23 +1,21 @@
 export class TradeBuyerRequestDto {
   userId: string;
   coinCode: string;
-  remainingAmount: number;
-  paymentAmount: number;
-  receivedCoins: number;
-  refund: number;
+  buyerPice: string;
+  tradePice: string;
+  receivedCoins: string;
 
   constructor(
     userId: string,
     coinCode: string,
-    buyerPrice: number,
-    tradePrice: number,
-    quantity: number,
+    buyerPrice: string,
+    tradePrice: string,
+    quantity: string,
   ) {
     this.userId = userId;
     this.coinCode = coinCode;
-    const payment = tradePrice * quantity;
-    this.paymentAmount = payment;
+    this.buyerPice = buyerPrice;
+    this.tradePice = tradePrice;
     this.receivedCoins = quantity;
-    this.refund = buyerPrice * quantity - payment;
   }
 }

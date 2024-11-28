@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
-import { OrderRequestDto } from '@app/grpc/dto/order.request.dto';
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
 import { formatFixedPoint } from '@app/common/utils/number.format.util';
 import { OrderType } from '@app/common/enums/order-type.enum';
@@ -54,6 +53,7 @@ export class TransactionRepository {
         tradedAt: 'desc',
       },
       select: {
+        tradeId: true,
         tradedAt: true,
         price: true,
         quantity: true,
@@ -61,32 +61,6 @@ export class TransactionRepository {
     });
 
     return trades;
-  }
-
-  async createBuyOrder(orderRequest: OrderRequestDto, historyId: string) {
-    return await this.prisma.buyOrder.create({
-      data: {
-        historyId: historyId,
-        userId: orderRequest.userId,
-        coinCode: orderRequest.coinCode,
-        price: formatFixedPoint(orderRequest.price),
-        originalQuote: String(orderRequest.amount),
-        remainingQuote: String(orderRequest.amount),
-      },
-    });
-  }
-
-  async createSellOrder(orderRequest: OrderRequestDto, historyId: string) {
-    return await this.prisma.sellOrder.create({
-      data: {
-        historyId: historyId,
-        userId: orderRequest.userId,
-        coinCode: orderRequest.coinCode,
-        price: formatFixedPoint(orderRequest.price),
-        originalQuote: String(orderRequest.amount),
-        remainingBase: String(orderRequest.amount),
-      },
-    });
   }
 
   private getTableName(timeScale: TimeScale): string {

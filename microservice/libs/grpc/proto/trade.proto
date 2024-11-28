@@ -15,16 +15,16 @@ message TradeRequest {
 message BuyerRequest {
   string userId = 1;
   string coinCode = 2;
-  double paymentAmount = 3;
-  double receivedCoins = 4;
-  double refund = 5;
+  string buyerPice = 3;
+  string tradePice = 4;
+  string receivedCoins = 5;
 }
 
 message SellerRequest {
   string userId = 1;
   string coinCode = 2;
-  double receivedAmount = 3;
-  double soldCoins = 4;
+  string tradePrice = 3;
+  string soldCoins = 4;
 }
 
 message TradeResponse {

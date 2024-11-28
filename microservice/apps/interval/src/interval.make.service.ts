@@ -51,6 +51,7 @@ export class IntervalMakeService {
           volume: trades.reduce((acc, trade) => acc + Number(trade.quantity), 0),
         }),
         trades: trades.map((trade, index) => ({
+          tradeId: trade.tradeId,
           date: trade.tradedAt,
           price: Number(trade.price),
           amount: Number(trade.quantity),

@@ -26,8 +26,7 @@ export class IntervalService implements OnModuleDestroy, OnModuleInit {
       (await this.IntervalRepository.getLatestTrade(CurrencyCode.BTC))?.price ?? 0,
     );
     for (const [, value] of Object.entries(TimeScale)) {
-      const count = await this.IntervalRepository.getCandleCount(value, CurrencyCode.BTC);
-      if (count === 0) await this.ensureMinimumCandles(value);
+      await this.ensureMinimumCandles(value);
     }
     Object.entries(TimeScale).forEach(async ([, value]) => {
       this.intervalData.set(
@@ -183,9 +182,6 @@ export class IntervalService implements OnModuleDestroy, OnModuleInit {
     }
   }
 
-  // getSeoulTime() {
-  //   return new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
-  // }
   private async handleCandleData(date: Date, secData: CandleDataDto) {
     return this.intervalData.forEach((value, timeScale) => {
       const updatedData = this.intervalMakeService.candleAdd(value, secData);

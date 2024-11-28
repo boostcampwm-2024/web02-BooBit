@@ -1,10 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import getPendingApi from '../api/getPendingApi';
 
 const useGetPending = () => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['pending'],
-    queryFn: getPendingApi,
+    queryFn: ({ pageParam }) => getPendingApi({ id: pageParam }),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => lastPage.nextId,
+    getPreviousPageParam: () => null,
   });
 };
 
