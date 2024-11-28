@@ -1,7 +1,7 @@
 export class TradeSellerRequestDto {
   userId: string;
   coinCode: string;
-  tradePice: string;
+  tradePrice: string;
   soldCoins: string;
 
   constructor(
@@ -12,7 +12,7 @@ export class TradeSellerRequestDto {
   ) {
     this.userId = userId;
     this.coinCode = coinCode;
-    this.tradePice = tradePrice;
+    this.tradePrice = tradePrice;
     this.soldCoins = quantity;
   }
 }

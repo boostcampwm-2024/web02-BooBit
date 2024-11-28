@@ -219,7 +219,7 @@ export class BalanceRepository {
 
   async makeBuyOrder(orderRequest: OrderRequestDto): Promise<OrderResponseDto> {
     const { userId, coinCode, amount, price } = orderRequest;
-    const orderPrice = new Decimal(amount).mul(new Decimal(price));
+    const orderPrice = amount * price;
     try {
       return await this.prisma.$transaction(async (prisma) => {
         const asset = await this.getAvailableBalanceTx(prisma, userId, CurrencyCode.KRW);
@@ -320,9 +320,7 @@ export class BalanceRepository {
 
   async settleTransaction(tradeRequest: TradeRequestDto) {
     const { buyerRequest, sellerRequest } = tradeRequest;
-    const tradePayment = new Decimal(buyerRequest.tradePice).mul(
-      new Decimal(buyerRequest.receivedCoins),
-    );
+    const tradePayment = Number(buyerRequest.tradePrice) * Number(buyerRequest.receivedCoins);
     return await this.prisma.$transaction(async (prisma) => {
       await this.updateBuyerAsset(prisma, buyerRequest, tradePayment);
       await this.updateSellerAsset(prisma, sellerRequest, tradePayment);
@@ -330,10 +328,10 @@ export class BalanceRepository {
     });
   }
 
-  async updateBuyerAsset(prisma, buyerRequest: TradeBuyerRequestDto, tradePayment: Decimal) {
-    const { userId, coinCode, buyerPice, receivedCoins } = buyerRequest;
-    const originalPayment = new Decimal(buyerPice).mul(new Decimal(receivedCoins));
-    const refund = originalPayment.sub(tradePayment);
+  async updateBuyerAsset(prisma, buyerRequest: TradeBuyerRequestDto, tradePayment: number) {
+    const { userId, coinCode, buyerPrice, receivedCoins } = buyerRequest;
+    const originalPayment = Number(buyerPrice) * Number(receivedCoins);
+    const refund = originalPayment - tradePayment;
     await this.decreaseBuyerCurrencyBalance(
       prisma,
       userId,
@@ -379,7 +377,7 @@ export class BalanceRepository {
     });
   }
 
-  async updateSellerAsset(prisma, sellerRequest: TradeSellerRequestDto, tradePayment: Decimal) {
+  async updateSellerAsset(prisma, sellerRequest: TradeSellerRequestDto, tradePayment: number) {
     const { userId, coinCode, soldCoins } = sellerRequest;
     await this.increaseSellerCurrencyBalance(prisma, userId, CurrencyCode.KRW, tradePayment);
     await this.decreaseSellerCoinBalance(prisma, userId, coinCode, soldCoins);

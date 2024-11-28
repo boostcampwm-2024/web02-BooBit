@@ -1,8 +1,8 @@
 export class TradeBuyerRequestDto {
   userId: string;
   coinCode: string;
-  buyerPice: string;
-  tradePice: string;
+  buyerPrice: string;
+  tradePrice: string;
   receivedCoins: string;
 
   constructor(
@@ -14,8 +14,8 @@ export class TradeBuyerRequestDto {
   ) {
     this.userId = userId;
     this.coinCode = coinCode;
-    this.buyerPice = buyerPrice;
-    this.tradePice = tradePrice;
+    this.buyerPrice = buyerPrice;
+    this.tradePrice = tradePrice;
     this.receivedCoins = quantity;
   }
 }
