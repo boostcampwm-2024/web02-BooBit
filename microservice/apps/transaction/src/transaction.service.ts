@@ -16,7 +16,7 @@ import { TradeGetResponseDto } from './dto/trade.get.response.dto';
 export class TransactionService {
   constructor(private transactionRepository: TransactionRepository) {}
 
-  async validateOrderResponse(orderResponse: OrderResponseDto) {
+  validateOrderResponse(orderResponse: OrderResponseDto) {
     if (orderResponse.status === GrpcOrderStatusCode.NO_BALANCE) {
       throw new BadRequestException('Not Enough Balance');
     } else if (orderResponse.status === GrpcOrderStatusCode.TRANSACTION_ERROR) {
