@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
-import { formatFixedPoint } from '@app/common/utils/number.format.util';
 import { OrderType } from '@app/common/enums/order-type.enum';
 import { OrderPendingDto } from './dto/order.pending.dto';
 
