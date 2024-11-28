@@ -13,7 +13,6 @@ import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
 import { TradeBuyerRequestDto } from '@app/grpc/dto/trade.buyer.request.dto';
 import { TradeSellerRequestDto } from '@app/grpc/dto/trade.seller.request.dto';
 import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
-import { Decimal } from '@prisma/client/runtime/library';
 
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
@@ -418,29 +417,29 @@ export class BalanceRepository {
   async cancelOrder(cancelRequest: TradeCancelRequestDto) {
     return await this.prisma.$transaction(async (prisma) => {
       const { userId, coinCode, orderType } = cancelRequest;
-      const priceDecimal = new Decimal(cancelRequest.price);
-      const remainDecimal = new Decimal(cancelRequest.remain);
+      const priceNumber = Number(cancelRequest.price);
+      const remainNumber = Number(cancelRequest.remain);
 
       await this.createOrderHistory(
         prisma,
         orderType,
         userId,
         coinCode,
-        priceDecimal,
-        remainDecimal,
+        priceNumber,
+        remainNumber,
         OrderStatus.CANCELED,
       );
 
       if (orderType === OrderType.BUY) {
-        const refund = priceDecimal.mul(remainDecimal);
+        const refund = priceNumber * remainNumber;
         await this.decreaseBuyerCurrencyBalance(prisma, userId, CurrencyCode.KRW, refund, refund);
       } else if (orderType === OrderType.SELL) {
         await this.decreaseBuyerCurrencyBalance(
           prisma,
           userId,
           coinCode,
-          remainDecimal,
-          remainDecimal,
+          remainNumber,
+          remainNumber,
         );
       }
 
