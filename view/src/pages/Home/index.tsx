@@ -27,6 +27,7 @@ const Home = () => {
   const [orderBookData, setOrderBookData] = useState<{ buy: OrderType[]; sell: OrderType[] }>();
   const [selectedTimeScale, setSelectedTimeScale] = useState<ChartTimeScaleType>('1sec');
   const [currentPrice, setCurrentPrice] = useState(0);
+  const [lastDayClose, setLastDayClose] = useState(0);
   const [orderPrice, setOrderPrice] = useState<string>('');
 
   const isFirstTradeProcessed = useRef(false);
@@ -51,6 +52,7 @@ const Home = () => {
       switch (receivedData.event) {
         case 'CANDLE_CHART_INIT': {
           const candlePrevData = receivedData.data;
+          setLastDayClose(receivedData.lastDayClose);
           setCandleData(candlePrevData);
           break;
         }
@@ -147,11 +149,13 @@ const Home = () => {
     setTradeRecords([]);
   }, [selectedTimeScale]);
 
+  useEffect(() => {}, [lastDayClose, currentPrice]);
+
   return (
     <div>
       <Header />
       <Layout paddingX="px-[22vw]" flex={false}>
-        <Title currentPrice={currentPrice} hasIncreased={hasIncreased} />
+        <Title currentPrice={currentPrice} lastDayClose={lastDayClose} />
         <TimeScaleSelector
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
