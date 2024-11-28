@@ -84,6 +84,7 @@ function generateTradeData(): RecordType {
   const gradient = Math.random() > 0.5 ? 'POSITIVE' : 'NEGATIVE';
 
   return {
+    tradeId: now.toLocaleDateString(),
     date: now.toISOString(),
     price,
     amount,

@@ -26,12 +26,8 @@ const TradeRecords: React.FC<TradeRecordsProps> = ({ tradeRecords }) => {
       <tbody className="block max-h-[25rem] overflow-y-auto">
         {tradeRecords &&
           tradeRecords.length !== 0 &&
-          tradeRecords.map((r, i) => (
-            <TradeRecordsRow
-              key={r.amount + '.' + r.date + i}
-              flex
-              styles="even:bg-surface-hover-light"
-            >
+          tradeRecords.map((r) => (
+            <TradeRecordsRow key={r.tradeId} flex styles="even:bg-surface-hover-light">
               <TradeRecordsCell start>
                 <span>{formatDate(r.date).slice(5, 10)}</span>
                 <span className="ml-[0.5rem] text-text-dark">{formatDate(r.date).slice(11)}</span>

@@ -91,10 +91,9 @@ const Home = () => {
         case 'TRADE': {
           const tradePrevData = receivedData.data;
 
-          // 첫 번째 TRADE 이벤트에서만 실행
           if (!isFirstTradeProcessed.current && tradePrevData && tradePrevData.length > 0) {
             setOrderPrice(formatPrice(tradePrevData[0].price));
-            isFirstTradeProcessed.current = true; // 첫 번째 처리 완료
+            isFirstTradeProcessed.current = true;
           }
 
           if (tradePrevData && tradePrevData.length > 0) {
