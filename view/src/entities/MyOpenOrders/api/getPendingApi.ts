@@ -1,6 +1,11 @@
 const apiUrl = import.meta.env.VITE_TRANSACTION_URL;
-const getPendingApi = async () => {
-  const response = await fetch(`${apiUrl}/api/orders/pending`, {
+
+const getPendingApi = async ({ id }: { id: number | null }) => {
+  const queryParams = new URLSearchParams({
+    id: id !== null ? String(id) : '',
+  }).toString();
+
+  const response = await fetch(`${apiUrl}/api/orders/pending?${queryParams}`, {
     method: 'GET',
     credentials: 'include',
   });

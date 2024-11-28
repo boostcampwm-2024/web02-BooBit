@@ -1,3 +1,4 @@
+import { useCallback, useRef } from 'react';
 import formatDate from '../../shared/model/formatDate.ts';
 import formatPrice from '../../shared/model/formatPrice.ts';
 import TableCell from '../../shared/UI/TableCell.tsx';
@@ -16,8 +17,26 @@ const columnData = [
 ];
 
 const MyOpenOrders = () => {
-  const { data: openOrders } = useGetPending();
+  const { data: openOrders, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetPending();
   const { mutate: deleteOrder } = useDeleteOrder();
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const bottomRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage) return;
+
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      });
+
+      if (node) observerRef.current.observe(node);
+    },
+    [isFetchingNextPage, fetchNextPage, hasNextPage]
+  );
 
   const handleRemoveOrder = (
     e: React.MouseEvent<HTMLElement, MouseEvent>,
@@ -44,41 +63,45 @@ const MyOpenOrders = () => {
         </thead>
 
         <tbody className="block h-[16rem] overflow-y-auto">
-          {openOrders && openOrders.length !== 0 ? (
-            openOrders.map((t: OrderType) => (
-              <TableRow
-                key={t.createdAt}
-                height="h-[3rem]"
-                styles="border-border-default border-b-[1px]"
-              >
-                <TableCell width={columnData[0].width}>
-                  <span>{formatDate(t.createdAt).slice(0, 10)}</span>
-                  <div className="mt-[-6px]">{formatDate(t.createdAt).slice(11)}</div>
-                </TableCell>
-                <TableCell
-                  width={columnData[1].width}
-                  styles={t.orderType === 'BUY' ? 'text-positive' : 'text-negative'}
+          {openOrders && openOrders.pages[0].orders.length !== 0 ? (
+            openOrders.pages.map((page) =>
+              page.orders.map((t: OrderType) => (
+                <TableRow
+                  key={t.createdAt}
+                  height="h-[3rem]"
+                  styles="border-border-default border-b-[1px]"
                 >
-                  {t.orderType === 'BUY' ? '매수' : '매도'}
-                </TableCell>
-                <TableCell width={columnData[2].width}>{formatPrice(t.quantity)}</TableCell>
-                <TableCell width={columnData[3].width}>{formatPrice(t.price)}</TableCell>
-                <TableCell width={columnData[4].width}>{formatPrice(t.unfilledAmount)}</TableCell>
-                <TableCell width={columnData[5].width}>
-                  <button
-                    className={`w-[5rem] h-[2rem] rounded bg-surface-hover-light`}
-                    onClick={(e) => handleRemoveOrder(e, t.historyId, t.orderType)}
+                  <TableCell width={columnData[0].width}>
+                    <span>{formatDate(t.createdAt).slice(0, 10)}</span>
+                    <div className="mt-[-6px]">{formatDate(t.createdAt).slice(11)}</div>
+                  </TableCell>
+                  <TableCell
+                    width={columnData[1].width}
+                    styles={t.orderType === 'BUY' ? 'text-positive' : 'text-negative'}
                   >
-                    주문취소
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))
+                    {t.orderType === 'BUY' ? '매수' : '매도'}
+                  </TableCell>
+                  <TableCell width={columnData[2].width}>{formatPrice(t.quantity)}</TableCell>
+                  <TableCell width={columnData[3].width}>{formatPrice(t.price)}</TableCell>
+                  <TableCell width={columnData[4].width}>{formatPrice(t.unfilledAmount)}</TableCell>
+                  <TableCell width={columnData[5].width}>
+                    <button
+                      className={`w-[5rem] h-[2rem] rounded bg-surface-hover-light`}
+                      onClick={(e) => handleRemoveOrder(e, t.historyId, t.orderType)}
+                    >
+                      주문취소
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )
           ) : (
             <tr className="w-full h-full flex justify-center items-center text-text-dark">
               <td>미체결 내역이 없습니다.</td>
             </tr>
           )}
+
+          <tr ref={bottomRef} className="h-[2px]"></tr>
         </tbody>
       </table>
     </div>
