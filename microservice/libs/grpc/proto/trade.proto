@@ -15,8 +15,8 @@ message TradeRequest {
 message BuyerRequest {
   string userId = 1;
   string coinCode = 2;
-  string buyerPice = 3;
-  string tradePice = 4;
+  string buyerPrice = 3;
+  string tradePrice = 4;
   string receivedCoins = 5;
 }
 
