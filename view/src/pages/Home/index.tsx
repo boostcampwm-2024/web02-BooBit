@@ -32,15 +32,12 @@ const Home = () => {
 
   const isFirstTradeProcessed = useRef(false);
 
-  const hasIncreased = false;
-
   // WebSocket 연결 및 메시지 처리
   useEffect(() => {
     const ws = new WebSocket(socketUrl);
     socketRef.current = ws;
 
     ws.onopen = () => {
-      console.log('웹소켓 연결 완료');
       while (messageQueue.length > 0) {
         ws.send(messageQueue.shift()!);
       }
@@ -167,7 +164,7 @@ const Home = () => {
         <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
             currentPrice={currentPrice}
-            hasIncreased={hasIncreased}
+            hasIncreased={currentPrice > lastDayClose}
             setOrderPrice={setOrderPrice}
             orderBook={orderBookData}
           />
