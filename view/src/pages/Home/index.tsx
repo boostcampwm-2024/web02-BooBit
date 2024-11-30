@@ -15,8 +15,8 @@ import { OrderType } from '../../shared/types/socket/OrderType';
 import formatPrice from '../../shared/model/formatPrice';
 
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
-const MAX_RECORDS = 200;
-const REMOVE_COUNT = 30;
+const MAX_RECORDS = 150;
+const REMOVE_COUNT = 20;
 
 const Home = () => {
   const socketRef = useRef<WebSocket | null>(null);
@@ -29,10 +29,9 @@ const Home = () => {
   const [currentPrice, setCurrentPrice] = useState(0);
   const [lastDayClose, setLastDayClose] = useState(0);
   const [orderPrice, setOrderPrice] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const isFirstTradeProcessed = useRef(false);
-
-  const hasIncreased = false;
 
   // WebSocket 연결 및 메시지 처리
   useEffect(() => {
@@ -40,7 +39,6 @@ const Home = () => {
     socketRef.current = ws;
 
     ws.onopen = () => {
-      console.log('웹소켓 연결 완료');
       while (messageQueue.length > 0) {
         ws.send(messageQueue.shift()!);
       }
@@ -54,6 +52,7 @@ const Home = () => {
           const candlePrevData = receivedData.data;
           setLastDayClose(receivedData.lastDayClose);
           setCandleData(candlePrevData);
+          setIsLoading(false);
           break;
         }
         case 'CANDLE_CHART': {
@@ -99,7 +98,6 @@ const Home = () => {
           if (tradePrevData && tradePrevData.length > 0) {
             setCurrentPrice(tradePrevData[0].price);
           }
-
           setTradeRecords((prevRecords) => {
             const updatedRecords = prevRecords
               ? [...tradePrevData, ...prevRecords]
@@ -145,10 +143,9 @@ const Home = () => {
       event: 'CANDLE_CHART_INIT',
       timeScale: selectedTimeScale,
     });
+    setIsLoading(true);
     setTradeRecords([]);
   }, [selectedTimeScale]);
-
-  useEffect(() => {}, [lastDayClose, currentPrice]);
 
   return (
     <div>
@@ -159,7 +156,11 @@ const Home = () => {
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
         />
-        {candleData ? (
+        {isLoading ? (
+          <div className="h-[460px] bg-surface-default flex items-center justify-center text-display-bold-20">
+            👻 Loading...
+          </div>
+        ) : candleData ? (
           <Chart data={candleData} scaleType={selectedTimeScale} />
         ) : (
           <div className="h-[460px] bg-surface-default"></div>
@@ -167,7 +168,7 @@ const Home = () => {
         <div className="w-full flex flex-wrap justify-between py-[0.75rem] overflow-hidden">
           <OrderBook
             currentPrice={currentPrice}
-            hasIncreased={hasIncreased}
+            hasIncreased={currentPrice > lastDayClose}
             setOrderPrice={setOrderPrice}
             orderBook={orderBookData}
           />

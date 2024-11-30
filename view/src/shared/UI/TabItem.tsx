@@ -7,18 +7,12 @@ interface TabItemProps {
   width?: string;
 }
 
-const TabItem: React.FC<TabItemProps> = ({
-  content,
-  isSeleted,
-  handleClick,
-  width,
-}) => {
-  const selectedClasses =
-    'border-b-[2px] border-border-alt text-display-bold-16';
+const TabItem: React.FC<TabItemProps> = ({ content, isSeleted, handleClick, width }) => {
+  const selectedClasses = 'border-b-[2px] border-border-alt text-display-bold-16';
 
   return (
     <div
-      className={`${width} h-[100%] flex items-center justify-center  ${isSeleted ? selectedClasses : 'available-medium-16'}`}
+      className={`${width} h-[100%] flex items-center justify-center ${isSeleted ? selectedClasses : 'cursor-pointer available-medium-16'}`}
       onClick={() => handleClick(content)}
     >
       {content}

@@ -1,15 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import {} from 'react-router-dom';
 import Logo from './UI/Logo';
 
 import { useAuth } from '../../shared/store/auth/authContext';
 import useSignout from './model/useSignout';
 
 const Header = () => {
+  const navigate = useNavigate();
   const { state } = useAuth();
   const { mutate } = useSignout();
 
   const handleLogout = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
+    navigate('/');
     mutate();
   };
 
