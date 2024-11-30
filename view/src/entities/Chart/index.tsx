@@ -135,7 +135,7 @@ const Chart: React.FC<CandleChartProps> = ({ data, scaleType }) => {
       });
   }, [data, scaleType]);
 
-  return <svg className="w-full border-[1px] border-border-default" ref={svgRef} />;
+  return <svg className="h-[460px] w-full border-[1px] border-border-default" ref={svgRef} />;
 };
 
 export default Chart;

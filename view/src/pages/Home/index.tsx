@@ -29,6 +29,7 @@ const Home = () => {
   const [currentPrice, setCurrentPrice] = useState(0);
   const [lastDayClose, setLastDayClose] = useState(0);
   const [orderPrice, setOrderPrice] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const isFirstTradeProcessed = useRef(false);
 
@@ -51,6 +52,7 @@ const Home = () => {
           const candlePrevData = receivedData.data;
           setLastDayClose(receivedData.lastDayClose);
           setCandleData(candlePrevData);
+          setIsLoading(false);
           break;
         }
         case 'CANDLE_CHART': {
@@ -141,10 +143,9 @@ const Home = () => {
       event: 'CANDLE_CHART_INIT',
       timeScale: selectedTimeScale,
     });
+    setIsLoading(true);
     setTradeRecords([]);
   }, [selectedTimeScale]);
-
-  useEffect(() => {}, [lastDayClose, currentPrice]);
 
   return (
     <div>
@@ -155,7 +156,11 @@ const Home = () => {
           selectedTimeScale={selectedTimeScale}
           setSelectedTimeScale={setSelectedTimeScale}
         />
-        {candleData ? (
+        {isLoading ? (
+          <div className="h-[460px] bg-surface-default flex items-center justify-center text-display-bold-20">
+            👻 Loading...
+          </div>
+        ) : candleData ? (
           <Chart data={candleData} scaleType={selectedTimeScale} />
         ) : (
           <div className="h-[460px] bg-surface-default"></div>
