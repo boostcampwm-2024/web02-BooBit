@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import Home from '../pages/Home';
@@ -14,7 +14,6 @@ import errorMessages from '../shared/consts/errorMessages';
 
 const App = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { login, logout } = useAuthActions();
   const { addToast } = useToast();
 
@@ -24,11 +23,11 @@ const App = () => {
         onSuccess: () => {
           login();
         },
-        onError: (error) => {
+        onError: (error, query) => {
           if (error instanceof Error) {
             if (error.message === '403') {
               logout();
-              if (location.pathname !== '/') {
+              if (!query.queryKey.includes('available')) {
                 addToast(errorMessages[403], 'error');
                 navigate('signin');
               }
