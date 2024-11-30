@@ -18,7 +18,11 @@ const InputNumber: React.FC<InputNumberProps> = ({
 
     const [intPart, decimalPart] = value.split('.');
 
-    if ((coinCode === 'KRW' && value.includes('.')) || (decimalPart && decimalPart.length === 7)) {
+    if (
+      isNaN(Number(value)) ||
+      (coinCode === 'KRW' && value.includes('.')) ||
+      (decimalPart && decimalPart.length === 7)
+    ) {
       return;
     }
 

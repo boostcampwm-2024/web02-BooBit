@@ -23,10 +23,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
 
     const [intPart, decimalPart] = value.split('.');
 
-    if (currencyCode === 'KRW' && value.includes('.')) {
-      return;
-    }
-    if (decimalPart && decimalPart.length === 7) {
+    if (
+      isNaN(Number(value)) ||
+      (currencyCode === 'KRW' && value.includes('.')) ||
+      (decimalPart && decimalPart.length === 7)
+    ) {
       return;
     }
 
