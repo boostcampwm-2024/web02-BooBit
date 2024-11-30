@@ -15,8 +15,8 @@ import { OrderType } from '../../shared/types/socket/OrderType';
 import formatPrice from '../../shared/model/formatPrice';
 
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
-const MAX_RECORDS = 200;
-const REMOVE_COUNT = 30;
+const MAX_RECORDS = 150;
+const REMOVE_COUNT = 20;
 
 const Home = () => {
   const socketRef = useRef<WebSocket | null>(null);
@@ -96,7 +96,6 @@ const Home = () => {
           if (tradePrevData && tradePrevData.length > 0) {
             setCurrentPrice(tradePrevData[0].price);
           }
-
           setTradeRecords((prevRecords) => {
             const updatedRecords = prevRecords
               ? [...tradePrevData, ...prevRecords]
