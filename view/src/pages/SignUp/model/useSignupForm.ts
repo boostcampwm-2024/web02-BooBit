@@ -46,7 +46,7 @@ const useSignupForm = () => {
   };
 
   const validatePassword = () => {
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,32}$/;
     const isInvalid = !passwordRegex.test(formData.password);
     setError('password', isInvalid, isInvalid ? '비밀번호가 조건에 맞지 않습니다.' : '');
     return isInvalid;

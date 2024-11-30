@@ -3,11 +3,16 @@ import React from 'react';
 interface SubmitButtonProps {
   height: string;
   content: string;
-  amount: string;
+  amount?: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const SubmitButton: React.FC<SubmitButtonProps> = ({ height, content, amount, onClick }) => {
+const SubmitButton: React.FC<SubmitButtonProps> = ({
+  height,
+  content,
+  amount = 'true',
+  onClick,
+}) => {
   const disable = amount === '' || amount === '0';
   const disableStyle = disable
     ? 'bg-surface-hover-light text-text-dark'
