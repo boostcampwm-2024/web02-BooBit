@@ -55,6 +55,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         </label>
       )}
       <SubmitButton
+        amount={amount}
         height="h-[3.5rem]"
         content={`${type} 신청`}
         onClick={handleSubmit}

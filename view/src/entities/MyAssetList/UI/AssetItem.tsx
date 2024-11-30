@@ -11,7 +11,7 @@ type AssetItemProps = {
 const AssetItem: React.FC<AssetItemProps> = ({ asset, handleClick }) => {
   return (
     <li
-      className="h-[4rem] flex justify-between items-center px-[5.5vw] py-[0.5rem] hover:bg-surface-hover-light"
+      className="h-[4rem] flex justify-between items-center px-[5.5vw] py-[0.5rem] hover:bg-surface-hover-light cursor-pointer"
       onClick={handleClick}
     >
       <div className="flex items-center gap-[1.5vw]">
