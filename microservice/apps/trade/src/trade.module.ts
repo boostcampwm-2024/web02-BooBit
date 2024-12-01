@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TradeRepository } from './trade.repository';
 import { TradeBalanceService } from './trade.balance.service';
 import { PrismaModule } from '@app/prisma';
+import { TradeQueueService } from './trade.queue.service';
 
 @Module({
   imports: [
@@ -28,6 +29,12 @@ import { PrismaModule } from '@app/prisma';
       },
     ]),
   ],
-  providers: [TradeService, TradeProcessor, TradeBalanceService, TradeRepository],
+  providers: [
+    TradeService,
+    TradeProcessor,
+    TradeBalanceService,
+    TradeRepository,
+    TradeQueueService,
+  ],
 })
 export class TradeModule {}
