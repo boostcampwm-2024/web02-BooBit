@@ -2,9 +2,9 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { TradeGrpcService } from '@app/grpc/trade.interface';
-import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
 import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
+import { TradeRequestListDto } from '@app/grpc/dto/trade.request.list.dto';
 
 @Injectable()
 export class TradeBalanceService implements OnModuleInit, TradeGrpcService {
@@ -16,7 +16,7 @@ export class TradeBalanceService implements OnModuleInit, TradeGrpcService {
     this.tradeService = this.client.getService<TradeGrpcService>('TradeService');
   }
 
-  settleTransaction(tradeRequest: TradeRequestDto[]): Promise<TradeResponseDto> {
+  settleTransaction(tradeRequest: TradeRequestListDto): Promise<TradeResponseDto> {
     return firstValueFrom(this.tradeService.settleTransaction(tradeRequest));
   }
 

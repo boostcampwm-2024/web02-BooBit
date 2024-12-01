@@ -20,6 +20,7 @@ import { TradeBuyersDto } from './dto/trade.buyers.dto';
 import { TradeSellersDto } from './dto/trade.sellers.dto';
 import { TradeBuyerRequestDto } from '@app/grpc/dto/trade.buyer.request.dto';
 import { TradeSellerRequestDto } from '@app/grpc/dto/trade.seller.request.dto';
+import { TradeRequestListDto } from '@app/grpc/dto/trade.request.list.dto';
 
 @Injectable()
 export class BalanceService implements OrderService, AccountService {
@@ -117,8 +118,8 @@ export class BalanceService implements OrderService, AccountService {
     return await this.balanceRepository.makeSellOrder(orderRequest);
   }
 
-  async settleTransaction(tradeRequests: TradeRequestDto[]) {
-    const { buyers, sellers } = this.groupTradesForSettlement(tradeRequests);
+  async settleTransaction(tradeRequests: TradeRequestListDto) {
+    const { buyers, sellers } = this.groupTradesForSettlement(tradeRequests.tradeRequests);
     return await this.balanceRepository.settleTransaction(buyers, sellers);
   }
 

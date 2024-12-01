@@ -11,6 +11,7 @@ import { BuyOrder } from './dto/trade.buy.order.type';
 import { SellOrder } from './dto/trade.sell.order.type';
 import { TradeOrder } from '@app/grpc/dto/trade.order.dto';
 import { CreateTrade } from './dto/trade.create.type';
+import { TradeRequestListDto } from '@app/grpc/dto/trade.request.list.dto';
 
 const BATCH_SIZE = 30;
 
@@ -52,7 +53,7 @@ export class TradeService {
       offset += BATCH_SIZE;
     }
 
-    await this.tradeBalanceService.settleTransaction(requests);
+    await this.tradeBalanceService.settleTransaction(new TradeRequestListDto(requests));
     await this.updateOrdersAndTrades(type, deleteIds, updates, trades, current, remain);
   }
 
