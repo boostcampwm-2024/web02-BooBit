@@ -6,11 +6,13 @@ import { BalanceRepository } from './balance.repository';
 import { SessionModule } from '@app/session';
 import { Transport } from '@nestjs/microservices';
 import { CommonModule } from '@app/common';
+import { BalanceProcessor } from './balance.processor';
+import { BullMQModule } from '@app/bull';
 
 @Module({
-  imports: [PrismaModule, SessionModule, CommonModule],
+  imports: [PrismaModule, SessionModule, CommonModule, BullMQModule],
   controllers: [BalanceController],
-  providers: [BalanceService, BalanceRepository],
+  providers: [BalanceService, BalanceRepository, BalanceProcessor],
 })
 export class BalanceModule {
   static grpcOptions = {

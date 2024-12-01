@@ -19,7 +19,6 @@ import { AccountService } from '@app/grpc/account.interface';
 import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
 import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 import { AvailableBalanceResponseDto } from './dto/available.balance.response.dto';
-import { TradeRequestListDto } from '@app/grpc/dto/trade.request.list.dto';
 
 @Controller('api/users')
 export class BalanceController implements OrderService, AccountService {
@@ -77,11 +76,6 @@ export class BalanceController implements OrderService, AccountService {
   @GrpcMethod('AccountService', 'CreateAccount')
   async createAccount(accountRequest) {
     return await this.balanceService.createAccount(accountRequest);
-  }
-
-  @GrpcMethod('TradeService', 'SettleTransaction')
-  async settleTransaction(tradeRequests: TradeRequestListDto): Promise<TradeResponseDto> {
-    return await this.balanceService.settleTransaction(tradeRequests);
   }
 
   @GrpcMethod('TradeService', 'CancelOrder')

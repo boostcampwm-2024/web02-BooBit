@@ -18,9 +18,7 @@ import { BullModule } from '@nestjs/bullmq';
         },
       }),
     }),
-    BullModule.registerQueue({
-      name: 'trade',
-    }),
+    BullModule.registerQueue({ name: 'trade' }, { name: 'balance' }),
   ],
   exports: [BullModule],
 })
