@@ -79,8 +79,6 @@ export class TradeRepository {
     deleteIds: string[],
     updates: { historyId: string; remain: number }[],
     trades: CreateTrade[],
-    current: TradeOrder,
-    remain: number,
   ) {
     await this.prisma.$transaction(async (prisma) => {
       if (deleteIds.length > 0) {
@@ -92,9 +90,6 @@ export class TradeRepository {
       }
 
       await this.createTrades(prisma, trades);
-
-      if (remain === 0) return;
-      this.createBuyOrder(prisma, current, remain);
     });
   }
 
@@ -102,8 +97,6 @@ export class TradeRepository {
     deleteIds: string[],
     updates: { historyId: string; remain: number }[],
     trades: CreateTrade[],
-    current: TradeOrder,
-    remain: number,
   ) {
     await this.prisma.$transaction(async (prisma) => {
       if (deleteIds.length > 0) {
@@ -115,9 +108,6 @@ export class TradeRepository {
       }
 
       await this.createTrades(prisma, trades);
-
-      if (remain === 0) return;
-      this.createSellOrder(prisma, current, remain);
     });
   }
 
@@ -142,42 +132,25 @@ export class TradeRepository {
   }
 
   async updateSellOrdersRemainingBase(prisma, updates: { historyId: string; remain: number }[]) {
-    const { updateQuery, updateIds } = this.createUpdateData(updates);
-    const query = `
-      UPDATE sellOrder
-      SET remainingBase = CASE
-        ${updateQuery}
-        ELSE remainingBase
-      END
-      WHERE historyId IN (${updateIds});
-    `;
+    const updatePromises = updates.map((update) =>
+      prisma.sellOrder.update({
+        where: { historyId: update.historyId },
+        data: { remainingBase: String(update.remain) },
+      }),
+    );
 
-    return await prisma.$queryRaw(query);
+    return await Promise.all(updatePromises);
   }
 
   async updateBuyOrdersRemainingQuote(prisma, updates: { historyId: string; remain: number }[]) {
-    const { updateQuery, updateIds } = this.createUpdateData(updates);
-    const query = `
-      UPDATE buyOrder
-      SET remainingQuote = CASE
-        ${updateQuery}
-        ELSE remainingQuote
-      END
-      WHERE historyId IN (${updateIds});
-    `;
+    const updatePromises = updates.map((update) =>
+      prisma.buyOrder.update({
+        where: { historyId: update.historyId },
+        data: { remainingQuote: String(update.remain) },
+      }),
+    );
 
-    return await prisma.$queryRaw(query);
-  }
-
-  createUpdateData(updates: { historyId: string; remain: number }[]) {
-    const updateQuery = updates
-      .map((update) => {
-        return `WHEN '${update.historyId}' THEN '${update.remain}'`;
-      })
-      .join(' ');
-    const updateIds = updates.map((update) => `'${update.historyId}'`).join(', ');
-
-    return { updateQuery, updateIds };
+    return await Promise.all(updatePromises);
   }
 
   async createTrades(prisma, trades: CreateTrade[]) {
@@ -196,8 +169,8 @@ export class TradeRepository {
     });
   }
 
-  async createBuyOrder(prisma, current: TradeOrder, remain: number) {
-    return await prisma.buyOrder.create({
+  async createBuyOrder(current: TradeOrder, remain: number) {
+    return await this.prisma.buyOrder.create({
       data: {
         historyId: current.historyId,
         userId: current.userId,
@@ -209,8 +182,8 @@ export class TradeRepository {
     });
   }
 
-  async createSellOrder(prisma, current: TradeOrder, remain: number) {
-    return await prisma.sellOrder.create({
+  async createSellOrder(current: TradeOrder, remain: number) {
+    return await this.prisma.sellOrder.create({
       data: {
         historyId: current.historyId,
         userId: current.userId,

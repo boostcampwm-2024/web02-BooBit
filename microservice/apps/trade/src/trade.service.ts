@@ -53,8 +53,12 @@ export class TradeService {
       offset += BATCH_SIZE;
     }
 
-    await this.tradeBalanceService.settleTransaction(new TradeRequestListDto(requests));
-    await this.updateOrdersAndTrades(type, deleteIds, updates, trades, current, remain);
+    if (trades.length > 0) {
+      await this.tradeBalanceService.settleTransaction(new TradeRequestListDto(requests));
+      await this.updateOrdersAndTrades(type, deleteIds, updates, trades);
+    }
+
+    await this.createTradeOrder(type, current, remain);
   }
 
   getOrdersFetcher(type: OrderType) {
@@ -154,13 +158,21 @@ export class TradeService {
     deleteIds: string[],
     updates: { historyId: string; remain: number }[],
     trades: CreateTrade[],
-    current: TradeOrder,
-    remain: number,
   ) {
     if (type === OrderType.BUY) {
-      await this.tradeRepository.tradeBuyOrder(deleteIds, updates, trades, current, remain);
+      await this.tradeRepository.tradeBuyOrder(deleteIds, updates, trades);
     } else {
-      await this.tradeRepository.tradeSellOrder(deleteIds, updates, trades, current, remain);
+      await this.tradeRepository.tradeSellOrder(deleteIds, updates, trades);
+    }
+  }
+
+  async createTradeOrder(type: OrderType, current: TradeOrder, remain: number) {
+    if (remain === 0) return;
+
+    if (type === OrderType.BUY) {
+      await this.tradeRepository.createBuyOrder(current, remain);
+    } else {
+      await this.tradeRepository.createSellOrder(current, remain);
     }
   }
 
