@@ -80,8 +80,8 @@ export class BalanceController implements OrderService, AccountService {
   }
 
   @GrpcMethod('TradeService', 'SettleTransaction')
-  async settleTransaction(tradeRequest: TradeRequestDto): Promise<TradeResponseDto> {
-    return await this.balanceService.settleTransaction(tradeRequest);
+  async settleTransaction(tradeRequests: TradeRequestDto[]): Promise<TradeResponseDto> {
+    return await this.balanceService.settleTransaction(tradeRequests);
   }
 
   @GrpcMethod('TradeService', 'CancelOrder')

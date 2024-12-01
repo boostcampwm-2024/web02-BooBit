@@ -16,7 +16,7 @@ export class TradeBalanceService implements OnModuleInit, TradeGrpcService {
     this.tradeService = this.client.getService<TradeGrpcService>('TradeService');
   }
 
-  settleTransaction(tradeRequest: TradeRequestDto): Promise<TradeResponseDto> {
+  settleTransaction(tradeRequest: TradeRequestDto[]): Promise<TradeResponseDto> {
     return firstValueFrom(this.tradeService.settleTransaction(tradeRequest));
   }
 

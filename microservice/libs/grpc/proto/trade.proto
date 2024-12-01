@@ -3,8 +3,12 @@ syntax = "proto3";
 package trade;
 
 service TradeService {
-  rpc SettleTransaction(TradeRequest) returns (TradeResponse);
+  rpc SettleTransaction(TradeRequestList) returns (TradeResponse);
   rpc CancelOrder(TradeCancelRequest) returns (TradeResponse);
+}
+
+message TradeRequestList {
+  repeated TradeRequest tradeRequests = 1;
 }
 
 message TradeRequest {
