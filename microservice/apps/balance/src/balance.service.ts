@@ -16,6 +16,10 @@ import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 import { AvailableBalanceResponseDto } from './dto/available.balance.response.dto';
 import { roundToSix } from '@app/common/utils/number.format.util';
 import { CurrencyCode } from '@app/common';
+import { TradeBuyersDto } from './dto/trade.buyers.dto';
+import { TradeSellersDto } from './dto/trade.sellers.dto';
+import { TradeBuyerRequestDto } from '@app/grpc/dto/trade.buyer.request.dto';
+import { TradeSellerRequestDto } from '@app/grpc/dto/trade.seller.request.dto';
 
 @Injectable()
 export class BalanceService implements OrderService, AccountService {
@@ -113,8 +117,69 @@ export class BalanceService implements OrderService, AccountService {
     return await this.balanceRepository.makeSellOrder(orderRequest);
   }
 
-  async settleTransaction(tradeRequest: TradeRequestDto) {
-    return await this.balanceRepository.settleTransaction(tradeRequest);
+  async settleTransaction(tradeRequests: TradeRequestDto[]) {
+    const { buyers, sellers } = this.groupTradesForSettlement(tradeRequests);
+    return await this.balanceRepository.settleTransaction(buyers, sellers);
+  }
+
+  groupTradesForSettlement(tradeRequests: TradeRequestDto[]) {
+    const buyers = new Map<string, TradeBuyersDto>();
+    const sellers = new Map<string, TradeSellersDto>();
+
+    for (const tradeRequest of tradeRequests) {
+      const { buyerRequest, sellerRequest } = tradeRequest;
+      const coins = Number(buyerRequest.receivedCoins);
+      const tradePayment = Number(buyerRequest.tradePrice) * coins;
+      const originalPayment = Number(buyerRequest.buyerPrice) * coins;
+      const refund = originalPayment - tradePayment;
+
+      this.processBuyer(buyers, buyerRequest, originalPayment, refund, coins);
+
+      this.processSeller(sellers, sellerRequest, tradePayment, coins);
+    }
+
+    return { buyers, sellers };
+  }
+
+  private processBuyer(
+    buyers: Map<string, TradeBuyersDto>,
+    buyerRequest: TradeBuyerRequestDto,
+    originalPayment: number,
+    refund: number,
+    coins: number,
+  ) {
+    if (buyers.has(buyerRequest.userId)) {
+      const buyer = buyers.get(buyerRequest.userId);
+      buyer.add(originalPayment, refund, coins);
+    } else {
+      buyers.set(
+        buyerRequest.userId,
+        new TradeBuyersDto(
+          buyerRequest.userId,
+          buyerRequest.coinCode,
+          originalPayment,
+          refund,
+          coins,
+        ),
+      );
+    }
+  }
+
+  private processSeller(
+    sellers: Map<string, TradeSellersDto>,
+    sellerRequest: TradeSellerRequestDto,
+    tradePayment: number,
+    coins: number,
+  ) {
+    if (sellers.has(sellerRequest.userId)) {
+      const seller = sellers.get(sellerRequest.userId);
+      seller.add(tradePayment, coins);
+    } else {
+      sellers.set(
+        sellerRequest.userId,
+        new TradeSellersDto(sellerRequest.userId, sellerRequest.coinCode, tradePayment, coins),
+      );
+    }
   }
 
   async cancelOrder(cancelRequest: TradeCancelRequestDto) {
