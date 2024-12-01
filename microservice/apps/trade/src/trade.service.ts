@@ -10,6 +10,7 @@ import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
 import { BuyOrder } from './dto/trade.buy.order.type';
 import { SellOrder } from './dto/trade.sell.order.type';
 import { TradeOrder } from '@app/grpc/dto/trade.order.dto';
+import { CreateTrade } from './dto/trade.create.type';
 
 const BATCH_SIZE = 30;
 
@@ -22,6 +23,10 @@ export class TradeService {
 
   async processTrade(type: OrderType, current: TradeOrder) {
     const { coinCode, price } = current;
+    const requests: TradeRequestDto[] = [];
+    const deleteIds: string[] = [];
+    const updates = [];
+    const trades: CreateTrade[] = [];
     let remain = current.originalQuote;
     let offset = 0;
 
@@ -38,15 +43,17 @@ export class TradeService {
         remain -= quantity; // 계산 문제 발생 가능
 
         const tradePrice = order.price;
-        await this.settleTransaction(type, current, order, tradePrice, quantity);
+        requests.push(this.makeTransaction(type, current, order, tradePrice, quantity));
 
-        await this.updateOrderAndTradeLog(type, current, opposite, coinCode, order.price, quantity);
+        this.updateOrder(opposite, deleteIds, updates);
+        trades.push(this.makeTrade(type, current, opposite, coinCode, order.price, quantity));
       }
 
       offset += BATCH_SIZE;
     }
 
-    await this.createTradeOrder(type, current, remain);
+    await this.tradeBalanceService.settleTransaction(requests);
+    await this.updateOrdersAndTrades(type, deleteIds, updates, trades, current, remain);
   }
 
   getOrdersFetcher(type: OrderType) {
@@ -85,7 +92,7 @@ export class TradeService {
     throw new NotFoundException('Invalid order type');
   }
 
-  async settleTransaction(
+  makeTransaction(
     type: OrderType,
     current: TradeOrder,
     order: BuyOrder | SellOrder,
@@ -105,11 +112,10 @@ export class TradeService {
       tradePrice,
       String(quantity),
     );
-    const tradeRequest = new TradeRequestDto(buyer, seller);
-    await this.tradeBalanceService.settleTransaction(tradeRequest);
+    return new TradeRequestDto(buyer, seller);
   }
 
-  async updateOrderAndTradeLog(
+  makeTrade(
     type: OrderType,
     current: TradeOrder,
     opposite: TradeHistoryRequestDto,
@@ -117,7 +123,7 @@ export class TradeService {
     tradePrice: string,
     quantity: number,
   ) {
-    const trade = {
+    return {
       buyerId: type === OrderType.BUY ? current.userId : opposite.userId,
       buyOrderId: type === OrderType.BUY ? current.historyId : opposite.historyId,
       sellerId: type === OrderType.BUY ? opposite.userId : current.userId,
@@ -126,21 +132,34 @@ export class TradeService {
       price: tradePrice,
       quantity: String(quantity),
     };
+  }
 
-    if (type === OrderType.BUY) {
-      await this.tradeRepository.tradeBuyOrder(opposite, trade);
+  updateOrder(
+    opposite: TradeHistoryRequestDto,
+    deleteIds: string[],
+    updates: { historyId: string; remain: number }[],
+  ) {
+    const { remain, historyId } = opposite;
+
+    if (remain === 0) {
+      deleteIds.push(historyId);
     } else {
-      await this.tradeRepository.tradeSellOrder(opposite, trade);
+      updates.push({ historyId, remain });
     }
   }
 
-  async createTradeOrder(type: OrderType, current: TradeOrder, remain: number) {
-    if (remain === 0) return;
-
+  async updateOrdersAndTrades(
+    type: OrderType,
+    deleteIds: string[],
+    updates: { historyId: string; remain: number }[],
+    trades: CreateTrade[],
+    current: TradeOrder,
+    remain: number,
+  ) {
     if (type === OrderType.BUY) {
-      await this.tradeRepository.createBuyOrder(current, remain);
+      await this.tradeRepository.tradeBuyOrder(deleteIds, updates, trades, current, remain);
     } else {
-      await this.tradeRepository.createSellOrder(current, remain);
+      await this.tradeRepository.tradeSellOrder(deleteIds, updates, trades, current, remain);
     }
   }
 

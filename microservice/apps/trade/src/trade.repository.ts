@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
-import { TradeHistoryRequestDto } from '@app/grpc/dto/trade.history.request.dto';
 import { TradeOrder } from '@app/grpc/dto/trade.order.dto';
+import { CreateTrade } from './dto/trade.create.type';
 
 @Injectable()
 export class TradeRepository {
@@ -75,70 +75,113 @@ export class TradeRepository {
     });
   }
 
-  async tradeBuyOrder(opposite: TradeHistoryRequestDto, trade) {
+  async tradeBuyOrder(
+    deleteIds: string[],
+    updates: { historyId: string; remain: number }[],
+    trades: CreateTrade[],
+    current: TradeOrder,
+    remain: number,
+  ) {
     await this.prisma.$transaction(async (prisma) => {
-      if (opposite.remain === 0) {
-        await this.deleteSellOrder(prisma, opposite.historyId);
-      } else {
-        await this.updateSellOrderRemainingBase(prisma, opposite.historyId, opposite.remain);
+      if (deleteIds.length > 0) {
+        await this.deleteSellOrders(prisma, deleteIds);
       }
 
-      await this.createTrade(prisma, trade);
+      if (updates.length > 0) {
+        await this.updateSellOrdersRemainingBase(prisma, updates);
+      }
+
+      await this.createTrades(prisma, trades);
+
+      if (remain === 0) return;
+      this.createBuyOrder(prisma, current, remain);
     });
   }
 
-  async tradeSellOrder(opposite: TradeHistoryRequestDto, trade) {
+  async tradeSellOrder(
+    deleteIds: string[],
+    updates: { historyId: string; remain: number }[],
+    trades: CreateTrade[],
+    current: TradeOrder,
+    remain: number,
+  ) {
     await this.prisma.$transaction(async (prisma) => {
-      if (opposite.remain === 0) {
-        await this.deleteBuyOrder(prisma, opposite.historyId);
-      } else {
-        await this.updateBuyOrderRemainingQuote(prisma, opposite.historyId, opposite.remain);
+      if (deleteIds.length > 0) {
+        await this.deleteBuyOrders(prisma, deleteIds);
       }
 
-      await this.createTrade(prisma, trade);
+      if (updates.length > 0) {
+        await this.updateBuyOrdersRemainingQuote(prisma, updates);
+      }
+
+      await this.createTrades(prisma, trades);
+
+      if (remain === 0) return;
+      this.createSellOrder(prisma, current, remain);
     });
   }
 
-  async deleteSellOrder(prisma, historyId: string) {
+  async deleteSellOrders(prisma, historyIds: string[]) {
     return await prisma.sellOrder.deleteMany({
       where: {
-        historyId: historyId,
+        historyId: {
+          in: historyIds,
+        },
       },
     });
   }
 
-  async deleteBuyOrder(prisma, historyId: string) {
+  async deleteBuyOrders(prisma, historyIds: string[]) {
     return await prisma.buyOrder.deleteMany({
       where: {
-        historyId: historyId,
+        historyId: {
+          in: historyIds,
+        },
       },
     });
   }
 
-  async updateSellOrderRemainingBase(prisma, historyId: string, remainingBase: number) {
-    return await prisma.sellOrder.update({
-      where: {
-        historyId: historyId,
-      },
-      data: {
-        remainingBase: String(remainingBase),
-      },
-    });
+  async updateSellOrdersRemainingBase(prisma, updates: { historyId: string; remain: number }[]) {
+    const { updateQuery, updateIds } = this.createUpdateData(updates);
+    const query = `
+      UPDATE sellOrder
+      SET remainingBase = CASE
+        ${updateQuery}
+        ELSE remainingBase
+      END
+      WHERE historyId IN (${updateIds});
+    `;
+
+    return await prisma.$queryRaw(query);
   }
 
-  async updateBuyOrderRemainingQuote(prisma, historyId: string, remainingQuote: number) {
-    return await prisma.buyOrder.update({
-      where: {
-        historyId: historyId,
-      },
-      data: {
-        remainingQuote: String(remainingQuote),
-      },
-    });
+  async updateBuyOrdersRemainingQuote(prisma, updates: { historyId: string; remain: number }[]) {
+    const { updateQuery, updateIds } = this.createUpdateData(updates);
+    const query = `
+      UPDATE buyOrder
+      SET remainingQuote = CASE
+        ${updateQuery}
+        ELSE remainingQuote
+      END
+      WHERE historyId IN (${updateIds});
+    `;
+
+    return await prisma.$queryRaw(query);
   }
 
-  async createTrade(prisma, trade) {
-    return await prisma.trade.create({ data: trade });
+  createUpdateData(updates: { historyId: string; remain: number }[]) {
+    const updateQuery = updates
+      .map((update) => {
+        return `WHEN '${update.historyId}' THEN '${update.remain}'`;
+      })
+      .join(' ');
+    const updateIds = updates.map((update) => `'${update.historyId}'`).join(', ');
+
+    return { updateQuery, updateIds };
+  }
+
+  async createTrades(prisma, trades: CreateTrade[]) {
+    return await prisma.trade.createMany({ data: trades });
   }
 
   async deleteBuyOrderByHistoryId(historyId) {
@@ -153,8 +196,8 @@ export class TradeRepository {
     });
   }
 
-  async createBuyOrder(current: TradeOrder, remain: number) {
-    return await this.prisma.buyOrder.create({
+  async createBuyOrder(prisma, current: TradeOrder, remain: number) {
+    return await prisma.buyOrder.create({
       data: {
         historyId: current.historyId,
         userId: current.userId,
@@ -166,8 +209,8 @@ export class TradeRepository {
     });
   }
 
-  async createSellOrder(current: TradeOrder, remain: number) {
-    return await this.prisma.sellOrder.create({
+  async createSellOrder(prisma, current: TradeOrder, remain: number) {
+    return await prisma.sellOrder.create({
       data: {
         historyId: current.historyId,
         userId: current.userId,
