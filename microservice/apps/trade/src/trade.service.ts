@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { TradeRepository } from './trade.repository';
 import { OrderType } from '@app/common/enums/order-type.enum';
 import { TradeHistoryRequestDto } from '@app/grpc/dto/trade.history.request.dto';
@@ -54,7 +54,10 @@ export class TradeService {
     }
 
     if (trades.length > 0) {
-      await this.tradeBalanceService.settleTransaction(new TradeRequestListDto(requests));
+      const res = await this.tradeBalanceService.settleTransaction(
+        new TradeRequestListDto(requests),
+      );
+      if (res.status !== 'SUCCESS') throw new InternalServerErrorException('InternalServerError');
       await this.updateOrdersAndTrades(type, deleteIds, updates, trades);
     }
 
