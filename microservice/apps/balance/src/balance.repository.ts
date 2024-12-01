@@ -8,11 +8,10 @@ import { CurrencyCode } from '@app/common';
 import { OrderStatus } from '@app/common/enums/order-status.enum';
 import { OrderType } from '@app/common/enums/order-type.enum';
 import { GetTransactionsDto } from './dto/get.transactions.request.dto';
-import { TradeRequestDto } from '@app/grpc/dto/trade.request.dto';
 import { TradeResponseDto } from '@app/grpc/dto/trade.reponse.dto';
-import { TradeBuyerRequestDto } from '@app/grpc/dto/trade.buyer.request.dto';
-import { TradeSellerRequestDto } from '@app/grpc/dto/trade.seller.request.dto';
 import { TradeCancelRequestDto } from '@app/grpc/dto/trade.cancel.request.dto';
+import { TradeBuyersDto } from './dto/trade.buyers.dto';
+import { TradeSellersDto } from './dto/trade.sellers.dto';
 
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
@@ -317,31 +316,58 @@ export class BalanceRepository {
     return orderHistory.historyId;
   }
 
-  async settleTransaction(tradeRequest: TradeRequestDto) {
-    const { buyerRequest, sellerRequest } = tradeRequest;
-    const tradePayment = Number(buyerRequest.tradePrice) * Number(buyerRequest.receivedCoins);
+  async settleTransaction(
+    buyers: Map<string, TradeBuyersDto>,
+    sellers: Map<string, TradeSellersDto>,
+  ) {
     return await this.prisma.$transaction(async (prisma) => {
-      await this.updateBuyerAsset(prisma, buyerRequest, tradePayment);
-      await this.updateSellerAsset(prisma, sellerRequest, tradePayment);
+      const buyerUpdates = this.prepareBuyerUpdates(buyers);
+      const sellerUpdates = this.prepareSellerUpdates(sellers);
+
+      await Promise.all([
+        ...buyerUpdates.map((buyer) => this.updateBuyerAsset(prisma, buyer)),
+        ...sellerUpdates.map((seller) => this.updateSellerAsset(prisma, seller)),
+      ]);
+
       return new TradeResponseDto('SUCCESS');
     });
   }
 
-  async updateBuyerAsset(prisma, buyerRequest: TradeBuyerRequestDto, tradePayment: number) {
-    const { userId, coinCode, buyerPrice, receivedCoins } = buyerRequest;
-    const originalPayment = Number(buyerPrice) * Number(receivedCoins);
-    const refund = originalPayment - tradePayment;
-    await this.decreaseBuyerCurrencyBalance(
+  prepareBuyerUpdates(buyers: Map<string, TradeBuyersDto>) {
+    return Array.from(buyers.values());
+  }
+
+  prepareSellerUpdates(sellers: Map<string, TradeSellersDto>) {
+    return Array.from(sellers.values());
+  }
+
+  async updateBuyerAsset(prisma, buyer: TradeBuyersDto) {
+    const { userId, coinCode, originalPayment, refund, receivedCoins } = buyer;
+
+    const decreaseCurrencyBalance = this.decreaseBuyerCurrencyBalance(
       prisma,
       userId,
       CurrencyCode.KRW,
       originalPayment,
       refund,
     );
-    await this.increaseBuyerCoinBalance(prisma, userId, coinCode, receivedCoins);
+    const increaseCoinBalance = this.increaseBuyerCoinBalance(
+      prisma,
+      userId,
+      coinCode,
+      receivedCoins,
+    );
+
+    await Promise.all([decreaseCurrencyBalance, increaseCoinBalance]);
   }
 
-  async decreaseBuyerCurrencyBalance(prisma, userId, currencyCode, payment, refund) {
+  async decreaseBuyerCurrencyBalance(
+    prisma,
+    userId: string,
+    currencyCode: string,
+    payment: number,
+    refund: number,
+  ) {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
@@ -360,7 +386,7 @@ export class BalanceRepository {
     });
   }
 
-  async increaseBuyerCoinBalance(prisma, userId, coinCode, receiveCoins) {
+  async increaseBuyerCoinBalance(prisma, userId: string, coinCode: string, receiveCoins: number) {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
@@ -376,13 +402,26 @@ export class BalanceRepository {
     });
   }
 
-  async updateSellerAsset(prisma, sellerRequest: TradeSellerRequestDto, tradePayment: number) {
-    const { userId, coinCode, soldCoins } = sellerRequest;
-    await this.increaseSellerCurrencyBalance(prisma, userId, CurrencyCode.KRW, tradePayment);
-    await this.decreaseSellerCoinBalance(prisma, userId, coinCode, soldCoins);
+  async updateSellerAsset(prisma, seller: TradeSellersDto) {
+    const { userId, coinCode, tradePayment, soldCoins } = seller;
+
+    const increaseCurrencyBalance = this.increaseSellerCurrencyBalance(
+      prisma,
+      userId,
+      CurrencyCode.KRW,
+      tradePayment,
+    );
+    const decreaseCoinBalance = this.decreaseSellerCoinBalance(prisma, userId, coinCode, soldCoins);
+
+    await Promise.all([increaseCurrencyBalance, decreaseCoinBalance]);
   }
 
-  async increaseSellerCurrencyBalance(prisma, userId, currencyCode, payment) {
+  async increaseSellerCurrencyBalance(
+    prisma,
+    userId: string,
+    currencyCode: string,
+    payment: number,
+  ) {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
@@ -398,7 +437,7 @@ export class BalanceRepository {
     });
   }
 
-  async decreaseSellerCoinBalance(prisma, userId, coinCode, soldCoins) {
+  async decreaseSellerCoinBalance(prisma, userId: string, coinCode: string, soldCoins: number) {
     return await prisma.asset.update({
       where: {
         userId_currencyCode: {
