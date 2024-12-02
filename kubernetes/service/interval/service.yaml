@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: interval-service
+spec:
+  selector:
+    app: interval-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+      name: http
+  type: ClusterIP

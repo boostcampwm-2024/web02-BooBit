@@ -1,0 +1,31 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "semi": true,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "useTabs": false,
+  "overrides": [
+    {
+      "files": "*.{ts,tsx}",
+      "options": {
+        "parser": "typescript"
+      }
+    },
+    {
+      "files": "*.decorator.ts",
+      "options": {
+        "printWidth": 120
+      }
+    },
+    {
+      "files": "*.dto.ts",
+      "options": {
+        "printWidth": 80
+      }
+    }
+  ]
+}

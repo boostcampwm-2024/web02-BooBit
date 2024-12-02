@@ -1,0 +1,114 @@
+{
+  "monorepo": true,
+  "root": "apps/auth",
+  "sourceRoot": "apps/auth/src",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/auth/tsconfig.app.json"
+  },
+  "projects": {
+    "auth": {
+      "type": "application",
+      "root": "apps/auth",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth/tsconfig.app.json"
+      }
+    },
+    "transaction": {
+      "type": "application",
+      "root": "apps/transaction",
+      "entryFile": "main",
+      "sourceRoot": "apps/transaction/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/transaction/tsconfig.app.json"
+      }
+    },
+    "balance": {
+      "type": "application",
+      "root": "apps/balance",
+      "entryFile": "main",
+      "sourceRoot": "apps/balance/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/balance/tsconfig.app.json"
+      }
+    },
+    "common": {
+      "type": "library",
+      "root": "libs/common",
+      "entryFile": "index",
+      "sourceRoot": "libs/common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/common/tsconfig.lib.json"
+      }
+    },
+    "prisma": {
+      "type": "library",
+      "root": "libs/prisma",
+      "entryFile": "index",
+      "sourceRoot": "libs/prisma/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/prisma/tsconfig.lib.json"
+      }
+    },
+    "session": {
+      "type": "library",
+      "root": "libs/session",
+      "entryFile": "index",
+      "sourceRoot": "libs/session/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/session/tsconfig.lib.json"
+      }
+    },
+    "grpc": {
+      "type": "library",
+      "root": "libs/grpc",
+      "entryFile": "index",
+      "sourceRoot": "libs/grpc/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/grpc/tsconfig.lib.json",
+        "assets": [
+          "**/*.proto"
+        ],
+        "watchAssets": true
+      }
+    },
+    "ws": {
+      "type": "library",
+      "root": "libs/ws",
+      "entryFile": "index",
+      "sourceRoot": "libs/ws/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/ws/tsconfig.lib.json"
+      }
+    },
+    "bull": {
+      "type": "library",
+      "root": "libs/bull",
+      "entryFile": "index",
+      "sourceRoot": "libs/bull/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/bull/tsconfig.lib.json"
+      }
+    },
+    "trade": {
+      "type": "application",
+      "root": "apps/trade",
+      "entryFile": "main",
+      "sourceRoot": "apps/trade/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/trade/tsconfig.app.json"
+      }
+    },
+    "interval": {
+      "type": "application",
+      "root": "apps/interval",
+      "entryFile": "main",
+      "sourceRoot": "apps/interval/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/interval/tsconfig.app.json"
+      }
+    }
+  }
+}

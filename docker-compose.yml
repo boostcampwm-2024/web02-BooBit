@@ -1,0 +1,231 @@
+services:
+  static:
+    container_name: static-server
+    image: static-server:latest
+    build:
+      context: .
+      dockerfile: ./static/DockerFile
+    ports:
+      - "8080:8080"
+    restart: always
+  # Service 컨테이너
+  #Auth 서비스
+  auth:
+    container_name: auth-service
+    image: auth-service:latest
+    build:
+      context: .
+      dockerfile: ./microservice/apps/auth/DockerFile
+    ports:
+      - "${AUTH_HOST_SERVICE_PORT}:3000"
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${AUTH_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
+      BALANCE_GRPC_URL: balance:50051
+      REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
+      SESSION_SECRET: ${SESSION_SECRET}
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    restart: always
+
+  # Balance 서비스
+  balance:
+    container_name: balance-service
+    image: balance-service:latest
+    build:
+      context: .
+      dockerfile: ./microservice/apps/balance/DockerFile
+    ports:
+      - "${BALANCE_HOST_SERVICE_PORT}:3000"
+      - "50051:50051"
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${BALANCE_DB}:${MYSQL_PORT}/${MYSQL_DATABASE}
+      REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
+      SESSION_SECRET: ${SESSION_SECRET}
+    depends_on:
+      balance-db:
+        condition: service_healthy
+    restart: always
+
+  # Transaction 서비스
+  transaction:
+    container_name: transaction-service
+    image: transaction-service:latest
+    build:
+      context: .
+      dockerfile: ./microservice/apps/transaction/DockerFile
+    ports:
+      - "${TRANSACTION_HOST_SERVICE_PORT}:3000"
+    environment:
+      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}?replicaSet=rs0
+      BALANCE_GRPC_URL: balance:50051
+      REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
+      TRADE_REDIS_URL: "redis://${TRADE_REDIS}:${REDIS_PORT}"
+      SESSION_SECRET: ${SESSION_SECRET}
+    depends_on:
+      transaction-db:
+        condition: service_healthy
+    restart: always
+
+  # Trade 서비스
+  trade:
+    container_name: trade-service
+    image: trade-service:latest
+    build:
+      context: .
+      dockerfile: ./microservice/apps/trade/DockerFile
+    ports:
+      - "${TRADE_HOST_SERVICE_PORT}:3000"
+    environment:
+      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}?replicaSet=rs0
+      BALANCE_GRPC_URL: balance:50051
+      REDIS_URL: "redis://${SESSION_DB}:${REDIS_PORT}"
+      TRADE_REDIS_URL: "redis://${TRADE_REDIS}:${REDIS_PORT}"
+      SESSION_SECRET: ${SESSION_SECRET}
+
+  # Interval 서비스
+  interval:
+    container_name: interval-service
+    image: interval-service:latest
+    build:
+      context: .
+      dockerfile: ./microservice/apps/interval/DockerFile
+    ports:
+      - "${INTERVAL_HOST_SERVICE_PORT}:3000"
+    environment:
+      DATABASE_URL: mongodb://${MYSQL_USER}:${MYSQL_PASSWORD}@${TRANSACTION_DB}:27017/${MYSQL_DATABASE}?replicaSet=rs0
+      TRADE_REDIS_URL: "redis://${TRADE_REDIS}:${REDIS_PORT}"
+      TZ: Asia/Seoul
+    depends_on:
+      transaction-db:
+        condition: service_healthy
+    restart: always
+
+  # DB 컨테이너
+  # trade Redis
+  trade-redis:
+    image: redis:7.2
+    container_name: trade-redis
+    ports:
+      - "${TRADE_REDIS_HOST_PORT}:${REDIS_PORT}"
+    volumes:
+      - trade-redis:/data
+    command: redis-server --appendonly yes
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
+
+  # DB 컨테이너
+  # session Redis
+  session-db:
+    image: redis:7.2
+    container_name: session-db
+    ports:
+      - "${REDIS_HOST_PORT}:${REDIS_PORT}"
+    volumes:
+      - redis-db:/data
+    command: redis-server --appendonly yes
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
+
+  # Auth DB
+  auth-db:
+    image: mysql:8.0
+    container_name: auth-db
+    ports:
+      - "${AUTH_HOST_DB_PORT}:${MYSQL_PORT}"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - auth-db:/var/lib/mysql
+      - ./docker_init/mysql_init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Balance DB
+  balance-db:
+    image: mysql:8.0
+    container_name: balance-db
+    ports:
+      - "${BALANCE_HOST_DB_PORT}:${MYSQL_PORT}"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - balance-db:/var/lib/mysql
+      - ./docker_init/mysql_init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Transaction DB
+  transaction-db:
+    image: mongo:8.0
+    container_name: transaction-db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MYSQL_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${TRANSACTION_HOST_DB_PORT}:27017"
+    command: ["sh", "/init_mongo.sh"]
+    volumes:
+      - transaction-db:/data/db
+      - ./docker_init/mongo_init.js:/mongo_init.js
+      - ./docker_init/init_mongo.sh:/init_mongo.sh
+    healthcheck:
+      test: >
+        mongosh boobit --eval '
+          if (db.getUsers().users.length > 0) {
+            exit(0);
+          } else {
+            exit(1);
+          }
+        ' --quiet || exit 1
+      interval: 3s
+      timeout: 5s
+      retries: 30
+      start_period: 30s # Transaction DB
+
+  trading-bot:
+    profiles:
+      - bot
+    container_name: trading-bot
+    image: trading-bot:latest
+    build:
+      context: .
+      dockerfile: ./bot/DockerFile
+    environment:
+      OPTIONS: ${OPTIONS}
+
+volumes:
+  redis-db:
+  auth-db:
+  balance-db:
+  transaction-db:
+  trade-redis:

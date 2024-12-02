@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trade-service
+  labels:
+    app: trade-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trade-service
+  template:
+    metadata:
+      labels:
+        app: trade-service
+    spec:
+      containers:
+        - name: trade-service
+          image: boobit-ncr.kr.ncr.ntruss.com/trade-service:latest #todo
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          env:
+            - name: DATABASE_URL
+              value: "mongodb://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):27017/$(DB_SCHEMA)?replicaSet=rs0"
+          envFrom:
+            - configMapRef:
+                name: trade-service-config
+            - secretRef:
+                name: db-credentials

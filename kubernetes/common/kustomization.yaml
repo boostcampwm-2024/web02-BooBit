@@ -1,0 +1,9 @@
+# base/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# 리소스 적용 순서 정의
+resources:
+  - configmap.yaml # 1. ConfigMap 생성
+  - secret.yaml # 2. Secret 생성
+

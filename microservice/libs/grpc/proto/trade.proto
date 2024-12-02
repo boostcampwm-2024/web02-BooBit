@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package trade;
+
+service TradeService {
+  rpc SettleTransaction(TradeRequest) returns (TradeResponse);
+  rpc CancelOrder(TradeCancelRequest) returns (TradeResponse);
+}
+
+message TradeRequest {
+  BuyerRequest buyerRequest = 1;
+  SellerRequest sellerRequest = 2;
+}
+
+message BuyerRequest {
+  string userId = 1;
+  string coinCode = 2;
+  string buyerPrice = 3;
+  string tradePrice = 4;
+  string receivedCoins = 5;
+}
+
+message SellerRequest {
+  string userId = 1;
+  string coinCode = 2;
+  string tradePrice = 3;
+  string soldCoins = 4;
+}
+
+message TradeResponse {
+  string status = 1;
+}
+
+message TradeCancelRequest {
+  string userId = 1;
+  string historyId = 2;
+  string coinCode = 3;
+  string price = 4;
+  string remain = 5;
+  string orderType = 6;
+  string orderStatus = 7;
+}

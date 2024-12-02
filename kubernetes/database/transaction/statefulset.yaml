@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: transaction-db
+  labels:
+    app: transaction-db
+spec:
+  serviceName: transaction-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transaction-db
+  template:
+    metadata:
+      labels:
+        app: transaction-db
+    spec:
+      containers:
+        - name: transaction-db
+          image: mongo:8.0
+          command: ["sh", "/init_mongodb.sh"]
+          ports:
+            - containerPort: 27017
+              name: mongodb
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DB_USER
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: transaction-db-data
+              mountPath: /data/db
+            - name: init-scripts
+              mountPath: /mongo_init.js
+              subPath: mongo_init.js
+            - name: init-scripts
+              mountPath: /init_mongodb.sh
+              subPath: init_mongodb.sh
+          livenessProbe:
+            exec:
+              command:
+                - mongosh
+                - boobit
+                - --eval
+                - |
+                  if (db.getUsers().users.length > 0) {
+                    exit(0);
+                  } else {
+                    exit(1);
+                  }
+                - --quiet
+            initialDelaySeconds: 30
+            periodSeconds: 3
+            timeoutSeconds: 5
+            failureThreshold: 30
+      volumes:
+        - name: init-scripts
+          configMap:
+            name: transaction-db-init
+            defaultMode: 0755
+        - name: transaction-db-data
+          persistentVolumeClaim:
+            claimName: transaction-db

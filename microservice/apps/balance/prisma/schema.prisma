@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Asset {
+  assetId          BigInt   @id @default(autoincrement()) @map("asset_id")
+  userId           BigInt   @map("user_id")
+  currencyCode     String   @map("currency_code") @db.VarChar(20)
+  availableBalance Decimal  @map("available_balance") @db.Decimal(24, 8)
+  lockedBalance    Decimal  @map("locked_balance") @db.Decimal(24, 8)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  @@unique([userId, currencyCode])
+  @@map("asset")
+}
+
+model DepositWithdrawal {
+  txId         BigInt   @id @default(autoincrement()) @map("tx_id")
+  userId       BigInt   @map("user_id")
+  currencyCode String   @map("currency_code") @db.VarChar(20)
+  txType       String   @map("tx_type") @db.VarChar(20)
+  amount       Decimal  @db.Decimal(24, 8)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+
+  @@index([userId])
+  @@map("deposit_withdrawal")
+}
+
+model OrderHistory {
+  historyId BigInt   @id @default(autoincrement()) @map("history_id")
+  orderType String   @map("order_type") @db.VarChar(10)
+  userId    BigInt   @map("user_id")
+  coinCode  String   @map("coin_code") @db.VarChar(20)
+  price     Decimal  @db.Decimal(24, 8)
+  quantity  Decimal  @db.Decimal(24, 8)
+  status    String   @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+
+  @@index([userId])
+  @@map("order_history")
+}
