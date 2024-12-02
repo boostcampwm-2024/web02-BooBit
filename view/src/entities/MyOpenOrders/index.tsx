@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import formatDate from '../../shared/model/formatDate.ts';
 import formatPrice from '../../shared/model/formatPrice.ts';
 import TableCell from '../../shared/UI/TableCell.tsx';
@@ -20,6 +20,7 @@ const MyOpenOrders = () => {
   const { data: openOrders, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetPending();
   const { mutate: deleteOrder } = useDeleteOrder();
 
+  const [clickedOrders, setClickedOrders] = useState<Record<number, boolean>>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
   const bottomRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -44,6 +45,7 @@ const MyOpenOrders = () => {
     orderType: 'BUY' | 'SELL'
   ) => {
     e.preventDefault();
+    setClickedOrders((prev) => ({ ...prev, [historyId]: true }));
 
     deleteOrder({ historyId, orderType });
   };
@@ -88,8 +90,9 @@ const MyOpenOrders = () => {
                     <button
                       className={`w-[5rem] h-[2rem] rounded bg-surface-hover-light`}
                       onClick={(e) => handleRemoveOrder(e, t.historyId, t.orderType)}
+                      disabled={!!clickedOrders[t.historyId]}
                     >
-                      주문취소
+                      {clickedOrders[t.historyId] ? '취소 중...' : '주문취소'}
                     </button>
                   </TableCell>
                 </TableRow>

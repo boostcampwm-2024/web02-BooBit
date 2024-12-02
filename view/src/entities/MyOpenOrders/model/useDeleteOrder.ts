@@ -15,10 +15,12 @@ const useDeleteOrder = () => {
   return useMutation({
     mutationFn: deleteOrderApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pending'] });
-      queryClient.invalidateQueries({ queryKey: ['orderHistory'] });
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['pending'] });
+        queryClient.invalidateQueries({ queryKey: ['orderHistory'] });
 
-      addToast(successMessages.deleteOrder, 'success');
+        addToast(successMessages.deleteOrder, 'success');
+      }, 1000);
     },
     onError: (error: unknown) => {
       if (error instanceof Error) {
