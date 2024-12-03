@@ -16,7 +16,8 @@ model buyOrder {
   remainingQuote String   @map("remaining_quote")
   createdAt      DateTime @default(now()) @map("created_at")
 
-  @@index([price, createdAt])
+  @@index(userId)
+  @@index([price(sort: Desc), createdAt])
   @@map("buy_order")
 }
 
@@ -29,18 +30,9 @@ model sellOrder {
   remainingBase String   @map("remaining_base")
   createdAt     DateTime @default(now()) @map("created_at")
 
+  @@index(userId)
   @@index([price, createdAt])
   @@map("sell_order")
-}
-
-model trade {
-  tradeId     String   @id @default(cuid()) @map("_id")
-  buyOrderId  String   @map("buy_order_id")
-  sellOrderId String   @map("sell_order_id")
-  coinCode    String   @map("coin_code")
-  price       String
-  quantity    String
-  tradedAt    DateTime @default(now()) @map("traded_at")
 }
 
 model candle01Sec {
@@ -89,7 +81,7 @@ model candle10Min {
 }
 
 model candle30Min {
-    candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  candleId   String   @id @default(auto()) @map("_id") @db.ObjectId
   coinCode   String   @map("coin_code")
   startTime  DateTime @map("start_time")
   openPrice  String   @map("open_price")
@@ -161,4 +153,20 @@ model candle01Month {
   @@unique([coinCode, startTime])
   @@index([startTime(sort: Desc)])
   @@map("candle_01_month")
+}
+
+model trade {
+  tradeId     String   @id @default(cuid()) @map("_id")
+  buyerId     String   @map("buyer_id")
+  buyOrderId  String   @map("buy_order_id")
+  sellerId    String   @map("seller_id")
+  sellOrderId String   @map("sell_order_id")
+  coinCode    String   @map("coin_code")
+  price       String
+  quantity    String
+  tradedAt    DateTime @default(now()) @map("traded_at")
+
+  @@index(buyerId)
+  @@index(sellerId)
+  @@index([tradedAt(sort: Desc)])
 }

@@ -17,7 +17,7 @@ model buyOrder {
   createdAt      DateTime @default(now()) @map("created_at")
 
   @@index(userId)
-  @@index([price, createdAt])
+  @@index([price(sort: Desc), createdAt])
   @@map("buy_order")
 }
 
