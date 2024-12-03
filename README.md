@@ -136,7 +136,10 @@ useInfiniteQuery와 Intersection Observer API를 사용해 무한 스크롤을 �
 데이터를 자동으로 로드하고 페이지 성능을 개선할 수 있었습니다.<br/>
 이를 통해 사용자 경험을 크게 향상시켰습니다.<br/>
 
-### BE
+<br/>
+<br/>
+
+### BE
 #### ✨ [gRPC](https://github.com/boostcampwm-2024/web02-BooBit/wiki/nestJs-&-gRPC)
 gRPC(Google Remote Procedure Call)는 <br/>
 마이크로 서비스 간 바이너리 데이터 통신을 지원하는 프로토콜입니다. <br/>
@@ -150,8 +153,8 @@ Git Action을 이용하여 변경 사항을 확인하여 <br/>
 NCloud의 SourceBuild를, <br/>
 배포는 Kubernetes를 사용하였습니다. <br/>
 
-#### ✨ [부하 테스트]()
-안정적인 실시간 기능 테스트를 하고자 <br/>
+#### ✨ [부하 테스트]()
+안정적인 실시간 기능 테스트를 하고자... <br/>
 
 <br/>
 <br/>
