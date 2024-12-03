@@ -4,10 +4,11 @@
 <img width="600" src="https://i.ibb.co/tQ2LKy3/Boo-Bit-logo-ver-1-1.png">
 <br/>
 <br/>
-1초에 최대 6만 건의 거래 요청을 처리하는 실시간 트레이딩 서비스 구현을 목표로 합니다.<br/>
-목표치는 업비트의 최다 거래 발생 월 기준, 평균 거래 수의 100배입니다<br/><br/>
-<a href="http://boobit.xyz" target="_blank">BooBit 배포 사이트</a> &nbsp; <a href="https://www.notion.so/BooBit-12b9186d993c8066b075d3a17d26cafa" target="_blank">BooBit 팀노션</a>
+대용량 트래픽을 처리하는 실시간 트레이딩 서비스 구현을 목표로 합니다.<br/>
+<br/>
+<a href="http://boobit.xyz" target="_blank">BooBit 배포 사이트</a> &nbsp; | &nbsp; <a href="https://www.notion.so/BooBit-12b9186d993c8066b075d3a17d26cafa" target="_blank">BooBit 팀노션</a> &nbsp; | &nbsp; <a href="https://www.figma.com/design/uGXntDeHArsGszcZTNuqOR/%EB%94%94%EC%9E%90%EC%9D%B8?node-id=1-2&node-type=canvas" target="_blank">BooBit 팀피그마</a>
 
+<br/>
 <br/>
 <br/>
 <div>
@@ -16,12 +17,11 @@
   <span>PW: <strong>test1234</strong></span>
 </div>
 
-
 <br/>
 <br/>
 <br/>
 
-<table align="center"; style="width: 100%; border-collapse: collapse;">
+<table align="center">
   <thead>
     <tr style="background-color: #222; color: #fff; text-align: center;">
       <th style="padding: 10px; border: 1px solid #444;">Category</th>
@@ -66,6 +66,7 @@
       <td style="padding: 10px; text-align: center; border: 1px solid #444;">
         <img src="https://img.shields.io/badge/Naver%20Cloud%20Platform-03C75A?style=for-the-badge&logo=Naver&logoColor=white">
         <img src="https://img.shields.io/badge/kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white">
+        <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
       </td>
     </tr>
     <tr>
@@ -78,6 +79,13 @@
     </tr>
   </tbody>
 </table>
+
+<br/>
+<br/>
+
+## 🏛️ 아키텍처
+<img width="900" src="https://github.com/user-attachments/assets/3ec230b3-778e-4440-bcdd-1a8105232c03" />
+
 
 <br/>
 <br/>
@@ -105,20 +113,50 @@
 최신 차트, 호가, 체결 내역을 나타냅니다.
 
   <br/>
-  <img width="800" src="https://github.com/user-attachments/assets/243841ac-9a78-43fb-a36b-a2247511256d" />
-
-
+  <img width="800" src="https://github.com/user-attachments/assets/243841ac-9a78-43fb-a36b-a2247511256d" /> <br/>
 
 <br/>
 <br/>
 
-## 🏛️ 아키텍처
-![아키텍쳐_다이어그램](https://github.com/user-attachments/assets/57afca9e-b804-4b43-869d-6732951c6625)
+## 🏃‍♀️ 프로젝트 핵심 경험
+### FE
+#### ✨ [MSW](https://github.com/boostcampwm-2024/web02-BooBit/wiki/MSW)
+MSW(Mock Service Worker)는 <br/>
+서버가 준비되지 않아도 API 요청을 가로채고 모의 응답을 제공하는 도구로, <br/>
+웹소켓 환경까지 설정할 수 있어 서버 연결 전에 개발을 진행할 수 있습니다. <br/>
+이를 통해 개발 일정이 딜레이되지 않고 원활하게 진행될 수 있습니다 <br/>
+
+#### ✨ [차트 데이터 초기 설정](https://github.com/boostcampwm-2024/web02-BooBit/wiki/%5BFE%5D-%EC%B0%A8%ED%8A%B8-%EC%B4%88%EA%B8%B0-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%84%A4%EC%A0%95)
+웹소켓 연결 시점과 컴포넌트 렌더링 타이밍 불일치로 인해 <br/>
+INIT 이벤트가 처리되지 않은 문제는, useEffect를 사용해 <br/>
+컴포넌트 렌더링 후 웹소켓 연결을 보장함으로써 해결되었습니다. <br/>
+
+#### ✨ [무한 스크롤 구현하기](https://github.com/boostcampwm-2024/web02-BooBit/wiki/%EB%AC%B4%ED%95%9C-%EC%8A%A4%ED%81%AC%EB%A1%A4-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0)
+useInfiniteQuery와 Intersection Observer API를 사용해 무한 스크롤을 구현해 <br/>
+데이터를 자동으로 로드하고 페이지 성능을 개선할 수 있었습니다.<br/>
+이를 통해 사용자 경험을 크게 향상시켰습니다.<br/>
+
+### BE
+#### ✨ [gRPC](https://github.com/boostcampwm-2024/web02-BooBit/wiki/nestJs-&-gRPC)
+gRPC(Google Remote Procedure Call)는 <br/>
+마이크로 서비스 간 바이너리 데이터 통신을 지원하는 프로토콜입니다. <br/>
+REST에 비해 빠르고 타 서비스의 리소스를 로컬 리소스처럼 사용할 수 있습니다. <br/>
+
+#### ✨ [k8s](https://github.com/boostcampwm-2024/web02-BooBit/wiki/CI&CD)
+Git Action을 이용하여 변경 사항을 확인하여 <br/>
+빌드가 필요한 서비스들만 새롭게 빌드하여 <br/>
+배포할 수 있는 시스템을 구축하는 경험을 하였습니다. <br/>
+변경사항 모니터링은 Git Action을, 빌드 자동화 및 이미지 업로드 자동화는 <br/>
+NCloud의 SourceBuild를, <br/>
+배포는 Kubernetes를 사용하였습니다. <br/>
+
+#### ✨ [부하 테스트]()
+안정적인 실시간 기능 테스트를 하고자 <br/>
 
 <br/>
 <br/>
 
-## 팀 소개
+## 🧑‍🧑‍👧‍👧 팀 소개
 
 <div align="center">
 
