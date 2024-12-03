@@ -8,6 +8,14 @@
 목표치는 업비트의 최다 거래 발생 월 기준, 평균 거래 수의 100배입니다<br/><br/>
 <a href="http://boobit.xyz" target="_blank">BooBit 배포 사이트</a> &nbsp; <a href="https://www.notion.so/BooBit-12b9186d993c8066b075d3a17d26cafa" target="_blank">BooBit 팀노션</a>
 
+<br/>
+<br/>
+<div>
+  <span>🧪 테스트 계정</span><br/>
+  <span>ID: <strong>test@naver.com</strong></span><br/>
+  <span>PW: <strong>test1234</strong></span>
+</div>
+
 
 <br/>
 <br/>
