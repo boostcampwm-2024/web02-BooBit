@@ -37,7 +37,10 @@
       <td style="padding: 10px; text-align: center; border: 1px solid #444;">
         <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
         <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=Vite&logoColor=white">
-        <img src="https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=Tailwind%20CSS&logoColor=white">
+        <img src="https://img.shields.io/badge/ReactRouter-000000?style=for-the-badge&logo=reactrouter&logoColor=white">
+        <img src="https://img.shields.io/badge/TanStackQuery-0525A8?style=for-the-badge&logo=react&logoColor=white">
+        <img src="https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=Tailwind%20CSS&logoColor=white">  
+        <img src="https://img.shields.io/badge/D3.js-18C446?style=for-the-badge&logo=D3&logoColor=white">
       </td>
     </tr>
     <tr>
