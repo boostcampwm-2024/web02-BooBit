@@ -71,8 +71,44 @@
   </tbody>
 </table>
 
-## 아키텍처
-...
+<br/>
+<br/>
+
+## 🚀 프로젝트 핵심기능
+
+### 1️⃣ 입출금
+유저는 원하는 만큼 원화와 코인을 입출금합니다.<br/>
+입출금 페이지 내역으로 입출금 시간과 금액을 확인합니다.
+
+  <br/>
+  <img width="800" src="https://github.com/user-attachments/assets/49122bc5-4034-4ce6-90da-b6c658d733ab" />
+<hr/>
+
+### 2️⃣ 실시간 매수, 매도
+다른 유저들과 실시간 코인 거래 서비스를 제공합니다.<br/>
+보유 자산에 따라 수량과 가격을 입력하거나 호가창을 클릭해 가격을 입력할 수 있습니다.
+
+  <br/>
+  <img width="800" src="https://github.com/user-attachments/assets/be210096-64d0-49ae-9cfc-8e4eed1f407b" />
+<hr/>
+
+### 3️⃣ 실시간 차트, 호가, 체결 내역
+실시간 데이터인<br/>
+최신 차트, 호가, 체결 내역을 나타냅니다.
+
+  <br/>
+  <img width="800" src="https://github.com/user-attachments/assets/243841ac-9a78-43fb-a36b-a2247511256d" />
+
+
+
+<br/>
+<br/>
+
+## 🏛️ 아키텍처
+![아키텍쳐_다이어그램](https://github.com/user-attachments/assets/57afca9e-b804-4b43-869d-6732951c6625)
+
+<br/>
+<br/>
 
 ## 팀 소개
 
