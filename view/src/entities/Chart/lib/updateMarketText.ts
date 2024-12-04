@@ -20,6 +20,6 @@ const updateMarketText = (
     `저가: ${formatPrice(data.low)}`,
     `VOL: ${formatPrice(data.volume)}`,
   ]);
-  addText(group, 34, [`시간: ${data.date.slice(0, -5).replace(/[T]/, ' ')}`]);
+  addText(group, 34, [`시간: ${new Date(data.date).toLocaleString()}`]);
 };
 export default updateMarketText;
