@@ -153,8 +153,9 @@ Git Action을 이용하여 변경 사항을 확인하여 <br/>
 NCloud의 SourceBuild를, <br/>
 배포는 Kubernetes를 사용하였습니다. <br/>
 
-#### ✨ [부하 테스트]()
-안정적인 실시간 기능 테스트를 하고자... <br/>
+#### ✨ [mongoDB Replica set](https://github.com/boostcampwm-2024/web02-BooBit/wiki/%5BBE%5D-docker%E2%80%90compose%EB%A1%9C-MongoDB-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0)
+도커 컴포즈 파일로 몽고 디비 레플리카 셋을 생성하고 <br/>
+세컨더리 노드를 생성해 데이터 가용성을 높였습니다. <br/>
 
 <br/>
 <br/>
