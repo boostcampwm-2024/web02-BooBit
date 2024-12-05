@@ -31,7 +31,8 @@ export class IntervalOrderBookRepository {
       const result = await this.prisma.sellOrder.aggregateRaw({
         pipeline: [
           {
-            $addFields: {
+            $project: {
+              price: 1,
               remaining_base_double: { $toDouble: '$remaining_base' },
             },
           },
@@ -71,7 +72,8 @@ export class IntervalOrderBookRepository {
       const result = await this.prisma.buyOrder.aggregateRaw({
         pipeline: [
           {
-            $addFields: {
+            $project: {
+              price: 1,
               remaining_quote_double: { $toDouble: '$remaining_quote' },
             },
           },

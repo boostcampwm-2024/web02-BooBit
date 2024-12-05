@@ -168,5 +168,6 @@ model trade {
 
   @@index(buyerId)
   @@index(sellerId)
+  @@index([coinCode, tradedAt])
   @@index([tradedAt(sort: Desc)])
 }
