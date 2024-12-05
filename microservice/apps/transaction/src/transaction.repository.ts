@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { TimeScale } from '@app/common/enums/chart-timescale.enum';
 import { OrderType } from '@app/common/enums/order-type.enum';
@@ -6,6 +6,7 @@ import { OrderPendingDto } from './dto/order.pending.dto';
 
 @Injectable()
 export class TransactionRepository {
+  private readonly logger = new Logger(TransactionRepository.name);
   constructor(private readonly prisma: PrismaService) {}
 
   async getLastDayClosePrice(): Promise<number> {
@@ -177,6 +178,7 @@ export class TransactionRepository {
         {
           $addFields: {
             order_type: 'BUY',
+            remaining_amount: '$remaining_quote', // remaining_quote를 remaining_amount로 통일
           },
         },
         {
@@ -202,6 +204,7 @@ export class TransactionRepository {
               {
                 $addFields: {
                   order_type: 'SELL',
+                  remaining_amount: '$remaining_base', // remaining_base를 remaining_amount로 통일
                 },
               },
             ],
@@ -216,9 +219,6 @@ export class TransactionRepository {
       ],
       cursor: {},
     });
-
-    // const cursor = orders.cursor as unknown as Prisma.JsonObject;
-    // cursor.firstBatch = cursor.firstBatch as unknown as Prisma.JsonArray;
     const aggregatedData = orders as {
       cursor: {
         firstBatch: {
@@ -226,7 +226,7 @@ export class TransactionRepository {
           order_type: string;
           price: string;
           original_quote: string;
-          remaining_quote: string;
+          remaining_amount: string; // remaining_amount로 통일
           created_at: object;
         }[];
       };
@@ -237,7 +237,7 @@ export class TransactionRepository {
         order_type: string;
         price: string;
         original_quote: string;
-        remaining_quote: string;
+        remaining_amount: string; // remaining_amount로 통일
         created_at: object;
       };
       return new OrderPendingDto(
@@ -245,7 +245,7 @@ export class TransactionRepository {
         data.order_type as OrderType,
         data.price,
         data.original_quote,
-        data.remaining_quote,
+        data.remaining_amount, // remaining_amount로 통일
         (data.created_at as { $date: string }).$date,
       );
     });
