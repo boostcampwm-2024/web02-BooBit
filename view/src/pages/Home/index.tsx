@@ -50,6 +50,20 @@ const Home = () => {
       switch (receivedData.event) {
         case 'CANDLE_CHART_INIT': {
           const candlePrevData = receivedData.data;
+
+          if (candlePrevData.length > 1) {
+            const prevClose = candlePrevData[candlePrevData.length - 2].close;
+            const lastCandle = candlePrevData[candlePrevData.length - 1];
+
+            candlePrevData[candlePrevData.length - 1] = {
+              ...lastCandle,
+              open: prevClose,
+              close: prevClose,
+              high: prevClose,
+              low: prevClose,
+            };
+          }
+
           setLastDayClose(receivedData.lastDayClose);
           setCandleData(candlePrevData);
           setIsLoading(false);
